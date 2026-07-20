@@ -83,19 +83,26 @@ export const useNavigation = () => {
   // Свайп по контенту
   let touchStartX = 0, touchStartY = 0
   const onTouchStart = (e: TouchEvent) => {
-    touchStartX = e.touches[0].clientX
-    touchStartY = e.touches[0].clientY
+    const touch = e.touches[0]
+    if (!touch) return
+    touchStartX = touch.clientX
+    touchStartY = touch.clientY
   }
   const onTouchEnd = (e: TouchEvent) => {
-    const diffX = e.changedTouches[0].clientX - touchStartX
-    const diffY = e.changedTouches[0].clientY - touchStartY
+    const touch = e.changedTouches[0]
+    if (!touch) return
+    const diffX = touch.clientX - touchStartX
+    const diffY = touch.clientY - touchStartY
     if (Math.abs(diffX) > 60 && Math.abs(diffY) < 45) {
       const currentIdx = routesList.indexOf(cleanPath(route.path))
       if (currentIdx !== -1) {
-        if (diffX < 0 && currentIdx < routesList.length - 1)
-          router.push(routesList[currentIdx + 1])
-        else if (diffX > 0 && currentIdx > 0)
-          router.push(routesList[currentIdx - 1])
+        if (diffX < 0 && currentIdx < routesList.length - 1) {
+          const next = routesList[currentIdx + 1]
+          if (next) router.push(next)
+        } else if (diffX > 0 && currentIdx > 0) {
+          const prev = routesList[currentIdx - 1]
+          if (prev) router.push(prev)
+        }
       }
     }
   }

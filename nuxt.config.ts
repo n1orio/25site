@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/icon",
     "@nuxtjs/sitemap",
+    "@nuxt/eslint",
   ],
   icon: {
     serverBundle: 'remote',
