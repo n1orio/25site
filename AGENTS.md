@@ -24,7 +24,8 @@ CI (ubuntu-latest, Node 22) runs `pnpm install -> pnpm run lint -> pnpm run type
 
 ## Structure & architecture
 
-- **`app.vue`** — Root layout: custom cursor, Discord/Steam widgets via `/api/discord` / `/api/steam`, theme toggle, accent color picker, nav tabs with swipe/mobile scroll. Page transitions use `<NuxtPage :transition="{ name: 'tab', mode: 'out-in' }">` for crossfade between tabs.
+- **`config.ts`** — All editable content (bio, socials, projects, setup, anime ranking, nav labels). Pages import from here. Edit one file to change any site text.
+- **`app.vue`** — Root layout (orchestration): fetches data, calls composables, renders component grid. Page transitions use `<NuxtPage :transition="{ name: 'tab', mode: 'out-in' }">`.
 - **`pages/`** — 4 pages: `index` (socials), `projects`, `uses` (setup), `now` (anime ranking).
 - **`error.vue`** — Minimal 404 page with big number and back‑to‑home button.
 - **`composables/`**:
