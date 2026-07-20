@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - 3000
+
+  multi-scrobbler:
+    image: foxxmd/multi-scrobbler:latest
+    container_name: multi-scrobbler
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./scrobbler/config:/config
+    ports:
+      - "9078:9078"
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - site
+
+volumes:
+  caddy_data:
+  caddy_config:
