@@ -24,13 +24,15 @@ CI (ubuntu-latest, Node 22) runs `pnpm install -> pnpm run lint -> pnpm run type
 
 ## Structure & architecture
 
-- **`app.vue`** — Root layout: custom cursor, Discord/Steam widgets via `/api/discord` / `/api/steam`, theme toggle, accent color picker, nav tabs with swipe/mobile scroll. SPA-style — no page transitions (`pageTransition: false`).
+- **`app.vue`** — Root layout: custom cursor, Discord/Steam widgets via `/api/discord` / `/api/steam`, theme toggle, accent color picker, nav tabs with swipe/mobile scroll. Page transitions use `<NuxtPage :transition="{ name: 'tab', mode: 'out-in' }">` for crossfade between tabs.
 - **`pages/`** — 4 pages: `index` (socials), `projects`, `uses` (setup), `now` (anime ranking).
-- **`error.vue`** — 404 page with terminal simulation (guest/root login, virtual FS, tic-tac-toe).
-- **`composables/useSecretTheme.ts`** — Theme state: dark/light mode, accent color (localStorage `nio-accent-color`), gradient presets. CSS var `--accent` drives all theme-aware styling.
+- **`error.vue`** — Minimal 404 page with big number and back‑to‑home button.
+- **`composables/`**:
+  - `useSecretTheme.ts` — Theme state: dark/light mode, accent color (localStorage `nio-accent-color`), gradient presets. CSS var `--accent` drives all theme-aware styling.
+  - `useNavigation.ts` — Nav scroll, swipe gesture, tab indicator position, scroll‑block between route changes. Watches `route.path` to update indicator on tab switch.
 - **`server/api/`** — Local API proxies: `discord.ts` (Lanyard REST), `steam.ts` (Steam Web API). **No scrobbler API** — separate multi-scrobbler service runs alongside in Docker.
-- **`components/`** — _(deleted — all were unused)_
-- **`public/`** — `favicon.ico` only (removed unused `eye.gif`, `seraphim.gif`, `ambient.mp3`, `cat-cat-e.mp4`)
+- **`components/`** — `AppBackground.vue` (background layers), `AppFooter.vue` (attribution footer, license‑protected).
+- **`public/`** — `favicon.ico` only.
 
 ## Theme system
 
@@ -52,6 +54,7 @@ CI (ubuntu-latest, Node 22) runs `pnpm install -> pnpm run lint -> pnpm run type
 - `@nuxt/ui` is in `package.json` dependencies but **not registered as a Nuxt module** (starter template leftover).
 - Font preconnect for Google Fonts in `app.head.link`; the actual `@import` is in `assets/css/main.css`.
 - Runtime config reads `STEAM_API_KEY`, `STEAM_ID` from env. Steam API has a mock fallback when key is the placeholder `"твой_ключ_здесь"`.
+- Page transition is set via `:transition` prop on `<NuxtPage>` — no `pageTransition` in config.
 
 ## Docker / deploy
 

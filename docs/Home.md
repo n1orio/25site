@@ -25,3 +25,4 @@ bun dev
 | [Цвета и тема](Theme) | Акцент, градиенты, пресеты |
 | [Деплой](Deploy) | Docker, Vercel, VPS |
 | [Структура](Structure) | Все файлы проекта |
+| [Футер и лицензия](https://github.com/n1orio/25site?tab=License-1-ov-file) | MIT, атрибуция обязательна |
