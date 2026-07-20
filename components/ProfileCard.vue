@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { username } from "~/config"
 defineProps<{
   discordAvatarUrl: string
   discordStatusColor: string
@@ -28,7 +29,7 @@ defineProps<{
       </div>
       <div class="flex flex-col justify-center">
         <h2 class="font-heading text-2xl sm:text-3xl font-black tracking-tight pb-0.5" :style="{ color: 'var(--accent)' }">{{ bioTitle }}</h2>
-        <p class="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">@Niorio</p>
+        <p class="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">{{ username }}</p>
       </div>
     </div>
     <div class="w-full h-[1px] bg-zinc-200 dark:bg-white/10 transition-colors duration-700"></div>

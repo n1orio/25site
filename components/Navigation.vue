@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted, onUnmounted } from "vue"
 import { onClickOutside } from "@vueuse/core"
+import { navTabs } from "~/config"
 
 const { isDark } = useSecretTheme()
 
@@ -45,10 +46,11 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
               background: `color-mix(in srgb, var(--accent) 15%, transparent)`,
               boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent)`,
             }"></div>
-          <NuxtLink to="/" class="nav-link cursor-pointer flex-shrink-0 z-10">Соцсети</NuxtLink>
-          <NuxtLink to="/projects" class="nav-link cursor-pointer flex-shrink-0 z-10">Проекты</NuxtLink>
-          <NuxtLink to="/uses" class="nav-link cursor-pointer flex-shrink-0 z-10">Мой Сетап</NuxtLink>
-          <NuxtLink to="/now" class="nav-link cursor-pointer flex-shrink-0 z-10 mr-4">Топ Аниме</NuxtLink>
+          <NuxtLink v-for="tab in navTabs" :key="tab.to" :to="tab.to"
+            class="nav-link cursor-pointer flex-shrink-0 z-10"
+            :class="{ 'mr-4': tab === navTabs[navTabs.length - 1] }">
+            {{ tab.label }}
+          </NuxtLink>
         </div>
       </div>
       <div class="w-[1px] h-6 bg-zinc-200 dark:bg-white/10 mx-2 flex-shrink-0 transition-colors duration-700"></div>

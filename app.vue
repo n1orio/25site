@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { bioTitle as bioTitleConfig, bio } from "~/config"
+
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
 } = useSecretTheme()
@@ -22,10 +24,10 @@ const {
 
 const { onTouchStart, onTouchEnd, initNav, destroyNav } = useNavigation()
 
-const bioTitle = ref("Привки 👋")
-const bioParagraph0 = ref("Меня зовут Максим, мне 16 лет, живу в Армавире")
-const bioParagraph1 = ref("Веду разные соцсети и делаю проекты в свободное время")
-const bioParagraph2 = ref("Имею опыт работы с Java, Kotlin, Python, Vue/Nuxt, React, TypeScript, JavaScript, Denizen, Figma, Blockbench, Aseprite.")
+const bioTitle = ref(bioTitleConfig)
+const bioParagraph0 = ref(bio[0] ?? "")
+const bioParagraph1 = ref(bio[1] ?? "")
+const bioParagraph2 = ref(bio[2] ?? "")
 
 onMounted(() => {
   startCursor()

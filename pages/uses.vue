@@ -124,78 +124,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { workstationItems, baseItems } from "~/config";
 const { accentColor } = useSecretTheme();
-
-// Блок 1: основное железо
-const workstationItems = [
-  { name: "Телефон", value: "iPhone 16 Pro", comment: "Дермоед" },
-  {
-    name: "PC",
-    value: "RTX 5070TI | Ryzen 5 7500F | 32gb RAM",
-    comment: "Собирал сам, тянет всё на максималках",
-  },
-  {
-    name: "Monitor 1",
-    value: "Ardor Infinity Pro 27'' 2K",
-    comment: "Нечего сказать, все отлично",
-    link: "https://www.dns-shop.ru/product/7b1f39f10b79ce2e/27-monitor-ardor-gaming-infinity-pro-aq27h1-cernyj/",
-  },
-  {
-    name: "Monitor 2",
-    value: "MI 27'' HFGL FullHD",
-    comment: "Под дискорд и тд, не очень советую к покупке",
-  },
-  {
-    name: "Keyboard",
-    value: "Dark Project KD83A",
-    comment: "Купить магнитку было лучшим решением",
-    link: "https://www.dns-shop.ru/product/d5516ec1cf9fed20/klaviatura-provodnaa-dark-prodzekt-kd83a/",
-  },
-  {
-    name: "Mouse",
-    value: "ARDOR GAMING Ulta",
-    comment: "Сменные свитчи имба. Пару раз кидал в стену, выдержала",
-    link: "https://www.dns-shop.ru/product/84d1774bcf7ced20/mys-besprovodnaaprovodnaa-ardor-gaming-ulta-cernyj/",
-  },
-  {
-    name: "Headset",
-    value: "Dark Project HS5",
-    comment: "Отличные уши",
-    link: "https://www.dns-shop.ru/product/a54441621c01d582/besprovodnye-nausniki-dark-prodzekt-hs5-wireless-v2-cernyj-2023/",
-  },
-  { name: "Earbuds", value: "AirPods Pro 2", comment: "40% дня в них" },
-  {
-    name: "Microphone",
-    value: "Fifine AM8",
-    comment: "Недавно сломался, сейчас использую встроеный с HS5",
-  },
-  {
-    name: "Webcam",
-    value: "Ardor Oracle",
-    comment: "Не очень советую, появились пятна",
-  },
-  {
-    name: "Smartwatch",
-    value: "Apple Watch SE3",
-    comment: "Меньше достаю телефон из-за уведомлений",
-  },
-];
-
-// Блок 2: дополнительно
-const baseItems = [
-  { name: "Height", value: "185 см", comment: "Ощущается как 150 см" },
-  { name: "Penis size", value: "20 cm", comment: "👀" },
-  {
-    name: "Тряпочка",
-    value: "50x90 см",
-    comment: "Огромная, чтобы протирать сразу всё",
-  },
-  {
-    name: "Зубочистка",
-    value: "Пластиковая",
-    comment: "Экологично и практично",
-  },
-];
 
 // ASCII-анимация
 const frames = [" \\(°O°)/ ", " —(°O°)— ", " /(°O°)\\ ", " —(°O°)— "];

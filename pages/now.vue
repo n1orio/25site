@@ -3,10 +3,7 @@
     <div
       class="p-4 rounded-2xl theme-pill text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed text-center cursor-default"
     >
-      <span class="font-medium">
-        Все аниме в топе очень хорошие, их места — это лишь мое мнение.
-        Некоторые просмотренные тайтлы сюда не попали.
-      </span>
+      <span class="font-medium">{{ animeDisclaimer }}</span>
     </div>
 
     <div
@@ -41,27 +38,8 @@
 </template>
 
 <script setup>
+import { topAnime, animeDisclaimer } from "~/config"
 const { primaryColor, isDark } = useSecretTheme();
-
-// Дисклеймер
-// Карточка аниме
-const topAnime = [
-  { title: "Ре: Зеро", desc: "Лучший исекай, который я смотрел." },
-  { title: "Магическая битва", desc: "Ну прекл вроде." },
-  { title: "Евангелион (ребилды тоже)", desc: "Море борща." },
-  { title: "Невероятные приключения ДжоДжо", desc: "" },
-  { title: "Звездное дитя", desc: "" },
-  { title: "Дандадан", desc: "" },
-  { title: "Реинкарнация безработного", desc: "" },
-  { title: "Киберпанк: Бегущие по краю", desc: "" },
-  { title: "Токийский гуль", desc: "" },
-  { title: "Тетрадь смерти", desc: "" },
-  { title: "Атака титанов", desc: "Я так и не смог досмотреть." },
-  { title: "Моб психо 100", desc: "" },
-  { title: "Милый во Франксе", desc: "" },
-  { title: "Паразит", desc: "Классика." },
-  { title: "Моя геройская академия", desc: "Я не собираюсь это досматривать." },
-];
 
 // Номер: топ-3 с особым стилем
 const getRankStyle = (i) => {
