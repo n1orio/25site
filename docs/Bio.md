@@ -1,13 +1,16 @@
 # Текст и био
 
-Файл: `app.vue`
+Все данные — в файле `config.ts`.
 
-```js
-const logoText = ref("nio")              // ← твой логотип
-const bioTitle = ref("Привки 👋")        // ← твой заголовок
-const bioParagraph0 = ref("Меня зовут...") // ← твоё описание
-const bioParagraph1 = ref("Веду соцсети...")
-const bioParagraph2 = ref("Имею опыт...")
+```ts
+export const logo = "nio"                    // логотип
+export const username = "@Niorio"            // юзернейм под аватаркой
+export const bioTitle = "Привки 👋"          // заголовок профиля
+export const bio = [                         // абзацы описания (можно добавить/убрать)
+  "Меня зовут Максим, мне 16 лет, живу в Армавире",
+  "Веду разные соцсети и делаю проекты в свободное время",
+  "Имею опыт работы с Java, Kotlin, Python, Vue/Nuxt, React...",
+]
 ```
 
 Просто замени строки в кавычках. Текст сразу появится на сайте.

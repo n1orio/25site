@@ -1,10 +1,8 @@
 # Соцсети
 
-Файл: `pages/index.vue`
+Все данные — в файле `config.ts`, массив `socials`.
 
-Массив `socials`:
-
-```js
+```ts
 {
   name: "Telegram",                              // название
   desc: "Мой личный канал",                      // описание

@@ -1,19 +1,16 @@
 # Проекты
 
-Файл: `pages/projects.vue`
+Все данные — в файле `config.ts`, массив `projects`.
 
-Массив `projects`:
-
-```js
+```ts
 {
-  title: "Название проекта",
-  desc: "Короткое описание",
-  tags: ["Vue", "Tailwind"],           // массив тегов
-  links: [
-    { label: "GitHub", url: "https://..." },
-    { label: "Демо", url: "https://..." },
+  icon: "lucide:bot",                      // иконка
+  title: "Название проекта",               // название
+  desc: "Короткое описание",               // описание
+  tags: ["Vue", "Tailwind"],               // массив тегов
+  noHover: false,                          // отключить ховер-подъём (необязательно)
+  links: [                                // ссылки (может быть пустым)
+    { label: "GitHub", icon: "mdi:github", url: "https://..." },
   ],
 }
 ```
-
-`links` может быть пустым или отсутствовать.
