@@ -57,8 +57,8 @@ export const useDiscord = (discord: any) => {
     }
   }
 
-  const getDiscordAssetUrl = (appId: string, assetId: string) => {
-    if (!assetId) return null
+  const getDiscordAssetUrl = (appId: string | undefined, assetId: string | null | undefined) => {
+    if (!assetId) return undefined
     if (assetId.startsWith("https://") || assetId.startsWith("http://")) return assetId
     if (assetId.startsWith("mp:external/")) return `https://media.discordapp.net/external/${assetId.slice(12)}`
     if (assetId.startsWith("mp:attachments/")) return `https://cdn.discordapp.com/attachments/${assetId.slice(15)}`
