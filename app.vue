@@ -287,22 +287,22 @@ onUnmounted(() => {
             </div>
           </nav>
 
-          <div class="relative w-full h-full min-h-[500px]" @touchstart="onTouchStart" @touchend="onTouchEnd">
-            <NuxtPage :transition="{ name: 'tab' }" />
+          <div class="relative w-full" @touchstart="onTouchStart" @touchend="onTouchEnd">
+            <NuxtPage :transition="{ name: 'tab', mode: 'out-in' }" />
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   </div>
 </template>
 
 <style>
 .tab-enter-active, .tab-leave-active {
-  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.tab-leave-active { position: absolute; top: 0; left: 0; width: 100%; }
-.tab-enter-from { opacity: 0; transform: translateY(15px) scale(0.98); }
-.tab-leave-to   { opacity: 0; transform: translateY(-15px) scale(0.98); }
+.tab-enter-from { opacity: 0; transform: translateY(6px); }
+.tab-leave-to   { opacity: 0; transform: translateY(-6px); }
 
 @media (pointer: fine) {
   .theme-wrapper, .theme-wrapper * { cursor: none !important; }

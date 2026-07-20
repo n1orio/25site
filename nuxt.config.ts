@@ -24,7 +24,6 @@ export default defineNuxtConfig({
     exclude: [],
   },
   app: {
-    pageTransition: false,
     head: {
       link: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },

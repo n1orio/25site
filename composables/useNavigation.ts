@@ -1,4 +1,4 @@
-import { ref, nextTick } from "vue"
+import { ref, nextTick, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 export const useNavigation = () => {
@@ -111,6 +111,14 @@ export const useNavigation = () => {
       updateNavIndicator()
     })
   }
+
+  watch(() => route.path, () => {
+    nextTick(() => {
+      updateArrows()
+      centerActiveTab()
+      updateNavIndicator()
+    })
+  })
 
   const destroyNav = () => {
     window.removeEventListener("resize", updateArrows)
