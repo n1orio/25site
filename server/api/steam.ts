@@ -24,8 +24,9 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  try {
-    const [summaryRes, levelRes, recentRes, ownedRes]: any = await Promise.all([
+  return cachedFetch("steam", 120_000, async () => {
+    try {
+      const [summaryRes, levelRes, recentRes, ownedRes]: any = await Promise.all([
       $fetch(
         `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamid}`,
       ).catch(() => null),
@@ -105,4 +106,5 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     return null;
   }
+});
 });
