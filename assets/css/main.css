@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&display=swap") layer(fonts);
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -12,5 +13,5 @@
 
 @theme {
   --font-sans: "Monaspace Neon", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: "Monaspace Neon", sans-serif;
+  --font-heading: Unbounded, sans-serif;
 }

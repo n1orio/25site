@@ -25,7 +25,12 @@ export default defineNuxtConfig({
     exclude: [],
   },
   app: {
-    head: {},
+    head: {
+      link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+      ],
+    },
   },
   runtimeConfig: {
     steamApiKey: process.env.STEAM_API_KEY,
