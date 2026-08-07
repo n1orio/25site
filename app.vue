@@ -187,7 +187,7 @@ onUnmounted(() => {
 ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 60%, #a1a1aa); }
 
 .nav-link {
-  padding: 0.4rem 1.2rem; border-radius: 99px;
+  padding: 0.4rem 1.2rem; border-radius: 8px;
   color: #71717a; font-weight: 700; font-size: 0.875rem;
   letter-spacing: 0.01em; transition: all 0.3s ease; white-space: nowrap;
 }

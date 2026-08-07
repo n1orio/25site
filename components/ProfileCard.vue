@@ -17,7 +17,7 @@ defineProps<{
     </h1>
   </header>
 
-  <div class="theme-card p-6 sm:p-8 rounded-[32px] flex flex-col gap-6 cursor-default transition-colors duration-700">
+  <div class="theme-card p-6 sm:p-8 rounded-2xl flex flex-col gap-6 cursor-default transition-colors duration-700">
     <div class="flex items-center gap-5">
       <div class="relative flex-shrink-0">
         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[3px] bg-gradient-to-br transition-all duration-700"

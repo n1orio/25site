@@ -5,7 +5,7 @@
       :key="social.name"
       :href="social.url"
       target="_blank"
-      class="group p-4 rounded-[24px] flex items-center gap-4 cursor-pointer transition-all duration-300 theme-card"
+      class="group p-4 rounded-xl flex items-center gap-4 cursor-pointer transition-all duration-300 theme-card"
       :style="{ '--brand': social.color }"
     >
       <Icon

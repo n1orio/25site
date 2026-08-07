@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <a :href="steam?.profileurl || '#'" target="_blank"
-    class="theme-card p-5 rounded-[24px] flex-1 flex flex-col gap-5 relative overflow-hidden group cursor-pointer h-fit">
+    class="theme-card p-5 rounded-xl flex-1 flex flex-col gap-5 relative overflow-hidden group cursor-pointer h-fit">
     <div v-if="(steam?.isPlaying && steam?.gameArt) || (!steam?.isPlaying && steam?.recentGameArt)"
       class="absolute inset-0 z-0">
       <img :src="steam?.isPlaying ? steam.gameArt : steam.recentGameArt"

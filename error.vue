@@ -9,7 +9,7 @@
         Такой страницы нет
       </p>
       <NuxtLink to="/"
-        class="inline-block mt-8 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300"
+        class="inline-block mt-8 px-6 py-3 rounded-md font-bold text-sm transition-all duration-300"
         :style="{
           color: 'white',
           backgroundColor: 'var(--accent)',

@@ -32,12 +32,12 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
 
 <template>
   <nav class="relative w-full mb-6 md:mb-8 z-50">
-    <div class="theme-card p-1.5 !rounded-full flex items-center w-full shadow-sm relative">
-      <div class="flex-1 relative overflow-hidden rounded-full h-[40px]">
+    <div class="theme-card p-1.5 !rounded-2xl flex items-center w-full shadow-sm relative">
+      <div class="flex-1 relative overflow-hidden rounded-xl h-[40px]">
         <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-zinc-900 to-transparent z-10 pointer-events-none"></div>
         <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent z-10 pointer-events-none"></div>
         <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
-          <div class="absolute top-0 bottom-0 my-auto h-[36px] rounded-full pointer-events-none z-0"
+          <div class="absolute top-0 bottom-0 my-auto h-[36px] rounded-md pointer-events-none z-0"
             :style="{
               transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
               left: navIndicator.visible ? navIndicator.left + 'px' : '0px',
@@ -69,7 +69,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             </div>
           </button>
           <Transition name="pop">
-            <div v-if="showPalette" class="absolute right-0 top-full mt-4 p-4 theme-card !rounded-[24px] shadow-2xl flex flex-col gap-4 z-50 w-[260px] transition-colors duration-700 origin-top-right">
+            <div v-if="showPalette" class="absolute right-0 top-full mt-4 p-4 theme-card !rounded-xl shadow-2xl flex flex-col gap-4 z-50 w-[260px] transition-colors duration-700 origin-top-right">
               <div class="flex flex-col gap-3">
                 <p class="text-[10px] uppercase font-bold text-zinc-500 tracking-widest pl-1">Темы</p>
                 <div class="grid grid-cols-2 gap-2">

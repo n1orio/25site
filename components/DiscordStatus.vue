@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="theme-card p-5 rounded-[24px] flex-1 flex flex-col gap-5 relative overflow-hidden group h-fit">
+  <div class="theme-card p-5 rounded-xl flex-1 flex flex-col gap-5 relative overflow-hidden group h-fit">
     <div class="flex justify-between items-center z-10">
       <div class="flex items-center gap-2">
         <Icon name="mdi:discord" class="w-5 h-5 text-zinc-400 dark:text-zinc-500 group-hover:text-[#5865F2] transition-colors" />

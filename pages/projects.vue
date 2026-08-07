@@ -3,7 +3,7 @@
     <div
       v-for="project in projects"
       :key="project.title"
-      class="theme-card p-6 sm:p-8 rounded-[32px] flex flex-col justify-between h-full"
+      class="theme-card p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full"
       :class="{ 'card-no-hover': project.noHover }"
     >
       <div>
@@ -22,7 +22,7 @@
         <span
           v-for="tag in project.tags"
           :key="tag"
-          class="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 transition-colors"
+          class="px-3 py-1 rounded-md bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 transition-colors"
         >
           {{ tag }}
         </span>
@@ -34,7 +34,7 @@
           :key="link.label"
           :href="link.url"
           target="_blank"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--accent)]/20 transition-all duration-300"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--accent)]/20 transition-all duration-300"
         >
           <Icon :name="link.icon" class="w-4 h-4" />
           {{ link.label }}

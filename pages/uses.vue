@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-6">
-    <div class="theme-card rounded-[32px] overflow-hidden flex flex-col p-2">
+    <div class="theme-card rounded-2xl overflow-hidden flex flex-col p-2">
       <div class="px-5 pt-4 pb-2">
         <h3
           class="font-heading text-[10px] font-black tracking-widest uppercase text-zinc-500 transition-colors"
@@ -63,7 +63,7 @@
       </ul>
     </div>
 
-    <div class="theme-card rounded-[32px] overflow-hidden flex flex-col p-2">
+    <div class="theme-card rounded-2xl overflow-hidden flex flex-col p-2">
       <div class="px-5 pt-4 pb-2 flex justify-between items-center">
         <h3
           class="font-heading text-[10px] font-black tracking-widest uppercase text-zinc-500 transition-colors"
