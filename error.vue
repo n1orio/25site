@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f4f4f5] dark:bg-[#000000] flex items-center justify-center p-6 transition-colors duration-700">
+  <div class="min-h-screen bg-[#f4f4f5] dark:bg-[#101014] flex items-center justify-center p-6 transition-colors duration-700">
     <div class="text-center">
       <h1 class="font-heading font-black text-8xl sm:text-9xl tracking-tighter"
         :style="{ color: 'var(--accent)' }">

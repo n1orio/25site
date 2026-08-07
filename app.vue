@@ -164,7 +164,7 @@ onUnmounted(() => {
   box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 .dark .theme-card {
-  background: rgba(24, 24, 27, 0.55);
+  background: rgba(30, 30, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -175,7 +175,7 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 .dark .theme-card:hover {
-  background: rgba(24, 24, 27, 0.75);
+  background: rgba(38, 38, 44, 0.8);
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--accent) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
