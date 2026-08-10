@@ -144,6 +144,15 @@ export const projects: Project[] = [
     ],
   },
   {
+    icon: "lucide:rocket",
+    title: "NIO Launcher",
+    desc: "Десктопный лаунчер для Minecraft-сборок (.mrpack) через GitHub Releases. Tauri 2 + Nuxt 3, автообновления, Microsoft-вход, несколько сборок.",
+    tags: ["Tauri 2", "Rust", "Vue", "Nuxt 3"],
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/nio-launcher" },
+    ],
+  },
+  {
     icon: "lucide:languages",
     title: "Auto Mod Translator",
     desc: "Скрипт на Python, который автоматически переводит моды Minecraft на русский через Google Translate.",
