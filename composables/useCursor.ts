@@ -28,6 +28,11 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
   let cursorHeight = 14
   let cursorRotation = 0
   let hasMoved = false
+  /** сколько кадров ещё дорисовываем после последнего движения мыши */
+  let idleFrames = 0
+  /** вкладка скрыта — останавливаем цикл совсем */
+  let paused = false
+  const IDLE_FRAMES = 3
   let hoverTarget: HTMLElement | null = null
   let animationFrameId: number | null = null
   let cachedBorderRadius = "4px"
@@ -63,6 +68,18 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
   }
 
   const updateCursor = () => {
+    if (paused || !cursorRef.value) {
+      animationFrameId = requestAnimationFrame(updateCursor)
+      return
+    }
+    // на простое дорисовываем только пока анимация не «успокоилась»
+    if (idleFrames > 0) {
+      idleFrames -= 1
+      if (idleFrames === 0) {
+        animationFrameId = requestAnimationFrame(updateCursor)
+        return
+      }
+    }
     if (cursorRef.value) {
       cursorRef.value.style.setProperty("--cursor-radius", cachedBorderRadius)
       updateColor()
@@ -103,6 +120,7 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
       hasMoved = true
     }
     mouseX = e.clientX; mouseY = e.clientY
+    if (idleFrames <= 0) idleFrames = IDLE_FRAMES
     isCursorVisible.value = true
   }
 
@@ -137,7 +155,14 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
     }
   }
 
-  const onMouseLeave = () => { isCursorVisible.value = false }
+  const onMouseLeave = () => {
+    isCursorVisible.value = false
+    idleFrames = 0
+  }
+  const onVisibility = () => {
+    paused = document.hidden
+    if (!paused) idleFrames = IDLE_FRAMES
+  }
 
   const startCursor = () => {
     syncTarget()
@@ -145,6 +170,7 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
     document.addEventListener("mouseover", onMouseOver)
     document.addEventListener("mouseout", onMouseOut)
     document.addEventListener("mouseleave", onMouseLeave)
+    document.addEventListener("visibilitychange", onVisibility)
     animationFrameId = requestAnimationFrame(updateCursor)
   }
 
@@ -153,6 +179,7 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
     document.removeEventListener("mouseover", onMouseOver)
     document.removeEventListener("mouseout", onMouseOut)
     document.removeEventListener("mouseleave", onMouseLeave)
+    document.removeEventListener("visibilitychange", onVisibility)
     if (animationFrameId) cancelAnimationFrame(animationFrameId)
   }
 

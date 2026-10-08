@@ -1,3 +1,11 @@
 {$DOMAIN} {
+    # Caddy не сжимает ответы без явного директива encode.
+    # Без него Nuxt отдаёт ~335 КБ несжатыми вместо ~110 КБ.
+    encode gzip zstd
+
     reverse_proxy site:3000
+
+    # статика с хешем в имени неизменяема
+    @immutable path /_nuxt/*
+    header @immutable Cache-Control "public, max-age=31536000, immutable"
 }
