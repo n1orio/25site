@@ -62,6 +62,10 @@ export const useThemeCircle = (isDark: Ref<boolean>) => {
     const swap = window.setTimeout(apply, DURATION * 0.45)
     await shrinkAnim.finished.catch(() => {})
     window.clearTimeout(swap)
+
+    // прячем слой ДО отмены анимации: cancel() вернул бы clip-path
+    // к начальному значению и на кадр снова закрыл экран
+    layer.style.opacity = "0"
     shrinkAnim.cancel()
     reset()
   }
@@ -93,6 +97,9 @@ export const useThemeCircle = (isDark: Ref<boolean>) => {
         {
           duration: DURATION,
           easing: EASING,
+          // fill обязателен: без него по окончании clip-path откатится
+          // на «без среза» и старый снимок на кадр закроет весь экран
+          fill: "forwards",
           pseudoElement: "::view-transition-old(root)",
         },
       )
