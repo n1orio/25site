@@ -67,7 +67,7 @@ onUnmounted(() => {
             :bio-paragraph2="bioParagraph2"
           />
 
-          <WaveDivider class="ds-wave-muted" />
+          <WaveDivider class="flex-1" />
 
           <section class="ds-section">
             <header class="flex items-center gap-3 mb-4">
@@ -148,6 +148,10 @@ onUnmounted(() => {
 @media (pointer: coarse) {
   .custom-cursor { display: none !important; }
   .theme-wrapper, .theme-wrapper * { cursor: auto !important; }
+}
+
+:root {
+  --wave-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q 15 0 30 7 T 60 7 T 90 7 T 120 7' fill='none' stroke='%23fff' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }
 
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #6366f1; }
@@ -294,12 +298,24 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
-/* --- wave divider --- */
+/* --- wave divider ---
+   Плитка фиксированного размера, повторяется по X — поэтому волна
+   выглядит одинаково в любом контейнере и не растягивается.
+   Цвет берётся из currentColor через mask, а не из самого SVG. */
 .ds-wave {
+  --wave-tile: 120px;
   display: block;
   width: 100%;
   height: 14px;
-  color: color-mix(in srgb, var(--accent-contrast) 30%, transparent);
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--accent-on-bg) 60%, transparent);
+  background-color: currentColor;
+  -webkit-mask-image: var(--wave-svg);
+  mask-image: var(--wave-svg);
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: var(--wave-tile) 14px;
+  mask-size: var(--wave-tile) 14px;
 }
 
 /* --- scalloped badge (24-petal seal) --- */
@@ -376,7 +392,6 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
   color: var(--text-secondary);
 }
-.ds-wave-muted { color: color-mix(in srgb, var(--text-secondary) 45%, transparent); }
 
 /* --- misc --- */
 .ds-stat {

@@ -58,7 +58,7 @@ onUnmounted(() => {
       <header class="flex items-center gap-3 mb-4">
         <h2 class="on-bg-meta">Дополнительно</h2>
         <span class="ds-meta ml-auto">{{ currentFrame }}</span>
-        <WaveDivider class="flex-1 !max-w-[120px]" />
+        <WaveDivider class="flex-1" />
       </header>
 
       <div class="ds-card p-5 sm:p-6">
