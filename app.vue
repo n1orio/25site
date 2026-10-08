@@ -193,13 +193,7 @@ onUnmounted(() => {
   transition: color 0.25s ease;
 }
 .nav-link:hover { color: var(--accent-contrast); }
-.nav-num {
-  font-size: 0.5625rem;
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
-}
 .router-link-exact-active { color: var(--accent); }
-.router-link-exact-active .nav-num { opacity: 0.7; }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -222,6 +216,7 @@ onUnmounted(() => {
 }
 .ds-body {
   font-family: var(--font-sans);
+  font-weight: 550;
   font-size: 0.9375rem;
   line-height: 1.65;
   color: color-mix(in srgb, var(--accent-contrast) 94%, var(--accent-surface));
@@ -350,6 +345,7 @@ onUnmounted(() => {
 }
 .on-bg-body {
   font-family: var(--font-sans);
+  font-weight: 550;
   font-size: 0.9375rem;
   line-height: 1.65;
   color: var(--text-secondary);

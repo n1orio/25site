@@ -50,16 +50,23 @@
 
 /* === Design tokens === */
 :root {
-  --bg-primary: #f6f6f7;
+  --bg-primary: #f4f4f5;
   --bg-surface: rgba(255, 255, 255, 0.72);
   --bg-surface-elevated: rgba(255, 255, 255, 0.94);
-  --text-primary: #18181b;
-  --text-secondary: #71717a;
-  --border-subtle: rgba(0, 0, 0, 0.1);
+  --text-primary: #09090b;
+  --text-secondary: #3f3f46;
+  --border-subtle: rgba(0, 0, 0, 0.12);
   --accent-contrast: #ffffff;
 
   --radius-card: 1.25rem;
   --radius-pill: 9999px;
+}
+
+/* Базовая плотность текста: Inter на 550 — заметно читабельнее 400 */
+body {
+  font-weight: 550;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .dark {

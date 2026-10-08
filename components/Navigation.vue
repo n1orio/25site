@@ -55,13 +55,12 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             }" />
 
           <NuxtLink
-            v-for="(tab, i) in navTabs"
+            v-for="tab in navTabs"
             :key="tab.to"
             :to="tab.to"
             class="nav-link cursor-pointer flex-shrink-0 z-10"
             :style="{ paddingRight: tab === navTabs[navTabs.length - 1] ? '0' : undefined }"
           >
-            <span class="nav-num">{{ String(i + 1).padStart(2, '0') }}</span>
             {{ tab.label }}
           </NuxtLink>
         </div>
