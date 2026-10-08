@@ -163,7 +163,9 @@ export const projects: Project[] = [
     desc: "Этот самый сайт, с современным дизайном, плавной анимацией и кучей пасхалок.",
     tags: ["Nuxt 4", "Tailwind", "Bun", "TypeScript"],
     noHover: true,
-    links: [],
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/25site" },
+    ],
   },
   {
     icon: "lucide:server",
