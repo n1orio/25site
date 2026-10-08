@@ -31,6 +31,8 @@ export default defineNuxtConfig({
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         { rel: "preload", href: "/fonts/MonaspaceArgon-Regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
         { rel: "preload", href: "/fonts/MonaspaceArgon-Bold.woff2", as: "font", type: "font/woff2", crossorigin: "" },
+        { rel: "preload", href: "/fonts/inter-cyr.woff2", as: "font", type: "font/woff2", crossorigin: "" },
+        { rel: "preload", href: "/fonts/inter-latin.woff2", as: "font", type: "font/woff2", crossorigin: "" },
       ],
     },
   },

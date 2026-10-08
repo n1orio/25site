@@ -20,48 +20,60 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-8">
-    <section class="v2-section">
-      <header class="flex items-baseline gap-3 mb-3">
-        <span class="v2-index">04</span>
-        <h2 class="v2-label">Основное железо</h2>
+  <div class="flex flex-col gap-10">
+    <section class="ds-section">
+      <header class="flex items-center gap-3 mb-4">
+        <span class="ds-num">04</span>
+        <h2 class="ds-meta">Основное железо</h2>
+        <WaveDivider class="flex-1" />
       </header>
 
-      <div class="v2-panel p-5 sm:p-6">
-        <div v-for="(item, index) in workstationItems" :key="index" class="v2-row">
-          <span class="v2-num">{{ String(index + 1).padStart(2, '0') }}</span>
-          <span class="text-sm text-zinc-500 dark:text-zinc-400 w-28 sm:w-32 flex-shrink-0 truncate">{{ item.name }}</span>
+      <div class="ds-card p-5 sm:p-6">
+        <div
+          v-for="item in workstationItems"
+          :key="item.name"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b"
+          style="border-color: var(--border-subtle)"
+        >
+          <span class="ds-meta w-28 sm:w-32 flex-shrink-0">{{ item.name }}</span>
 
-          <component :is="item.link ? 'a' : 'span'"
+          <component
+            :is="item.link ? 'a' : 'span'"
             :href="item.link"
             :target="item.link ? '_blank' : undefined"
             :rel="item.link ? 'noopener' : undefined"
-            class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate flex items-center gap-1.5 min-w-0"
-            :class="item.link ? 'hover:text-[var(--accent)] transition-colors' : ''">
+            class="ds-title text-sm flex items-center gap-1.5 min-w-0"
+            :class="item.link ? 'hover:text-[var(--accent)] transition-colors' : ''"
+          >
             <span class="truncate">{{ item.value }}</span>
             <Icon v-if="item.link" name="lucide:external-link" class="w-3 h-3 flex-shrink-0" />
           </component>
 
-          <span v-if="item.comment" class="ml-auto text-xs text-zinc-400 dark:text-zinc-500 truncate max-w-[45%] hidden sm:block text-right">
+          <span v-if="item.comment" class="ds-body text-xs ml-auto text-right max-w-[50%] hidden sm:block">
             {{ item.comment }}
           </span>
         </div>
       </div>
     </section>
 
-    <section class="v2-section">
-      <header class="flex items-baseline gap-3 mb-3">
-        <span class="v2-index">04.1</span>
-        <h2 class="v2-label">Дополнительно</h2>
-        <span class="ml-auto text-xs text-zinc-400 dark:text-zinc-500 tabular-nums">{{ currentFrame }}</span>
+    <section class="ds-section">
+      <header class="flex items-center gap-3 mb-4">
+        <span class="ds-num">04.1</span>
+        <h2 class="ds-meta">Дополнительно</h2>
+        <span class="ds-meta ml-auto">{{ currentFrame }}</span>
+        <WaveDivider class="flex-1 !max-w-[120px]" />
       </header>
 
-      <div class="v2-panel p-5 sm:p-6">
-        <div v-for="(item, index) in baseItems" :key="index" class="v2-row">
-          <span class="v2-num">{{ String(index + 1).padStart(2, '0') }}</span>
-          <span class="text-sm text-zinc-500 dark:text-zinc-400 w-28 sm:w-32 flex-shrink-0 truncate">{{ item.name }}</span>
-          <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ item.value }}</span>
-          <span v-if="item.comment" class="ml-auto text-xs text-zinc-400 dark:text-zinc-500 truncate">{{ item.comment }}</span>
+      <div class="ds-card p-5 sm:p-6">
+        <div
+          v-for="item in baseItems"
+          :key="item.name"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b last:border-0"
+          style="border-color: var(--border-subtle)"
+        >
+          <span class="ds-meta w-28 sm:w-32 flex-shrink-0">{{ item.name }}</span>
+          <span class="ds-title text-sm">{{ item.value }}</span>
+          <span v-if="item.comment" class="ds-body text-xs ml-auto">{{ item.comment }}</span>
         </div>
       </div>
     </section>

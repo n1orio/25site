@@ -1,17 +1,36 @@
-import type { DeadlockData } from "~/types/deadlock"
+import type { DeadlockData, DeadlockMatch } from "~/types/deadlock"
 
 const BASE = "https://ddlk.bio/api/profile/niorio"
+
+interface MmrResponse {
+  rank_name?: string
+  division?: number
+  division_tier?: number
+  rank_points?: number
+  rank_points_max?: number
+}
+
+interface MatchesResponse {
+  totals?: DeadlockData["totals"]
+  recent_matches?: DeadlockMatch[]
+}
+
+interface StatsResponse {
+  kda?: number
+  accuracy?: number
+  headshot_rate?: number
+}
 
 export default defineEventHandler(async (): Promise<DeadlockData | null> => {
   return cachedFetch<DeadlockData | null>("deadlock", 180_000, async () => {
     try {
-      const [mmr, matchesRes, statsRes]: [any, any, any] = await Promise.all([
-        $fetch(`${BASE}/mmr`),
-        $fetch(`${BASE}/matches?limit=50`),
-        $fetch(`${BASE}/stats`),
+      const [mmr, matchesRes, statsRes] = await Promise.all([
+        $fetch<MmrResponse>(`${BASE}/mmr`),
+        $fetch<MatchesResponse>(`${BASE}/matches?limit=50`),
+        $fetch<StatsResponse>(`${BASE}/stats`),
       ])
 
-      const recent = (matchesRes?.recent_matches ?? []) as DeadlockData["recent"]
+      const recent: DeadlockMatch[] = matchesRes?.recent_matches ?? []
 
       const byHero = new Map<number, DeadlockData["heroes"][number]>()
       for (const m of recent) {

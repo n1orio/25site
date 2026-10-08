@@ -5,25 +5,29 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
 </script>
 
 <template>
-  <section class="v2-section">
-    <header class="flex items-baseline gap-3 mb-3">
-      <span class="v2-index">07</span>
-      <h2 class="v2-label">Топ аниме</h2>
-      <span class="ml-auto text-xs text-zinc-400 dark:text-zinc-500">{{ topAnime.length }} тайтлов</span>
+  <section class="ds-section">
+    <header class="flex items-center gap-3 mb-4">
+      <span class="ds-num">07</span>
+      <h2 class="ds-meta">Топ аниме</h2>
+      <span class="ds-meta ml-auto">{{ topAnime.length }} тайтлов</span>
+      <WaveDivider class="flex-1 !max-w-[120px]" />
     </header>
 
-    <p class="v2-label leading-relaxed mb-4 max-w-prose normal-case tracking-normal">
-      {{ animeDisclaimer }}
-    </p>
+    <p class="ds-body text-xs mb-4 max-w-prose">{{ animeDisclaimer }}</p>
 
-    <div class="v2-panel p-5 sm:p-6">
-      <div v-for="(anime, i) in topAnime" :key="anime.title" class="v2-row">
-        <span class="v2-num font-bold" :style="i < 3 ? { color: medal(i) } : undefined">
+    <div class="ds-card p-5 sm:p-6">
+      <div
+        v-for="(anime, i) in topAnime"
+        :key="anime.title"
+        class="flex items-baseline gap-3 py-3 border-b last:border-0"
+        style="border-color: var(--border-subtle)"
+      >
+        <span class="ds-num w-8 font-bold" :style="i < 3 ? { color: medal(i) } : undefined">
           {{ String(i + 1).padStart(2, '0') }}
         </span>
         <div class="min-w-0 flex-1">
-          <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ anime.title }}</h3>
-          <p v-if="anime.desc" class="text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ anime.desc }}</p>
+          <h3 class="ds-title text-sm">{{ anime.title }}</h3>
+          <p v-if="anime.desc" class="ds-body text-xs">{{ anime.desc }}</p>
         </div>
       </div>
     </div>

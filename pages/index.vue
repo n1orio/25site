@@ -3,35 +3,37 @@ import { socials } from "~/config"
 </script>
 
 <template>
-  <section class="v2-section">
-    <header class="flex items-baseline gap-3 mb-3">
-      <span class="v2-index">02</span>
-      <h2 class="v2-label">Связь</h2>
+  <section class="ds-section">
+    <header class="flex items-center gap-3 mb-4">
+      <span class="ds-num">02</span>
+      <h2 class="ds-meta">Связь</h2>
+      <WaveDivider class="flex-1" />
     </header>
 
-    <div class="v2-panel p-5 sm:p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <a
-        v-for="(social, i) in socials"
+        v-for="social in socials"
         :key="social.name"
         :href="social.url"
         target="_blank"
         rel="noopener"
-        class="v2-row group"
+        class="ds-card ds-card-hover p-5 flex items-center gap-4 group relative"
       >
-        <span class="v2-num">{{ String(i + 1).padStart(2, '0') }}</span>
-        <Icon
-          :name="social.icon"
-          size="18"
-          class="w-[18px] h-[18px] flex-shrink-0 self-center transition-colors duration-300"
-          :style="{ color: social.color }"
-        />
-        <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 decoration-1 transition-colors">
-          {{ social.name }}
+        <span
+          class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+          :style="{ background: `color-mix(in srgb, ${social.color} 14%, transparent)` }"
+        >
+          <Icon :name="social.icon" size="20" class="w-5 h-5" :style="{ color: social.color }" />
         </span>
-        <span class="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ social.desc }}</span>
-        <Icon name="lucide:arrow-up-right" size="14"
-          class="ml-auto flex-shrink-0 self-center text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity"
-          :style="{ color: social.color }" />
+
+        <div class="min-w-0 flex-1">
+          <h3 class="ds-title text-base mb-0.5">{{ social.name }}</h3>
+          <p class="ds-body text-xs leading-snug">{{ social.desc }}</p>
+        </div>
+
+        <span class="ds-action flex-shrink-0">
+          <Icon name="lucide:arrow-up-right" size="14" class="w-3.5 h-3.5" />
+        </span>
       </a>
     </div>
   </section>
