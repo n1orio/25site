@@ -1,12 +1,15 @@
 import type { Ref } from "vue"
 
 /**
- * Шрифты темы «Дедлок» (Russo One / Podkova / Fira Sans Condensed)
- * весят около 300 КБ, поэтому тянутся только когда тема включена:
+ * Шрифты темы «Дедлок» тянутся только когда тема включена:
  * useHead реактивен, и <link> появляется и исчезает вместе с темой.
+ *
+ * Из внешних осталась одна Podkova — на абзацы. Заголовки и служебный
+ * текст набраны TF2 Build, он лежит локально в /fonts и объявлен
+ * прямо в deadlock.css, поэтому внешнюю загрузку не требует.
  */
 const DEADLOCK_FONTS_HREF =
-  "https://fonts.googleapis.com/css2?family=Podkova:wght@400;500;600;700;800&family=Fira+Sans+Condensed:wght@400;700;900&family=Russo+One&display=swap"
+  "https://fonts.googleapis.com/css2?family=Podkova:wght@400;500;600;700;800&display=swap"
 
 export const useDeadlockFonts = (enabled: Ref<boolean>) => {
   useHead(() => ({

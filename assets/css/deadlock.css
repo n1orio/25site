@@ -25,6 +25,23 @@
  *    переменной само приходит из каскада.
  */
 
+/**
+ * TF2 Build — гарнитура от Valve, разработка Andrea Wicklund.
+ * Взята с публичной страницы предпросмотра fonts-online.ru
+ * (файл отдаётся анонимно), сконвертирована в woff2: 56 КБ → 18 КБ.
+ * Распространение — бесплатно для личного использования.
+ *
+ * Объявление внутри слоя: файл качается браузером только когда
+ * шрифт реально понадобился, то есть исключительно в теме «Дедлок».
+ */
+@font-face {
+  font-family: "TF2 Build";
+  src: url("/fonts/tf2build.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 [data-deadlock] {
   /* палитра темы: графит #0C0C0C, карточки #292820, акцент #DD6638 */
   --bg-primary: #0c0c0c;
@@ -38,10 +55,11 @@
   --radius-card: 0;
   --radius-pill: 2px;
 
-  /* шрифты темы (грузятся лениво, см. useDeadlockFonts) */
+  /* шрифты темы: TF2 Build на заголовках и служебном тексте,
+     Podkova на абзацах (грузятся лениво, см. useDeadlockFonts) */
   --font-sans: "Podkova", Georgia, serif;
-  --font-mono: "Fira Sans Condensed", ui-monospace, monospace;
-  --font-heading: "Russo One", "Fira Sans Condensed", sans-serif;
+  --font-mono: "TF2 Build", "Podkova", sans-serif;
+  --font-heading: "TF2 Build", "Podkova", sans-serif;
 
   /* внутренние величины слоя; часть зависит от схемы — см. блок ниже */
   --dl-accent: #dd6638;    /* вкладки, ховеры, полосы, растр */
@@ -197,8 +215,13 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .ds-num,
 [data-deadlock] .ds-stat {
   font-family: var(--font-mono);
-  letter-spacing: 0.1em;
 }
+/* TF2 Build шире Fira Sans Condensed: на 0.1em разъезжались
+   подписи в узких местах («АРМАНИЯ» уходила в многоточие) */
+[data-deadlock] .ds-meta,
+[data-deadlock] .ds-num { letter-spacing: 0.04em; }
+[data-deadlock] .ds-meta { font-size: 0.625rem; }
+[data-deadlock] .ds-stat { letter-spacing: 0.02em; }
 [data-deadlock] .ds-stat,
 [data-deadlock] .ds-num { font-weight: 900; }
 

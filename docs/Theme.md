@@ -51,6 +51,8 @@ const activeGradient = useLocalStorage("nio-active-gradient", defaultColors());
 | Включение | атрибут `data-deadlock` на `.theme-wrapper` (`app.vue`) |
 | Флажок | `isDeadlock` в `useSecretTheme` |
 | Палитра | фон `#0C0C0C`, карточки `#292820`, акцент `#DD6638` |
+| Шрифт заголовков | TF2 Build, локально `public/fonts/tf2build.woff2` |
+| Шрифт абзацев | Podkova с Google Fonts, лениво |
 
 ### Почему палитра в composable, а формы в CSS
 
@@ -70,8 +72,17 @@ const activeGradient = useLocalStorage("nio-active-gradient", defaultColors());
 
 ### Шрифты
 
-Russo One, Podkova, Fira Sans Condensed (~300 КБ) тянутся только когда тема
-включена — `composables/useDeadlockFonts.ts` через реактивный `useHead`.
+- **TF2 Build** (`public/fonts/tf2build.woff2`, 18 КБ) — заголовки, вкладки,
+  подписи, цифры. Гарнитура от Valve, разработка Andrea Wicklund; файл взят с
+  публичной страницы предпросмотра fonts-online.ru (отдаётся анонимно) и
+  сконвертирован из ttf в woff2. `@font-face` объявлен прямо в `deadlock.css`,
+  поэтому качается он только когда тема включена.
+- **Podkova** — абзацы. Тянутся с Google Fonts только когда тема включена,
+  через `composables/useDeadlockFonts.ts` (реактивный `useHead`).
+
+TF2 Build шире, чем Fira Sans Condensed, которым он заменил служебный текст:
+в слое уменьшены кегль `.ds-meta` и межбуквенный интервал, иначе подписи в
+узких местах («АРМАНИЯ» в блоке часов) уходили в многоточие.
 
 ### Что переделывает слой
 
