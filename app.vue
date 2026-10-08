@@ -3,8 +3,10 @@ import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
-  accentSurface, accentContrast, accentOnBg,
+  accentSurface, accentContrast, accentOnBg, isDark,
 } = useSecretTheme()
+
+const { toggle: toggleThemeCircle } = useThemeCircle(isDark)
 
 const { data: discord } = await useFetch("/api/discord")
 const { data: steam } = await useFetch("/api/steam")
@@ -45,6 +47,8 @@ onUnmounted(() => {
   <div class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
     :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, '--accent-on-bg': accentOnBg, color: 'var(--text-primary)' }"
   >
+    <div id="theme-circle" class="theme-circle" aria-hidden="true" />
+
     <div ref="cursorRef" class="custom-cursor" v-show="isCursorVisible" :class="{ 'is-hovering': isHovering }">
       <div class="cursor-corner top-left"></div>
       <div class="cursor-corner top-right"></div>
@@ -342,6 +346,17 @@ onUnmounted(() => {
   z-index: 0;
 }
 .ds-scallop > * { position: relative; z-index: 1; }
+
+/* --- круговое переключение темы --- */
+.theme-circle {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: circle(0px);
+  will-change: clip-path, opacity;
+}
 
 /* --- nav controls (theme toggle / palette) --- */
 .nav-ctl {

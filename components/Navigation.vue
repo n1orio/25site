@@ -4,13 +4,12 @@ import { onClickOutside } from "@vueuse/core"
 import { navTabs } from "~/config"
 
 const { isDark } = useSecretTheme()
+const { toggle: toggleTheme } = useThemeCircle(isDark)
 
 const {
   navScrollRef, showLeftArrow, showRightArrow, navIndicator,
   handleNavScroll,
 } = useNavigation()
-
-const toggleDark = () => { isDark.value = !isDark.value }
 
 const showPalette = ref(false)
 const paletteRef = shallowRef<HTMLElement | null>(null)
@@ -69,7 +68,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       <span class="w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
-        <button @click="toggleDark()" class="nav-ctl" :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'">
+        <button @click="toggleTheme($event)" class="nav-ctl" :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'">
           <Icon :name="isDark ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 

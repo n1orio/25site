@@ -50,7 +50,10 @@
 
 /* === Design tokens === */
 :root {
-  --bg-primary: #f4f4f5;
+  /* источник правды для фона страницы и для круговой анимации переключения */
+  --theme-bg-light: #f4f4f5;
+  --theme-bg-dark: #101014;
+  --bg-primary: var(--theme-bg-light);
   --bg-surface: rgba(255, 255, 255, 0.72);
   --bg-surface-elevated: rgba(255, 255, 255, 0.94);
   --text-primary: #09090b;
@@ -70,7 +73,7 @@ body {
 }
 
 .dark {
-  --bg-primary: #101014;
+  --bg-primary: var(--theme-bg-dark);
   --bg-surface: rgba(30, 30, 35, 0.6);
   --bg-surface-elevated: rgba(40, 40, 47, 0.85);
   --text-primary: #fafafa;
