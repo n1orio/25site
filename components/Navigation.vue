@@ -69,19 +69,19 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       <span class="w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
-        <button @click="toggleDark()"
-          class="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
-          style="color: var(--accent-contrast)" aria-label="Сменить тему">
+        <button @click="toggleDark()" class="nav-ctl" :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'">
           <Icon :name="isDark ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 
         <div class="relative" ref="paletteRef">
           <button
-            class="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer relative overflow-hidden"
-            style="color: var(--accent-contrast)" aria-label="Цвета темы" @click="showPalette = !showPalette">
-            <div class="absolute inset-[2px] rounded-full animate-[spin_3s_linear_infinite]"
+            class="nav-ctl"
+            :aria-label="showPalette ? 'Закрыть палитру' : 'Цвета темы'"
+            :aria-expanded="showPalette"
+            @click="showPalette = !showPalette">
+            <div class="absolute inset-[1px] rounded-full animate-[spin_3s_linear_infinite]"
               :style="{ background: `conic-gradient(from 0deg, transparent 0 300deg, var(--accent) 180deg, var(--accent-secondary) 360deg)` }" />
-            <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--accent-contrast)">
+            <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--nav-ctl-bg)">
               <Icon name="lucide:palette" size="14" class="w-3.5 h-3.5" />
             </div>
           </button>

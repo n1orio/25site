@@ -336,6 +336,29 @@ onUnmounted(() => {
 }
 .ds-scallop > * { position: relative; z-index: 1; }
 
+/* --- nav controls (theme toggle / palette) --- */
+.nav-ctl {
+  --nav-ctl-bg: color-mix(in srgb, var(--accent-contrast) 20%, transparent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  border: 0;
+  cursor: pointer;
+  color: var(--accent-contrast);
+  background: var(--nav-ctl-bg);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-ctl:hover {
+  background: var(--accent-contrast);
+  color: var(--accent-surface);
+  transform: scale(1.08);
+}
+.nav-ctl:active { transform: scale(0.96); }
+
 /* --- on page background (not on accent surfaces) --- */
 .on-bg-title {
   font-family: var(--font-heading);
