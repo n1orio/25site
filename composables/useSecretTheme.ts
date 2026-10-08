@@ -40,13 +40,6 @@ const hslToHex = (h: number, s: number, l: number) => {
 export const useSecretTheme = () => {
   // useDark: prefers-color-scheme + .dark на &lt;html&gt;
   const isDark = useDark();
-  // Режим: single / gradient
-  const themeMode = useLocalStorage("nio-theme-mode", "single");
-  // Цвет для single-режима
-  const accentColor = useLocalStorage("nio-accent-color", "#6366f1");
-  // Цвета для gradient-режима
-  const activeGradient = useLocalStorage("nio-active-gradient", ["#E94057", "#8A2387"]);
-
   // Пресеты градиентов
   const gradientPresets = [
     { id: "ruby",  name: "Рубин",  colors: ["#e53935", "#e35d5b"] },
@@ -58,6 +51,19 @@ export const useSecretTheme = () => {
     { id: "rose",  name: "Роза",   colors: ["#FF6B9D", "#C44569"] },
     { id: "slate", name: "Графит", colors: ["#636E72", "#2D3436"] },
   ];
+
+  /** тема по умолчанию для новых посетителей */
+  const DEFAULT_PRESET = "ocean";
+  const defaultColors = () => [
+    ...(gradientPresets.find((p) => p.id === DEFAULT_PRESET)?.colors ?? ["#6366f1"]),
+  ];
+
+  // Режим: single / gradient
+  const themeMode = useLocalStorage("nio-theme-mode", "gradient");
+  // Цвет для single-режима — на случай, если переключат вручную
+  const accentColor = useLocalStorage("nio-accent-color", defaultColors()[0]!);
+  // Цвета для gradient-режима
+  const activeGradient = useLocalStorage("nio-active-gradient", defaultColors());
 
   // Палитра: два цвета фона + два акцента
   const activePalette = computed(() => {

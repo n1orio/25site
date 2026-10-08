@@ -18,10 +18,31 @@
 Логика полностью в `accentPair` и `accentOnBg` — если хочешь поменять порог
 контраста, правь `MIN_CR`.
 
+## Тема по умолчанию
+
+Новые посетители приходят на градиент **«Океан»**:
+
+```ts
+const DEFAULT_PRESET = "ocean";   // id пресета
+
+const themeMode = useLocalStorage("nio-theme-mode", "gradient");
+const accentColor = useLocalStorage("nio-accent-color", defaultColors()[0]!);
+const activeGradient = useLocalStorage("nio-active-gradient", defaultColors());
+```
+
+Цвета берутся из самого пресета по его `id`, а не продублированы рядом —
+поменял палитру «Океана», дефолт поедет вместе с ней.
+
+Поменять дефолт: укажи другой id в `DEFAULT_PRESET`.
+
+⚠️ Значения хранятся в localStorage, поэтому смена дефолта влияет только на
+тех, кто зашёл впервые. У кого выбор уже сохранён — останется его тема.
+Сбросить вручную: в консоли `localStorage.clear()` и перезагрузка.
+
 ## Акцентный цвет
 
 ```ts
-const accentColor = useLocalStorage("nio-accent-color", "#6366f1");
+const accentColor = useLocalStorage("nio-accent-color", "#3498DB");
 //                                                         ↑ значение по умолчанию
 ```
 
@@ -68,7 +89,7 @@ const gradientPresets = [
 | Ключ | Что хранит |
 |---|---|
 | `nio-theme-mode` | `single` или `gradient` |
-| `nio-accent-color` | выбранный акцент |
+| `nio-accent-color` | выбранный акцент (дефолт — первый цвет «Океана») |
 | `nio-active-gradient` | цвета активного градиента |
 
 Плюс служебный ключ VueUse для темы (`vueuse-color-scheme`).
