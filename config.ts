@@ -39,6 +39,10 @@ export const bio = [
   "Имею опыт работы с Java, Kotlin, Python, Vue/Nuxt, React, TypeScript, JavaScript, Denizen, Figma, Blockbench, Aseprite.",
 ]
 
+// === Профиль ===
+/** куда ведёт клик по аватарке в сайдбаре */
+export const profileUrl = "https://github.com/n1orio"
+
 // === Поддержка ===
 export interface Donation {
   title: string

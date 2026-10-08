@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { DiscordServerData } from "~/server/api/discord-server"
+
+const { data: server } = await useFetch<DiscordServerData | null>("/api/discord-server")
+
 defineProps<{
   discordStatusColor: string
   discordStatus: string
@@ -23,6 +27,18 @@ defineProps<{
         {{ discordStatus === "offline" ? "оффлайн" : "в сети" }}
       </span>
     </div>
+
+    <p v-if="server?.members" class="ds-meta flex items-center gap-2">
+      <span class="flex items-center gap-1">
+        <Icon name="lucide:users" size="12" class="w-3 h-3" />
+        {{ server.members }}
+      </span>
+      <span class="opacity-40">·</span>
+      <span class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500" />
+        {{ server.online }} в сети
+      </span>
+    </p>
 
     <div v-if="visibleActivities.length > 0" class="flex flex-col gap-3">
       <div

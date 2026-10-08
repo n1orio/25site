@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { username } from "~/config"
+import { username, profileUrl } from "~/config"
 defineProps<{
   discordAvatarUrl: string
   discordStatusColor: string
@@ -13,17 +13,23 @@ defineProps<{
 <template>
   <header class="w-full">
     <div class="flex items-center gap-4 mb-5">
-      <div class="relative flex-shrink-0">
+      <a
+        :href="profileUrl"
+        target="_blank"
+        rel="noopener"
+        class="relative flex-shrink-0 group"
+        :aria-label="`Профиль ${username}`"
+      >
         <img
           :src="discordAvatarUrl"
           alt="avatar"
-          class="w-20 h-20 object-cover"
+          class="w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
           style="border-radius: var(--radius-card)"
         />
         <span
           class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--accent)]"
           :style="{ backgroundColor: discordStatusColor }" />
-      </div>
+      </a>
 
       <div class="min-w-0">
         <h1 class="on-bg-title text-2xl sm:text-3xl mb-1.5">{{ username }}</h1>
