@@ -189,10 +189,14 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
   white-space: nowrap;
   color: color-mix(in srgb, var(--accent-contrast) 88%, var(--accent-surface));
-  transition: color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .nav-link:hover { color: var(--accent-contrast); }
-.router-link-exact-active { color: var(--accent-surface); }
+/* Активная вкладка красит себя сама — не зависит от измерений DOM */
+.router-link-exact-active {
+  background: var(--accent-contrast);
+  color: var(--accent-surface);
+}
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

@@ -3,6 +3,7 @@ import type {
 } from "~/types/deadlock"
 
 const BASE = "https://ddlk.bio/api/profile/niorio"
+const CDLK = "https://ddlk.bio"
 const SAMPLE_LIMIT = 50
 
 interface MmrResponse {
@@ -57,6 +58,15 @@ const modeOf = (m: Pick<RawMatch, "game_mode" | "match_mode">): Mode => {
 
 const ROMAN: Record<number, string> = {
   1: "I", 2: "II", 3: "III", 4: "IV", 5: "V",
+}
+
+/** Эмблема ранга: division — индекс ранга, tier — подранг (1..6) */
+const rankEmblem = (division: number, tier: number) => {
+  if (!division) return null
+  const file = tier >= 1
+    ? `${division}_large_subrank${tier}_webp.webp`
+    : `${division}_large_webp.webp`
+  return `${CDLK}/assets/ranks/${file}`
 }
 
 const emptySide = (): DeadlockSide => ({ matches: 0, wins: 0, losses: 0, winrate: 0 })
@@ -186,6 +196,7 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
               points: mmr.rank_points ?? 0,
               max: mmr.rank_points_max ?? 1000,
               updatedAt: mmr.rank_updated_at ?? null,
+              emblem: rankEmblem(mmr.division ?? 0, mmr.division_tier ?? 0),
             }
           : null,
         totals: matchesRes?.totals ?? null,

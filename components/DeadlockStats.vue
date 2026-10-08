@@ -29,7 +29,9 @@ const riskLabel = computed(() => {
     <section class="ds-card p-5 sm:p-6">
       <div class="flex items-center gap-5">
         <div class="ds-scallop flex-shrink-0">
-          <Icon name="lucide:crosshair" size="22" class="w-5 h-5" />
+          <img v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data.rank.tier}`"
+            class="w-10 h-10 object-contain" loading="lazy">
+          <Icon v-else name="lucide:crosshair" size="22" class="w-5 h-5" />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-baseline gap-2 flex-wrap">
@@ -73,6 +75,7 @@ const riskLabel = computed(() => {
       </p>
     </section>
 
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
     <!-- ранкед vs анранкед -->
     <section v-if="data.ranked || data.unranked" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-4">Ранкед против анранкеда</p>
@@ -136,6 +139,8 @@ const riskLabel = computed(() => {
       <p class="ds-meta mt-3">текущая / рекордная серия побед подряд</p>
     </section>
 
+    </div>
+
     <!-- герои -->
     <section v-if="data.heroes.length" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Герои за {{ data.sample }} последних матчей</p>
@@ -161,12 +166,13 @@ const riskLabel = computed(() => {
     <!-- любимые предметы -->
     <section v-if="data.favorites.length" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Любимые улучшения</p>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div v-for="item in data.favorites" :key="item.name" class="flex flex-col gap-2">
-          <img :src="itemImageUrl(item.image)" :alt="item.name" width="48" height="48"
-            class="w-full aspect-square object-contain rounded-xl"
-            style="background: color-mix(in srgb, var(--accent-contrast) 12%, transparent)" loading="lazy">
-          <span class="ds-meta leading-tight">{{ item.name }}</span>
+      <div class="flex flex-wrap gap-2">
+        <div v-for="item in data.favorites" :key="item.name"
+          class="flex items-center gap-2 pr-3 py-1.5 pl-1.5"
+          style="border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent-contrast) 12%, transparent)">
+          <img :src="itemImageUrl(item.image)" :alt="item.name" width="28" height="28"
+            class="w-7 h-7 object-contain flex-shrink-0" loading="lazy">
+          <span class="ds-meta">{{ item.name }}</span>
         </div>
       </div>
     </section>

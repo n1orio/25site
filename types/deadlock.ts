@@ -43,6 +43,8 @@ export interface DeadlockData {
     points: number
     max: number
     updatedAt: number | null
+    /** эмблема ранга с ddlk.bio: /assets/ranks/{division}_large_subrank{tier}_webp.webp */
+    emblem: string | null
   } | null
   totals: { matches: number; wins: number; losses: number; winrate: number } | null
   stats: {

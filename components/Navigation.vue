@@ -7,7 +7,7 @@ const { isDark } = useSecretTheme()
 const { toggle: toggleTheme, flash } = useThemeCircle(isDark)
 
 const {
-  navScrollRef, showLeftArrow, showRightArrow, navIndicator,
+  navScrollRef, showLeftArrow, showRightArrow,
   handleNavScroll,
 } = useNavigation()
 
@@ -46,17 +46,6 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
           style="background: linear-gradient(to left, var(--accent-surface), transparent)" />
 
         <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
-          <div
-            class="absolute top-0 bottom-0 my-auto h-[28px] pointer-events-none z-0"
-            :style="{
-              transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-              left: navIndicator.visible ? navIndicator.left + 'px' : '0px',
-              width: navIndicator.visible ? navIndicator.width + 'px' : '0px',
-              opacity: navIndicator.visible ? 1 : 0,
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--accent-contrast)',
-            }" />
-
           <NuxtLink
             v-for="tab in navTabs"
             :key="tab.to"
