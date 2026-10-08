@@ -8,10 +8,7 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    environment:
-      # том с данными счётчика посетителей: без него счётчик
-      # обнуляется при каждом пересоздании контейнера
-      - DATA_DIR=/data
+    # том счётчика посетителей: путь внутри совпадает с nitro.storage
     volumes:
       - site_data:/data
     expose:
