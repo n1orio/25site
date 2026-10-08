@@ -18,17 +18,23 @@ export const useThemeCircle = (isDark: Ref<boolean>) => {
   const readVar = (name: string) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 
-  const paint = (targetDark: boolean) => {
-    if (!layer) return
-    const bg = readVar(targetDark ? "--theme-bg-dark" : "--theme-bg-light")
-    layer.style.background = bg || (targetDark ? "#101014" : "#f4f4f5")
-  }
-
   const reset = () => {
     if (!layer) return
     layer.style.clipPath = ""
     layer.style.opacity = "0"
     isAnimating.value = false
+  }
+
+  /** Прямоугольник, в который круг должен вписаться, и сам слой — готовность. */
+  const prepare = (targetDark: boolean) => {
+    if (!layer) return false
+    const bg = readVar(targetDark ? "--theme-bg-dark" : "--theme-bg-light")
+    layer.style.background = bg || (targetDark ? "#101014" : "#f4f4f5")
+    layer.style.opacity = "1"
+    layer.style.clipPath = "circle(0px)"
+    // форсируем стиль, чтобы анимация стартовала с нулевого круга
+    void layer.offsetWidth
+    return true
   }
 
   const toggle = async (event?: MouseEvent) => {
@@ -44,7 +50,11 @@ export const useThemeCircle = (isDark: Ref<boolean>) => {
     }
 
     isAnimating.value = true
-    paint(targetDark)
+    if (!prepare(targetDark)) {
+      isDark.value = targetDark
+      isAnimating.value = false
+      return
+    }
 
     const { clientX: x, clientY: y } = event
     const radius = Math.hypot(
