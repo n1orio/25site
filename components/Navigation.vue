@@ -38,9 +38,9 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
     >
       <div class="flex-1 relative overflow-hidden h-[34px] min-w-0">
         <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to right, var(--bg-surface), transparent)" />
+          style="background: linear-gradient(to right, var(--accent), transparent)" />
         <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to left, var(--bg-surface), transparent)" />
+          style="background: linear-gradient(to left, var(--accent), transparent)" />
 
         <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
           <div
@@ -51,7 +51,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
               width: navIndicator.visible ? navIndicator.width + 'px' : '0px',
               opacity: navIndicator.visible ? 1 : 0,
               borderRadius: 'var(--radius-pill)',
-              background: 'var(--accent)',
+              background: 'var(--accent-contrast)',
             }" />
 
           <NuxtLink
@@ -67,22 +67,22 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
         </div>
       </div>
 
-      <span class="w-px h-5 mx-1.5 flex-shrink-0" style="background: var(--border-subtle)" />
+      <span class="w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
         <button @click="toggleDark()"
           class="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
-          style="color: var(--accent)" aria-label="Сменить тему">
+          style="color: var(--accent-contrast)" aria-label="Сменить тему">
           <Icon :name="isDark ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 
         <div class="relative" ref="paletteRef">
           <button
             class="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer relative overflow-hidden"
-            style="color: var(--accent)" aria-label="Цвета темы" @click="showPalette = !showPalette">
+            style="color: var(--accent-contrast)" aria-label="Цвета темы" @click="showPalette = !showPalette">
             <div class="absolute inset-[2px] rounded-full animate-[spin_3s_linear_infinite]"
               :style="{ background: `conic-gradient(from 0deg, transparent 0 300deg, var(--accent) 180deg, var(--accent-secondary) 360deg)` }" />
-            <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--bg-primary)">
+            <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--accent-contrast)">
               <Icon name="lucide:palette" size="14" class="w-3.5 h-3.5" />
             </div>
           </button>
@@ -109,14 +109,14 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                     <div class="w-full h-8 rounded-lg border"
                       :style="{
                         background: `linear-gradient(135deg, ${preset.colors[0]} 10%, ${preset.colors[1]} 90%)`,
-                        borderColor: 'var(--border-subtle)',
+                        borderColor: 'transparent',
                       }" />
                     <span class="ds-meta text-center">{{ preset.name }}</span>
                   </button>
                 </div>
               </div>
 
-              <span class="w-full h-px" style="background: var(--border-subtle)" />
+              <span class="w-full h-px" style="background: color-mix(in srgb, var(--accent-contrast) 22%, transparent)" />
 
               <div class="flex items-center justify-between">
                 <p class="ds-meta">Свой цвет</p>

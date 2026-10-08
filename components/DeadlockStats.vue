@@ -63,8 +63,7 @@ const {
         <div
           v-for="(hero, i) in data.heroes"
           :key="hero.name"
-          class="flex items-center gap-3 py-2.5 border-b last:border-0"
-          style="border-color: var(--border-subtle)"
+          class="flex items-center gap-3 py-2.5 border-b border-white/20 last:border-0"
         >
           <span class="ds-num w-6">{{ String(i + 1).padStart(2, '0') }}</span>
           <img v-if="hero.icon" :src="heroIconUrl(hero.icon)" :alt="hero.name" width="22" height="22"
@@ -81,15 +80,14 @@ const {
         <div
           v-for="m in data.recent"
           :key="m.match_id"
-          class="flex items-center gap-3 py-2.5 border-b last:border-0"
-          style="border-color: var(--border-subtle)"
+          class="flex items-center gap-3 py-2.5 border-b border-white/20 last:border-0"
         >
           <img v-if="m.hero_icon" :src="heroIconUrl(m.hero_icon)" :alt="m.hero_name" width="22" height="22"
             class="w-[22px] h-[22px] object-cover rounded-lg flex-shrink-0" loading="lazy">
           <span class="ds-title text-sm">{{ m.hero_name }}</span>
-          <span class="ds-pill !py-0.5 !px-2" :style="m.result === 'Win'
-            ? { background: 'color-mix(in srgb, #10b981 15%, transparent)', borderColor: 'color-mix(in srgb, #10b981 35%, transparent)', color: '#10b981' }
-            : { background: 'color-mix(in srgb, #f43f5e 15%, transparent)', borderColor: 'color-mix(in srgb, #f43f5e 35%, transparent)', color: '#f43f5e' }">
+          <span class="ds-pill !py-0.5 !px-2 !border-0" :style="m.result === 'Win'
+            ? { background: 'var(--accent-contrast)', color: 'var(--accent)' }
+            : { background: 'color-mix(in srgb, var(--accent-contrast) 22%, transparent)', color: 'var(--accent-contrast)' }">
             {{ m.result === 'Win' ? 'Победа' : 'Поражение' }}
           </span>
           <span class="ds-meta ml-auto">{{ m.kda }} · {{ matchDuration(m.duration_s) }}</span>

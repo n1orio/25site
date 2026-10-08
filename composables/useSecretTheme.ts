@@ -95,9 +95,21 @@ export const useSecretTheme = () => {
     activeGradient.value = colors;
   };
 
+  // Контрастный текст поверх акцентной заливки: светлый акцент -> тёмный текст
+  const accentContrast = computed(() => {
+    const hex = (primaryColor.value || "#6366f1").replace("#", "");
+    if (hex.length < 6) return "#ffffff";
+    const r = parseInt(hex.slice(0, 2), 16) / 255;
+    const g = parseInt(hex.slice(2, 4), 16) / 255;
+    const b = parseInt(hex.slice(4, 6), 16) / 255;
+    const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    return luminance > 0.45 ? "#101014" : "#ffffff";
+  });
+
   return {
     isDark, themeMode, activeGradient, accentColor, gradientPresets,
-    bgPrimary, bgSecondary, primaryColor, secondaryColor,
+    bgPrimary, bgSecondary, primaryColor, secondaryColor, accentContrast,
     setSingleColor, setGradient,
   };
 };

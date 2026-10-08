@@ -23,7 +23,6 @@ onUnmounted(() => {
   <div class="flex flex-col gap-10">
     <section class="ds-section">
       <header class="flex items-center gap-3 mb-4">
-        <span class="ds-num">04</span>
         <h2 class="ds-meta">Основное железо</h2>
         <WaveDivider class="flex-1" />
       </header>
@@ -32,8 +31,7 @@ onUnmounted(() => {
         <div
           v-for="item in workstationItems"
           :key="item.name"
-          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b"
-          style="border-color: var(--border-subtle)"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b border-white/20"
         >
           <span class="ds-meta w-28 sm:w-32 flex-shrink-0">{{ item.name }}</span>
 
@@ -43,7 +41,7 @@ onUnmounted(() => {
             :target="item.link ? '_blank' : undefined"
             :rel="item.link ? 'noopener' : undefined"
             class="ds-title text-sm flex items-center gap-1.5 min-w-0"
-            :class="item.link ? 'hover:text-[var(--accent)] transition-colors' : ''"
+            :class="item.link ? 'hover:opacity-70 transition-opacity' : ''"
           >
             <span class="truncate">{{ item.value }}</span>
             <Icon v-if="item.link" name="lucide:external-link" class="w-3 h-3 flex-shrink-0" />
@@ -58,7 +56,6 @@ onUnmounted(() => {
 
     <section class="ds-section">
       <header class="flex items-center gap-3 mb-4">
-        <span class="ds-num">04.1</span>
         <h2 class="ds-meta">Дополнительно</h2>
         <span class="ds-meta ml-auto">{{ currentFrame }}</span>
         <WaveDivider class="flex-1 !max-w-[120px]" />
@@ -68,8 +65,7 @@ onUnmounted(() => {
         <div
           v-for="item in baseItems"
           :key="item.name"
-          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b last:border-0"
-          style="border-color: var(--border-subtle)"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b border-white/20 last:border-0"
         >
           <span class="ds-meta w-28 sm:w-32 flex-shrink-0">{{ item.name }}</span>
           <span class="ds-title text-sm">{{ item.value }}</span>

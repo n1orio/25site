@@ -2,7 +2,7 @@
 import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
-  primaryColor, secondaryColor, bgPrimary, bgSecondary,
+  primaryColor, secondaryColor, bgPrimary, bgSecondary, accentContrast,
 } = useSecretTheme()
 
 const { data: discord } = await useFetch("/api/discord")
@@ -42,7 +42,7 @@ onUnmounted(() => {
 
 <template>
   <div class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
-    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, color: 'var(--text-primary)' }"
+    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-contrast': accentContrast, color: 'var(--text-primary)' }"
   >
     <div ref="cursorRef" class="custom-cursor" v-show="isCursorVisible" :class="{ 'is-hovering': isHovering }">
       <div class="cursor-corner top-left"></div>
@@ -70,7 +70,6 @@ onUnmounted(() => {
 
           <section class="ds-section">
             <header class="flex items-center gap-3 mb-4">
-              <span class="ds-num">05</span>
               <h2 class="ds-meta">Сейчас</h2>
             </header>
             <div class="ds-card p-5 flex flex-col gap-5">
@@ -85,7 +84,7 @@ onUnmounted(() => {
                 :get-discord-asset-url="getDiscordAssetUrl"
               />
 
-              <span class="w-full h-px" style="background: var(--border-subtle)" />
+              <span class="w-full h-px" style="background: color-mix(in srgb, var(--accent-contrast) 22%, transparent)" />
 
               <SteamStatus
                 :steam="steam"
@@ -152,6 +151,7 @@ onUnmounted(() => {
 
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #6366f1; }
 @property --accent-secondary { syntax: "<color>"; inherits: true; initial-value: #8a2387; }
+@property --accent-contrast { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
 @property --bg-1 { syntax: "<color>"; inherits: true; initial-value: #f4f4f5; }
 @property --bg-2 { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
 
@@ -162,33 +162,9 @@ onUnmounted(() => {
               box-shadow 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --accent 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --accent-secondary 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              --accent-contrast 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --bg-1 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --bg-2 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.theme-card {
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-.dark .theme-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.theme-card:hover {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--accent) 15%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
-}
-.dark .theme-card:hover {
-  background: rgba(38, 38, 44, 0.8);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--accent) 30%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 ::selection { background-color: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; }
@@ -210,16 +186,16 @@ onUnmounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--accent-contrast) 70%, var(--accent));
   transition: color 0.25s ease;
 }
-.nav-link:hover { color: var(--text-primary); }
+.nav-link:hover { color: var(--accent-contrast); }
 .nav-num {
   font-size: 0.5625rem;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
 }
-.router-link-exact-active { color: var(--accent-contrast); }
+.router-link-exact-active { color: var(--accent); }
 .router-link-exact-active .nav-num { opacity: 0.7; }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
@@ -233,19 +209,19 @@ onUnmounted(() => {
 
 .ds-section { position: relative; }
 
-/* --- typography --- */
+/* --- on-accent foreground helpers --- */
 .ds-title {
   font-family: var(--font-heading);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.02;
-  color: var(--text-primary);
+  color: var(--accent-contrast);
 }
 .ds-body {
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   line-height: 1.65;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--accent-contrast) 72%, var(--accent));
 }
 .ds-meta {
   font-family: var(--font-mono);
@@ -253,32 +229,36 @@ onUnmounted(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--accent-contrast) 65%, var(--accent));
 }
 .ds-num {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--accent) 60%, var(--text-secondary));
+  color: color-mix(in srgb, var(--accent-contrast) 55%, var(--accent));
   flex-shrink: 0;
 }
 
-/* --- surfaces --- */
+/* --- accent surfaces, no borders --- */
 .ds-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: var(--accent);
+  border: 0;
   border-radius: var(--radius-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transition: background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
               transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .ds-card-hover:hover {
-  background: var(--bg-surface-elevated);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
+  filter: brightness(1.12) saturate(1.05);
   transform: translateY(-3px);
+}
+
+/* --- dividers inside accent surfaces --- */
+.ds-divider {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: color-mix(in srgb, var(--accent-contrast) 22%, transparent);
 }
 
 /* --- pill badges & buttons --- */
@@ -287,23 +267,23 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.375rem;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
+  border: 0;
+  background: color-mix(in srgb, var(--accent-contrast) 14%, transparent);
   padding: 0.3rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--accent-contrast);
   transition: all 0.3s ease;
 }
 .ds-pill-accent {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
+  background: var(--accent-contrast);
+  color: var(--accent);
 }
 .ds-pill-outline:hover {
-  border-color: var(--accent);
+  background: var(--accent-contrast);
   color: var(--accent);
 }
 
@@ -315,14 +295,14 @@ onUnmounted(() => {
   width: 1.75rem;
   height: 1.75rem;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  border: 0;
+  background: color-mix(in srgb, var(--accent-contrast) 16%, transparent);
+  color: var(--accent-contrast);
   transition: all 0.3s ease;
 }
 .ds-action:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
+  background: var(--accent-contrast);
+  color: var(--accent);
 }
 
 /* --- wave divider --- */
@@ -330,18 +310,18 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   height: 14px;
-  color: var(--border-subtle);
+  color: color-mix(in srgb, var(--accent-contrast) 30%, transparent);
 }
 
-/* --- scalloped badge (8-petal seal) --- */
+/* --- scalloped badge (24-petal seal) --- */
 .ds-scallop {
   position: relative;
   display: grid;
   place-items: center;
   width: 4.5rem;
   height: 4.5rem;
-  background: var(--accent);
-  color: var(--accent-contrast);
+  background: var(--accent-contrast);
+  color: var(--accent);
 }
 .ds-scallop::before {
   content: "";
@@ -365,19 +345,19 @@ onUnmounted(() => {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
+  color: var(--accent-contrast);
 }
 .ds-bar {
   height: 3px;
   border-radius: var(--radius-pill);
-  background: var(--border-subtle);
+  background: color-mix(in srgb, var(--accent-contrast) 25%, transparent);
   overflow: hidden;
 }
 .ds-bar > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: var(--accent-contrast);
   transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 </style>

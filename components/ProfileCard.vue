@@ -18,11 +18,11 @@ defineProps<{
           :src="discordAvatarUrl"
           alt="avatar"
           class="w-20 h-20 object-cover"
-          style="border-radius: var(--radius-card); border: 1px solid var(--border-subtle)"
+          style="border-radius: var(--radius-card)"
         />
         <span
-          class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2"
-          :style="{ backgroundColor: discordStatusColor, borderColor: 'var(--bg-primary)' }" />
+          class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--accent)]"
+          :style="{ backgroundColor: discordStatusColor }" />
       </div>
 
       <div class="min-w-0">

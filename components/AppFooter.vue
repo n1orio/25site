@@ -1,8 +1,8 @@
 <template>
-  <footer class="w-full pt-6 mt-16" style="border-top: 1px solid var(--border-subtle)">
+  <footer class="w-full pt-6 mt-16" style="border-top: 1px solid color-mix(in srgb, var(--accent-contrast) 22%, transparent)">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
       <p class="ds-meta">
-        <span style="color: var(--text-primary)">Niorio</span> · MIT · {{ new Date().getFullYear() }}
+        <span class="footer-strong">Niorio</span> · MIT · {{ new Date().getFullYear() }}
       </p>
       <p class="ds-meta">
         Сделано на
@@ -18,9 +18,10 @@
 
 <style scoped>
 .footer-link {
-  color: var(--accent);
+  color: var(--accent-contrast);
   font-weight: 700;
   transition: opacity 0.3s ease;
 }
+.footer-strong { color: var(--accent-contrast); }
 .footer-link:hover { opacity: 0.7; }
 </style>
