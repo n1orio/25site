@@ -349,6 +349,10 @@ onUnmounted(() => {
   transform: scale(1.08);
 }
 .nav-ctl:active { transform: scale(0.96); }
+.nav-ctl.is-active {
+  background: var(--accent-contrast);
+  color: var(--accent-surface);
+}
 
 /* --- on page background (not on accent surfaces) --- */
 .on-bg-title {

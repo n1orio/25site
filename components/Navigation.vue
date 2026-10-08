@@ -76,14 +76,11 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
         <div class="relative" ref="paletteRef">
           <button
             class="nav-ctl"
+            :class="{ 'is-active': showPalette }"
             :aria-label="showPalette ? 'Закрыть палитру' : 'Цвета темы'"
             :aria-expanded="showPalette"
             @click="showPalette = !showPalette">
-            <div class="absolute inset-[1px] rounded-full"
-              :style="{ background: `conic-gradient(from 0deg, var(--accent) 0deg, var(--accent-secondary) 360deg)` }" />
-            <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--nav-ctl-bg)">
-              <Icon name="lucide:palette" size="14" class="w-3.5 h-3.5" />
-            </div>
+            <Icon name="lucide:palette" size="16" class="w-4 h-4" />
           </button>
 
           <Transition name="pop">
