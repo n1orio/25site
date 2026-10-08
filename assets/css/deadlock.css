@@ -230,11 +230,14 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .nav-shell {
   background: transparent;
   filter: none;
-  clip-path: none;
   border-radius: 0;
   padding: 0;
   gap: 6px;
 }
+/* navbar — первый ребёнок <nav>, поэтому попадал под правила среза
+   для карточек (:nth-child) и обрезал выпадашку палитры по своим
+   границам. Селектор с двумя классами перебивает их по порядку. */
+[data-deadlock] .ds-card.nav-shell { clip-path: none; }
 [data-deadlock] .nav-window,
 [data-deadlock] .nav-track { overflow: visible; height: auto; }
 [data-deadlock] .nav-fade { display: none; }
@@ -376,8 +379,14 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .tab-leave-active { transition-duration: 0.12s; }
 
 @media (max-width: 640px) {
+  /* На телефоне сдвиг вкладок вверх не нужен: из-за transform они
+     рисуются поверх соседей и накрывают кнопки темы (попадая по
+     клику в ссылку). Поэтому оставляем прокрутку по горизонтали. */
+  [data-deadlock] .nav-link,
+  [data-deadlock] .nav-ctl { transform: none; }
+  [data-deadlock] .nav-window { overflow: hidden; height: auto; }
+  [data-deadlock] .nav-track { overflow-x: auto; }
   [data-deadlock] .nav-link {
-    transform: translateY(-5px);
     filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.45));
     padding: 9px 11px 6px 10px;
     font-size: 11px;
@@ -385,7 +394,6 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   [data-deadlock] .nav-ctl {
     width: 30px;
     height: 30px;
-    transform: translateY(-5px);
     filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.45));
   }
 }
