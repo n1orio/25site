@@ -55,5 +55,7 @@ const { copy, copiedKey } = useCopy()
     <p v-if="copiedKey" class="on-bg-meta mt-3">
       Ссылка на {{ copiedKey }} скопирована
     </p>
+
+    <Donations />
   </section>
 </template>

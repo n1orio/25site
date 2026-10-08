@@ -160,6 +160,7 @@ const summary = computed(() => {
     <!-- календарь вкладов -->
     <div v-if="contrib" class="mt-10">
       <ContributionGraph :data="contrib" />
+      <ActivityProfile :data="contrib" />
     </div>
 
     <!-- архив -->

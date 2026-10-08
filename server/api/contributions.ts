@@ -25,6 +25,16 @@ export interface ContributionsData {
   longestStreak: number
   /** сколько дней всего в периоде */
   total: number
+  /** доля активных дней, проценты */
+  activityRate: number
+  /** активные дни по дням недели: пн..вс */
+  byWeekday: number[]
+  /** индекс дня недели с максимумом активности (0 = пн) */
+  topWeekday: number
+  /** сколько активных дней в самой продуктивной неделе */
+  topWeekCount: number
+  /** доля от всех активных дней, проценты */
+  topWeekShare: number
 }
 
 const LOGIN = "n1orio"
@@ -81,6 +91,27 @@ export default defineEventHandler(async (): Promise<ContributionsData | null> =>
         previous = day.date
       }
 
+      // распределение по дням недели и неделям
+      const byWeekday = [0, 0, 0, 0, 0, 0, 0]
+      const byWeek = new Map<string, number>()
+      for (const day of days) {
+        if (day.level === 0) continue
+        const date = new Date(`${day.date}T00:00:00Z`)
+        // getUTCDay: 0 = воскресенье, сдвигаем так, чтобы 0 = понедельник
+        const weekday = (date.getUTCDay() + 6) % 7
+        byWeekday[weekday] = (byWeekday[weekday] ?? 0) + 1
+        const monday = new Date(date)
+        monday.setUTCDate(date.getUTCDate() - weekday)
+        const key = monday.toISOString().slice(0, 10)
+        byWeek.set(key, (byWeek.get(key) ?? 0) + 1)
+      }
+
+      let topWeekday = 0
+      byWeekday.forEach((count, i) => {
+        if (count > (byWeekday[topWeekday] ?? 0)) topWeekday = i
+      })
+      const topWeekCount = Math.max(0, ...byWeek.values())
+
       return {
         from: days[0]?.date ?? "",
         to: days[days.length - 1]?.date ?? "",
@@ -88,6 +119,11 @@ export default defineEventHandler(async (): Promise<ContributionsData | null> =>
         activeDays,
         longestStreak,
         total: days.length,
+        activityRate: days.length ? Math.round((activeDays / days.length) * 100) : 0,
+        byWeekday,
+        topWeekday,
+        topWeekCount,
+        topWeekShare: activeDays ? Math.round((topWeekCount / activeDays) * 100) : 0,
       }
     } catch {
       return null

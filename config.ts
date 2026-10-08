@@ -39,6 +39,29 @@ export const bio = [
   "Имею опыт работы с Java, Kotlin, Python, Vue/Nuxt, React, TypeScript, JavaScript, Denizen, Figma, Blockbench, Aseprite.",
 ]
 
+// === Поддержка ===
+export interface Donation {
+  title: string
+  note: string
+  url: string
+  /** основная кнопка выделяется заливкой */
+  featured?: boolean
+}
+
+export const donations: Donation[] = [
+  {
+    title: "50 ₽",
+    note: "на кофе",
+    url: "https://pay.lava.ru/w/6ff18f96-e91b-4be1-ad24-7e756a4a27f0/link",
+  },
+  {
+    title: "250 ₽",
+    note: "поддержать проект",
+    url: "https://pay.lava.ru/w/090c564c-13a6-42a4-bc83-7f5c56b53733/link",
+    featured: true,
+  },
+]
+
 // === Геолокация ===
 // Используется для локального времени и погоды
 export const location = {
