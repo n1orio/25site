@@ -3,7 +3,7 @@ import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
-  accentSurface, accentContrast,
+  accentSurface, accentContrast, accentOnBg,
 } = useSecretTheme()
 
 const { data: discord } = await useFetch("/api/discord")
@@ -43,7 +43,7 @@ onUnmounted(() => {
 
 <template>
   <div class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
-    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, color: 'var(--text-primary)' }"
+    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, '--accent-on-bg': accentOnBg, color: 'var(--text-primary)' }"
   >
     <div ref="cursorRef" class="custom-cursor" v-show="isCursorVisible" :class="{ 'is-hovering': isHovering }">
       <div class="cursor-corner top-left"></div>
@@ -154,6 +154,7 @@ onUnmounted(() => {
 @property --accent-secondary { syntax: "<color>"; inherits: true; initial-value: #8a2387; }
 @property --accent-contrast { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
 @property --accent-surface { syntax: "<color>"; inherits: true; initial-value: #4f46e5; }
+@property --accent-on-bg { syntax: "<color>"; inherits: true; initial-value: #4f46e5; }
 @property --bg-1 { syntax: "<color>"; inherits: true; initial-value: #f4f4f5; }
 @property --bg-2 { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
 
@@ -183,7 +184,7 @@ onUnmounted(() => {
   transition: color 0.25s ease;
 }
 .nav-link:hover { color: var(--accent-contrast); }
-.router-link-exact-active { color: var(--accent); }
+.router-link-exact-active { color: var(--accent-surface); }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -268,7 +269,7 @@ onUnmounted(() => {
 }
 .ds-pill-accent {
   background: var(--accent-contrast);
-  color: var(--accent);
+  color: var(--accent-surface);
 }
 .ds-pill-outline:hover {
   background: var(--accent-contrast);

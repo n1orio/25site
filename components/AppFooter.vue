@@ -18,7 +18,7 @@
 
 <style scoped>
 .footer-link {
-  color: var(--accent);
+  color: var(--accent-on-bg);
   font-weight: 700;
   transition: opacity 0.3s ease;
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-6" style="background: var(--bg-primary)">
     <div class="text-center">
-      <h1 class="font-heading font-black text-8xl sm:text-9xl" style="color: var(--accent)">
+      <h1 class="font-heading font-black text-8xl sm:text-9xl" style="color: var(--accent-on-bg)">
         404
       </h1>
       <p class="mt-4 text-lg font-medium" style="color: var(--text-secondary)">

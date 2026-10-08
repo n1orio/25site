@@ -117,25 +117,53 @@ export const useSecretTheme = () => {
     return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
   }
 
-  const WHITE: [number, number, number] = [255, 255, 255]
-  const INK: [number, number, number] = [16, 16, 20]
+  const LIGHT: [number, number, number] = [250, 250, 250]
+  const DARK: [number, number, number] = [12, 12, 16]
   /** Минимальный контраст текста на акцентной заливке */
-  const MIN_CR = 5.5
+  const MIN_CR = 5.0
 
-  // Акцентная заливка + контрастный текст к ней
+  /**
+   * Полярность текста задаёт тема, а не светлота акцента:
+   * тёмная тема -> всегда светлый текст, светлая -> всегда тёмный.
+   * Акцентная поверхность подтягивается к нужной полярности,
+   * сохраняя оттенок, пока текст не достигнет MIN_CR.
+   */
   const accentPair = computed(() => {
-    const rgb = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
+    const base = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
+    const fg = isDark.value ? LIGHT : DARK
+    let surface = base
 
-    if (contrast(rgb, INK) >= MIN_CR) {
-      return { surface: toHex(rgb), contrast: toHex(INK) }
+    if (isDark.value) {
+      // светлый текст на тёмной поверхности — уходим в тень
+      for (let i = 0; i < 30 && contrast(surface, fg) < MIN_CR; i++) {
+        surface = surface.map((c) => c * 0.94) as [number, number, number]
+      }
+    } else {
+      // тёмный текст на светлой поверхности — уходим в свет
+      for (let i = 0; i < 30 && contrast(surface, fg) < MIN_CR; i++) {
+        surface = surface.map((c) => c + (255 - c) * 0.06) as [number, number, number]
+      }
     }
 
-    // белым не хватает — затемняем акцент, сохраняя оттенок
-    let scaled = rgb
-    for (let i = 0; i < 24 && contrast(scaled, WHITE) < MIN_CR; i++) {
-      scaled = scaled.map((c) => c * 0.94) as [number, number, number]
+    return { surface: toHex(surface), contrast: toHex(fg) }
+  })
+
+  /** Акцент, читаемый на фоне страницы (ссылки футера, номер ошибки) */
+  const accentOnBg = computed(() => {
+    const base = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
+    const bg = hexToRgb(bgPrimary.value || "") ?? (isDark.value ? [16, 16, 20] : [244, 244, 245]) as [number, number, number]
+    let c = base
+
+    if (isDark.value) {
+      for (let i = 0; i < 30 && contrast(c, bg) < 4.5; i++) {
+        c = c.map((v) => v + (255 - v) * 0.06) as [number, number, number]
+      }
+    } else {
+      for (let i = 0; i < 30 && contrast(c, bg) < 4.5; i++) {
+        c = c.map((v) => v * 0.94) as [number, number, number]
+      }
     }
-    return { surface: toHex(scaled), contrast: toHex(WHITE) }
+    return toHex(c)
   })
 
   const accentSurface = computed(() => accentPair.value.surface)
@@ -144,7 +172,7 @@ export const useSecretTheme = () => {
   return {
     isDark, themeMode, activeGradient, accentColor, gradientPresets,
     bgPrimary, bgSecondary, primaryColor, secondaryColor,
-    accentSurface, accentContrast,
+    accentSurface, accentContrast, accentOnBg,
     setSingleColor, setGradient,
   };
 };
