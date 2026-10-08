@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-6 transition-colors duration-700" style="background: var(--bg-primary)">
+  <div class="min-h-screen flex items-center justify-center p-6" style="background: var(--bg-primary)">
     <div class="text-center">
       <h1 class="font-heading font-black text-8xl sm:text-9xl" style="color: var(--accent)">
         404

@@ -79,8 +79,8 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             :aria-label="showPalette ? 'Закрыть палитру' : 'Цвета темы'"
             :aria-expanded="showPalette"
             @click="showPalette = !showPalette">
-            <div class="absolute inset-[1px] rounded-full animate-[spin_3s_linear_infinite]"
-              :style="{ background: `conic-gradient(from 0deg, transparent 0 300deg, var(--accent) 180deg, var(--accent-secondary) 360deg)` }" />
+            <div class="absolute inset-[1px] rounded-full"
+              :style="{ background: `conic-gradient(from 0deg, var(--accent) 0deg, var(--accent-secondary) 360deg)` }" />
             <div class="absolute inset-[3px] rounded-full flex items-center justify-center" style="background: var(--nav-ctl-bg)">
               <Icon name="lucide:palette" size="14" class="w-3.5 h-3.5" />
             </div>

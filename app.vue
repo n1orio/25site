@@ -157,18 +157,8 @@ onUnmounted(() => {
 @property --bg-1 { syntax: "<color>"; inherits: true; initial-value: #f4f4f5; }
 @property --bg-2 { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
 
-.theme-wrapper {
-  transition: color 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              background-color 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --accent 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --accent-secondary 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --accent-contrast 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --accent-surface 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --bg-1 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-              --bg-2 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
+/* переключение темы мгновенное, как у переключателя светлой/тёмной темы */
+.theme-wrapper { transition: none; }
 
 ::selection { background-color: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }

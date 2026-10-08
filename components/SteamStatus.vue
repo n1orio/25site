@@ -28,7 +28,7 @@ defineProps<{
         <img :src="steam.gameArt" class="w-10 h-10 object-cover flex-shrink-0" style="border-radius: var(--radius-card)" loading="lazy" />
       </template>
       <template v-else-if="steam?.recentGameArt">
-        <img :src="steam.recentGameArt" class="w-10 h-10 object-cover opacity-70 grayscale group-hover:grayscale-0 transition duration-700 flex-shrink-0"
+        <img :src="steam.recentGameArt" class="w-10 h-10 object-cover opacity-70 grayscale group-hover:grayscale-0 transition duration-300 flex-shrink-0"
           style="border-radius: var(--radius-card)" loading="lazy" />
       </template>
       <template v-else>
