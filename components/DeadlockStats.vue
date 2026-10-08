@@ -28,9 +28,9 @@ const riskLabel = computed(() => {
     <!-- ранг -->
     <section class="ds-card p-5 sm:p-6">
       <div class="flex items-center gap-5">
-        <div class="ds-scallop flex-shrink-0" style="width: 5.5rem; height: 5.5rem">
+        <div class="flex-shrink-0 flex items-center justify-center" style="width: 5.5rem">
           <img v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data.rank.tier}`"
-            class="w-14 h-14 object-contain" loading="lazy">
+            class="h-16 w-auto object-contain" loading="lazy">
           <Icon v-else name="lucide:crosshair" size="22" class="w-5 h-5" />
         </div>
         <div class="min-w-0 flex-1">
