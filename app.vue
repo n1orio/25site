@@ -3,8 +3,11 @@ import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
-  accentSurface, accentContrast, accentOnBg, isDark,
+  accentSurface, accentContrast, accentOnBg, isDark, isDeadlock,
 } = useSecretTheme()
+
+// шрифты темы «Дедлок» — только когда она включена
+useDeadlockFonts(isDeadlock)
 
 const { toggle: toggleThemeCircle } = useThemeCircle(isDark)
 
@@ -32,10 +35,44 @@ const bioParagraph0 = ref(bio[0] ?? "")
 const bioParagraph1 = ref(bio[1] ?? "")
 const bioParagraph2 = ref(bio[2] ?? "")
 
+/**
+ * Тема из localStorage не совпадает с тем, что отрендерил сервер
+ * (сервер её не видит), а Vue при гидрации не патчит инлайновые
+ * стили и data-атрибуты корневого элемента — тема слетала до
+ * первого перерисовывания. Поэтому проставляем переменные и
+ * атрибут темы прямо в DOM.
+ */
+const wrapperRef = ref<HTMLElement | null>(null)
+
+const applyThemeToDom = () => {
+  const el = wrapperRef.value
+  if (!el) return
+  const style = el.style
+  const vars: [string, string | undefined][] = [
+    ["--bg-1", bgPrimary.value],
+    ["--bg-2", bgSecondary.value],
+    ["--accent", primaryColor.value],
+    ["--accent-secondary", secondaryColor.value],
+    ["--accent-surface", accentSurface.value],
+    ["--accent-contrast", accentContrast.value],
+    ["--accent-on-bg", accentOnBg.value],
+  ]
+  for (const [name, value] of vars) if (value) style.setProperty(name, value)
+  style.setProperty("color", "var(--text-primary)")
+  if (isDeadlock.value) el.setAttribute("data-deadlock", "")
+  else el.removeAttribute("data-deadlock")
+}
+
 onMounted(() => {
+  applyThemeToDom()
   startCursor()
   initNav()
 })
+
+watch(
+  [bgPrimary, bgSecondary, primaryColor, secondaryColor, accentSurface, accentContrast, accentOnBg, isDeadlock],
+  applyThemeToDom,
+)
 
 onUnmounted(() => {
   stopCursor()
@@ -44,7 +81,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
+  <div ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
+    :data-deadlock="isDeadlock ? '' : undefined"
     :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, '--accent-on-bg': accentOnBg, color: 'var(--text-primary)' }"
   >
     <div id="theme-circle" class="theme-circle" aria-hidden="true" />
@@ -254,6 +292,18 @@ onUnmounted(() => {
 .ds-card-hover:hover {
   filter: brightness(1.12) saturate(1.05);
   transform: translateY(-3px);
+}
+
+/* --- оболочка навигации и выпадашка палитры ---
+   Скругление и фон заданы классами, а не инлайном: инлайн бьёт
+   любой селектор, и тема «Дедлок» не смогла бы их переопределить. */
+.nav-shell { border-radius: var(--radius-pill); }
+.ds-pop {
+  border-radius: var(--radius-card);
+  /* два слоя: непрозрачная подложка + полупрозрачный верхний.
+     Иначе сквозь выпадашку просвечивали карточки страницы. */
+  background-color: var(--bg-primary);
+  background-image: linear-gradient(var(--bg-surface-elevated), var(--bg-surface-elevated));
 }
 
 /* --- dividers inside accent surfaces --- */

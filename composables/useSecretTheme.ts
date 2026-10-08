@@ -1,4 +1,5 @@
 import { computed } from "vue";
+import type { Ref } from "vue";
 import { useLocalStorage, useDark } from "@vueuse/core";
 
 // HEX в HSL
@@ -36,6 +37,34 @@ const hslToHex = (h: number, s: number, l: number) => {
   return `#${f(0)}${f(8)}${f(4)}`;
 };
 
+/**
+ * Тема «Дедлок» — не просто цвета, а отдельный слой оформления
+ * (assets/css/deadlock.css, включается атрибутом data-deadlock).
+ * Оформление и палитра скопированы с /home/nio/mistraly-site.
+ *
+ * Палитра задаётся здесь, потому что --accent* приходят в разметку
+ * инлайном: инлайн бьёт любой селектор, перебить его из CSS нельзя.
+ */
+const DEADLOCK = {
+  presetId: "deadlock",
+  name: "Дедлок",
+  /** пара цветов в палитре: по ней же включается слой оформления */
+  colors: ["#DD6638", "#8C4520"],
+  bg: "#0C0C0C",
+  bgDeep: "#070707",
+  bgLight: "#EFECE1",
+  /** карточки красит CSS градиентом, это запасной цвет */
+  card: "#292820",
+  cardLight: "#FFFDF6",
+  text: "#FFFFFF",
+  textLight: "#141310",
+  accent: "#DD6638",
+  /** второй цвет градиента — затемнённый тон акцента */
+  accentAlt: "#8C4520",
+} as const;
+
+/** шрифты темы грузятся отдельно, см. useDeadlockFonts */
+
 // Управление темой
 export const useSecretTheme = () => {
   // useDark: prefers-color-scheme + .dark на &lt;html&gt;
@@ -50,6 +79,7 @@ export const useSecretTheme = () => {
     { id: "violet",name: "Фиолет", colors: ["#A855F7", "#4C1D95"] },
     { id: "rose",  name: "Роза",   colors: ["#FF6B9D", "#C44569"] },
     { id: "slate", name: "Графит", colors: ["#636E72", "#2D3436"] },
+    { id: DEADLOCK.presetId, name: DEADLOCK.name, colors: [...DEADLOCK.colors] },
   ];
 
   /** тема по умолчанию для новых посетителей */
@@ -65,8 +95,46 @@ export const useSecretTheme = () => {
   // Цвета для gradient-режима
   const activeGradient = useLocalStorage("nio-active-gradient", defaultColors());
 
+  /**
+   * Значения из localStorage на клиенте не подхватывались: refs
+   * оставались с SSR-значением (дефолт), поэтому после перезагрузки
+   * тема слетала на «Океан» — и слой оформления Deadlock пропадал.
+   * Синхронизируем один раз, до первого рендера на клиенте.
+   */
+  if (import.meta.client) {
+    const stored: [Ref<unknown>, string][] = [
+      [themeMode, "nio-theme-mode"],
+      [accentColor, "nio-accent-color"],
+      [activeGradient, "nio-active-gradient"],
+    ];
+    for (const [ref, key] of stored) {
+      const raw = localStorage.getItem(key);
+      if (raw == null) continue;
+      try { ref.value = JSON.parse(raw) as never } catch { /* мусор в хранилище — оставляем дефолт */ }
+    }
+  }
+
+  /**
+   * Включён ли слой оформления Deadlock. Сверяем с эталонными цветами
+   * пресета, а не по id: в localStorage лежит только пара цветов,
+   * id живёт лишь в gradientPresets.
+   */
+  const isDeadlock = computed(
+    () =>
+      themeMode.value === "gradient" &&
+      activeGradient.value[0] === DEADLOCK.colors[0] &&
+      activeGradient.value[1] === DEADLOCK.colors[1],
+  );
+
   // Палитра: два цвета фона + два акцента
   const activePalette = computed(() => {
+    if (isDeadlock.value) {
+      // фон и акценты Deadlock задаёт слой оформления, а не пресет
+      return {
+        bg1: DEADLOCK.bg, bg2: DEADLOCK.bgDeep,
+        accent1: DEADLOCK.accent, accent2: DEADLOCK.accentAlt,
+      };
+    }
     if (themeMode.value === "gradient") {
       // Из activeGradient
       return {
@@ -135,6 +203,15 @@ export const useSecretTheme = () => {
    * сохраняя оттенок, пока текст не достигнет MIN_CR.
    */
   const accentPair = computed(() => {
+    // У Deadlock своя поверхность: карточка #292820 с белым текстом в
+    // тёмной теме и почти белая — со светлым в светлой. Контраст задан
+    // вручную: он заведомо выше любого порога.
+    if (isDeadlock.value) {
+      return isDark.value
+        ? { surface: DEADLOCK.card, contrast: DEADLOCK.text }
+        : { surface: DEADLOCK.cardLight, contrast: DEADLOCK.textLight };
+    }
+
     const base = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
     const fg = isDark.value ? LIGHT : DARK
     let surface = base
@@ -156,8 +233,11 @@ export const useSecretTheme = () => {
 
   /** Акцент, читаемый на фоне страницы (ссылки футера, номер ошибки) */
   const accentOnBg = computed(() => {
-    const base = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
-    const bg = hexToRgb(bgPrimary.value || "") ?? (isDark.value ? [16, 16, 20] : [244, 244, 245]) as [number, number, number]
+    const base = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!;
+    // фон Deadlock красит CSS, здесь нужен только для расчёта контраста
+    const bg = isDeadlock.value
+      ? hexToRgb(isDark.value ? DEADLOCK.bg : DEADLOCK.bgLight)!
+      : hexToRgb(bgPrimary.value || "") ?? (isDark.value ? [16, 16, 20] : [244, 244, 245]) as [number, number, number];
     let c = base
 
     if (isDark.value) {
@@ -177,6 +257,7 @@ export const useSecretTheme = () => {
 
   return {
     isDark, themeMode, activeGradient, accentColor, gradientPresets,
+    isDeadlock,
     bgPrimary, bgSecondary, primaryColor, secondaryColor,
     accentSurface, accentContrast, accentOnBg,
     setSingleColor, setGradient,

@@ -36,16 +36,15 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
 <template>
   <nav class="w-full mb-8 md:mb-12 z-50 flex justify-center">
     <div
-      class="ds-card flex items-center w-full max-w-full md:max-w-fit px-2 py-1.5"
-      style="border-radius: var(--radius-pill)"
+      class="nav-shell ds-card flex items-center w-full max-w-full md:max-w-fit px-2 py-1.5"
     >
-      <div class="flex-1 relative overflow-hidden h-[34px] min-w-0">
-        <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
+      <div class="nav-window flex-1 relative overflow-hidden h-[34px] min-w-0">
+        <div v-if="showLeftArrow" class="nav-fade absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
           style="background: linear-gradient(to right, var(--accent-surface), transparent)" />
-        <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
+        <div v-if="showRightArrow" class="nav-fade absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
           style="background: linear-gradient(to left, var(--accent-surface), transparent)" />
 
-        <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
+        <div ref="navScrollRef" @scroll="handleNavScroll" class="nav-track flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
           <NuxtLink
             v-for="tab in navTabs"
             :key="tab.to"
@@ -58,7 +57,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
         </div>
       </div>
 
-      <span class="w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
+      <span class="nav-sep w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
         <button @click="toggleTheme($event)" class="nav-ctl" :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'">
@@ -78,8 +77,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
           <Transition name="pop">
             <div
               v-if="showPalette"
-              class="ds-card absolute right-0 top-full mt-4 p-4 shadow-2xl flex flex-col gap-4 z-50 w-[260px] origin-top-right"
-              style="border-radius: var(--radius-card); background: var(--bg-surface-elevated)"
+              class="ds-pop ds-card absolute right-0 top-full mt-4 p-4 shadow-2xl flex flex-col gap-4 z-50 w-[260px] origin-top-right"
             >
               <div class="flex flex-col gap-3">
                 <p class="on-bg-meta">Темы</p>

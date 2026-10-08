@@ -15,7 +15,8 @@ export default defineNuxtConfig({
   icon: {
     serverBundle: 'remote',
   },
-  css: ["~/assets/css/main.css"],
+  // порядок важен: слой «Дедлока» переопределяет токены из main.css
+  css: ["~/assets/css/main.css", "~/assets/css/deadlock.css"],
   hooks: {
     "vite:extendConfig": (config: any) => {
       config.plugins?.push(tailwindcss())

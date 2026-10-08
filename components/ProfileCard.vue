@@ -23,7 +23,7 @@ defineProps<{
         <img
           :src="discordAvatarUrl"
           alt="avatar"
-          class="w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
+          class="profile-avatar w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
           style="border-radius: var(--radius-card)"
         />
         <span

@@ -72,6 +72,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Подложка страницы. Базовый фон — через класс, а не инлайном:
+   тема «Дедлок» переопределяет его каскадом (inline бьёт селектор). */
+.dl-bg-base { background: var(--bg-primary); }
+
 .dark {
   --bg-primary: var(--theme-bg-dark);
   --bg-surface: rgba(30, 30, 35, 0.6);
