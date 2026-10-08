@@ -298,6 +298,11 @@ onUnmounted(() => {
    Скругление и фон заданы классами, а не инлайном: инлайн бьёт
    любой селектор, и тема «Дедлок» не смогла бы их переопределить. */
 .nav-shell { border-radius: var(--radius-pill); }
+
+/* Подсказки о прокрутке вкладок. Цвет задаётся классом, а не инлайном:
+   тема «Дедлок» переопределяет его под свой фон. */
+.nav-fade-left { background: linear-gradient(to right, var(--accent-surface), transparent); }
+.nav-fade-right { background: linear-gradient(to left, var(--accent-surface), transparent); }
 .ds-pop {
   border-radius: var(--radius-card);
   /* два слоя: непрозрачная подложка + полупрозрачный верхний.

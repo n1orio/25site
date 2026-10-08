@@ -240,7 +240,11 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .ds-card.nav-shell { clip-path: none; }
 [data-deadlock] .nav-window,
 [data-deadlock] .nav-track { overflow: visible; height: auto; }
-[data-deadlock] .nav-fade { display: none; }
+/* Подсказки о прокрутке нужны и здесь: на телефоне пять вкладок не
+   влезают, и без них список выглядит просто оборванным. Фон navbar
+   у темы прозрачный, поэтому градиент берём от фона страницы. */
+[data-deadlock] .nav-fade-left { background-image: linear-gradient(to right, var(--bg-primary), transparent); }
+[data-deadlock] .nav-fade-right { background-image: linear-gradient(to left, var(--bg-primary), transparent); }
 [data-deadlock] .nav-sep { background: var(--dl-line); }
 
 [data-deadlock] .nav-link {
@@ -388,8 +392,8 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   [data-deadlock] .nav-track { overflow-x: auto; }
   [data-deadlock] .nav-link {
     filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.45));
-    padding: 9px 11px 6px 10px;
-    font-size: 11px;
+    padding: 8px 9px 6px 8px;
+    font-size: 10px;
   }
   [data-deadlock] .nav-ctl {
     width: 30px;

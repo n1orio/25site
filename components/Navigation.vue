@@ -50,10 +50,8 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       class="nav-shell ds-card flex items-center w-full max-w-full md:max-w-fit px-2 py-1.5"
     >
       <div class="nav-window flex-1 relative overflow-hidden h-[34px] min-w-0">
-        <div v-if="showLeftArrow" class="nav-fade absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to right, var(--accent-surface), transparent)" />
-        <div v-if="showRightArrow" class="nav-fade absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to left, var(--accent-surface), transparent)" />
+        <div v-if="showLeftArrow" class="nav-fade nav-fade-left absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none" />
+        <div v-if="showRightArrow" class="nav-fade nav-fade-right absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none" />
 
         <div ref="navScrollRef" @scroll="handleNavScroll" class="nav-track flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
           <NuxtLink
