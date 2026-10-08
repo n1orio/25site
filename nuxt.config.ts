@@ -37,10 +37,12 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    steamApiKey: process.env.STEAM_API_KEY,
-    steamId: process.env.STEAM_ID,
+    // Ключи задаются переменными окружения NUXT_* — иначе они запекаются
+    // в образ на этапе сборки и не подхватывают изменения без пересборки.
+    steamApiKey: "",
+    steamId: "",
     // без токена GitHub API даёт 60 запросов в час, с токеном — 5000
-    githubToken: process.env.GITHUB_TOKEN || "",
+    githubToken: "",
     lastfmApiKey: "",
     lastfmUsername: "",
   },
