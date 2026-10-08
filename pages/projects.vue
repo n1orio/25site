@@ -1,5 +1,28 @@
 <script setup lang="ts">
+import type { GithubData } from "~/types/github"
 import { projects } from "~/config"
+
+const { data: gh } = await useFetch<GithubData | null>("/api/github")
+const { info, statsFor, daysAgo, sizeLabel, compact } = useGithub(gh)
+
+/** карточка + её статистика, считается один раз */
+const rows = computed(() =>
+  projects.map((project) => ({ project, gh: statsFor(project.links) })),
+)
+
+/** доли языков для полоски, в процентах от суммы */
+const langShare = (langs: { name: string; bytes: number }[], bytes: number) =>
+  (bytes / langs.reduce((s, l) => s + l.bytes, 0)) * 100
+
+const summary = computed(() => {
+  const d = info.value
+  if (!d?.ok) return null
+  return [
+    { label: "репозиториев", value: d.totalRepos },
+    { label: "звёзд", value: d.totalStars },
+    { label: "языков", value: d.topLanguages.length },
+  ]
+})
 </script>
 
 <template>
@@ -9,9 +32,20 @@ import { projects } from "~/config"
       <WaveDivider class="flex-1" />
     </header>
 
+    <!-- сводка по аккаунту -->
+    <div v-if="summary" class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+      <span v-for="s in summary" :key="s.label" class="ds-pill">
+        <span class="ds-stat text-sm">{{ s.value }}</span>
+        <span class="ds-meta">{{ s.label }}</span>
+      </span>
+      <span v-if="info?.topLanguages.length" class="ds-meta">
+        {{ info.topLanguages.map((l) => l.name).join(" · ") }}
+      </span>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <article
-        v-for="project in projects"
+        v-for="{ project, gh } in rows"
         :key="project.title"
         class="ds-card ds-card-hover p-6 flex flex-col relative"
       >
@@ -38,9 +72,46 @@ import { projects } from "~/config"
         </div>
 
         <h3 class="ds-title text-lg mb-2">{{ project.title }}</h3>
-        <p class="ds-body text-sm mb-5 flex-1">{{ project.desc }}</p>
+        <p class="ds-body text-sm mb-4">{{ project.desc }}</p>
 
-        <div class="flex flex-wrap gap-2">
+        <!-- статистика с GitHub -->
+        <div v-if="gh" class="mb-4">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2.5">
+            <span class="ds-meta flex items-center gap-1">
+              <Icon name="mdi:star" size="12" class="w-3 h-3" />
+              {{ gh.stars }}
+            </span>
+            <span v-if="gh.commits" class="ds-meta flex items-center gap-1">
+              <Icon name="lucide:git-commit-horizontal" size="12" class="w-3 h-3" />
+              {{ gh.commits }} коммитов
+            </span>
+            <span v-if="gh.downloads" class="ds-meta flex items-center gap-1">
+              <Icon name="lucide:download" size="12" class="w-3 h-3" />
+              {{ compact(gh.downloads) }}
+            </span>
+            <span class="ds-meta ml-auto">{{ daysAgo(gh.pushedAt) ?? '—' }}</span>
+          </div>
+
+          <!-- состав по языкам -->
+          <div v-if="gh.languages.length" class="flex h-1.5 rounded-full overflow-hidden">
+            <span
+              v-for="(lang, i) in gh.languages"
+              :key="lang.name"
+              class="h-full"
+              :style="{
+                width: `${langShare(gh.languages, lang.bytes)}%`,
+                opacity: 1 - i * 0.18,
+                background: 'var(--accent-contrast)',
+              }"
+              :title="`${lang.name} — ${sizeLabel(Math.round(lang.bytes / 1024))}`"
+            />
+          </div>
+          <p v-if="gh.languages.length" class="ds-meta mt-1.5">
+            {{ gh.languages.map((l) => l.name).join(" · ") }}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-auto">
           <span v-for="tag in project.tags" :key="tag" class="ds-pill">{{ tag }}</span>
         </div>
       </article>

@@ -137,20 +137,20 @@ export const projects: Project[] = [
   },
   {
     icon: "lucide:wind",
-    title: "Breeze Site",
+    title: "Mistraly Site",
     desc: "Сайт для невышедшего майнкрафт сервера Breeze",
     tags: ["Next.js", "TypeScript", "Prisma", "Bun"],
     links: [
-      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/breeze-site" },
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mistraly-site" },
     ],
   },
   {
     icon: "lucide:rocket",
-    title: "NIO Launcher",
+    title: "Mono Launcher",
     desc: "Десктопный лаунчер для Minecraft-сборок (.mrpack) через GitHub Releases. Tauri 2 + Nuxt 3, автообновления, Microsoft-вход, несколько сборок.",
     tags: ["Tauri 2", "Rust", "Vue", "Nuxt 3"],
     links: [
-      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/nio-launcher" },
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-launcher" },
     ],
   },
   {
