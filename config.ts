@@ -180,12 +180,10 @@ export const projects: Project[] = [
   {
     icon: "lucide:wind",
     title: "Breeze Site",
-    desc: "Сайт для невышедшего майнкрафт сервера Breeze",
+    desc: "Сайт для невышедшего майнкрафт сервера Breeze. Впоследствии преобразован в Mistraly Site.",
     tags: ["Next.js", "TypeScript", "Prisma", "Bun"],
     archived: true,
-    links: [
-      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/breeze-site" },
-    ],
+    links: [],
   },
   {
     icon: "lucide:rocket",
