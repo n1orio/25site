@@ -51,6 +51,55 @@ const monthLabels = computed(() => {
   return out
 })
 
+const LEVEL_TEXT = ["без вкладов", "немного", "средне", "много", "очень много"]
+const MONTHS_FULL = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]
+
+const formatDate = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) return iso
+  return `${d.getUTCDate()} ${MONTHS_FULL[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+/** выбранный день: поповер держим на ячейке, как на GitHub */
+const active = ref<{ date: string; level: number } | null>(null)
+const pinned = ref(false)
+const wrapRef = ref<HTMLElement | null>(null)
+const popStyle = ref<Record<string, string>>({})
+
+const showPop = (day: { date: string; level: number } | null, el?: HTMLElement | null) => {
+  if (!day || !wrapRef.value) return
+  active.value = day
+  const box = wrapRef.value.getBoundingClientRect()
+  const cell = (el ?? null)?.getBoundingClientRect()
+  if (!cell) return
+  // держим поповер внутри графика, не даём уехать за края
+  const left = Math.min(Math.max(cell.left - box.left + cell.width / 2, 70), box.width - 70)
+  popStyle.value = {
+    left: `${left}px`,
+    top: `${cell.top - box.top + cell.height / 2}px`,
+  }
+}
+
+const hidePop = () => {
+  if (!pinned.value) active.value = null
+}
+
+const togglePin = (day: { date: string; level: number }) => {
+  pinned.value = !pinned.value
+  if (pinned.value) active.value = day
+  else active.value = null
+}
+
+const onKey = (e: KeyboardEvent) => {
+  if (e.key === "Escape" && pinned.value) {
+    pinned.value = false
+    active.value = null
+  }
+}
+
+onMounted(() => document.addEventListener("keydown", onKey))
+onUnmounted(() => document.removeEventListener("keydown", onKey))
+
 const formatRange = (from: string, to: string) => {
   if (!from || !to) return ""
   const f = new Date(`${from}T00:00:00Z`)
@@ -61,7 +110,7 @@ const formatRange = (from: string, to: string) => {
 </script>
 
 <template>
-  <div v-if="data" class="ds-card p-5 sm:p-6">
+  <div v-if="data" ref="wrapRef" data-contrib class="ds-card p-5 sm:p-6 relative" @mouseleave="hidePop">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
       <p class="ds-meta">Вклады</p>
       <p class="ds-meta tabular-nums">{{ formatRange(data.from, data.to) }}</p>
@@ -107,16 +156,46 @@ const formatRange = (from: string, to: string) => {
         <!-- дни -->
         <div class="flex gap-[3px]">
           <div v-for="(col, ci) in weeks" :key="ci" class="flex flex-col gap-[3px] shrink-0">
-            <span
+            <button
               v-for="(day, di) in col"
               :key="day?.date ?? `empty-${ci}-${di}`"
-              class="w-[10px] h-[10px] rounded-[2px]"
-              :style="day ? { background: tile(day.level) } : { background: 'transparent' }"
-              :title="day ? `${day.date} — уровень ${day.level}` : undefined"
+              type="button"
+              class="w-[10px] h-[10px] rounded-[2px] p-0 border-0"
+              :class="day ? 'cursor-pointer' : 'pointer-events-none'"
+              :style="day
+                ? {
+                    background: tile(day.level),
+                    outline: active?.date === day.date ? '1px solid var(--accent-contrast)' : 'none',
+                    outlineOffset: '1px',
+                  }
+                : { background: 'transparent' }"
+              :disabled="!day"
+              :aria-label="day ? `${formatDate(day.date)}: ${LEVEL_TEXT[day.level]}` : undefined"
+              @mouseenter="showPop(day, $event.currentTarget as HTMLElement)"
+              @focus="showPop(day, $event.currentTarget as HTMLElement)"
+              @mouseleave="hidePop"
+              @blur="hidePop"
+              @click="day && (showPop(day, $event.currentTarget as HTMLElement), togglePin(day))"
             />
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- поповер дня, как на GitHub -->
+    <div
+      v-if="active"
+      class="absolute z-10 pointer-events-none -translate-x-1/2 -translate-y-[calc(100%+8px)] whitespace-nowrap px-2.5 py-1.5"
+      :style="{
+        ...popStyle,
+        background: 'var(--accent-contrast)',
+        color: 'var(--accent-surface)',
+        borderRadius: 'var(--radius-pill)',
+      }"
+    >
+      <span class="text-[0.6875rem] font-bold">
+        {{ LEVEL_TEXT[active.level] }} · {{ formatDate(active.date) }}
+      </span>
     </div>
 
     <div class="flex items-center gap-1.5 mt-3">
