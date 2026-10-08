@@ -29,7 +29,7 @@ defineProps<{
         v-for="activity in visibleActivities"
         :key="activity.id || activity.name"
         class="flex items-center gap-3 p-3"
-        style="background: rgba(255,255,255,0.14); border-radius: var(--radius-pill)"
+        style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)"
       >
         <div class="relative flex-shrink-0">
           <template v-if="activity.assets?.large_image">
@@ -48,7 +48,8 @@ defineProps<{
           <img
             v-if="activity.assets?.small_image"
             :src="getDiscordAssetUrl(activity.application_id, activity.assets.small_image)"
-            class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full object-cover border-2 border-[var(--accent)]" />
+            class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full object-cover border-2"
+            style="border-color: var(--accent-surface)" />
         </div>
 
         <div class="min-w-0 flex flex-col justify-center">
@@ -60,7 +61,7 @@ defineProps<{
     </div>
 
     <div v-else class="flex items-center gap-3 p-3"
-      style="background: rgba(255,255,255,0.14); border-radius: var(--radius-pill)">
+      style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)">
       <div class="w-10 h-10 flex items-center justify-center flex-shrink-0" style="color: var(--text-secondary)">
         <Icon name="lucide:moon" size="20" class="w-5 h-5" />
       </div>

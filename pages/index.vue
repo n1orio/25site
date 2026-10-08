@@ -5,7 +5,7 @@ import { socials } from "~/config"
 <template>
   <section class="ds-section">
     <header class="flex items-center gap-3 mb-4">
-      <h2 class="ds-meta">Связь</h2>
+      <h2 class="on-bg-meta">Связь</h2>
       <WaveDivider class="flex-1" />
     </header>
 
@@ -20,7 +20,7 @@ import { socials } from "~/config"
       >
         <span
           class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
-          style="background: rgba(255,255,255,0.18)"
+          style="background: color-mix(in srgb, var(--accent-contrast) 18%, transparent)"
         >
           <Icon :name="social.icon" size="20" class="w-5 h-5" style="color: var(--accent-contrast)" />
         </span>

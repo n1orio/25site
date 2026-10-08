@@ -1,6 +1,21 @@
 import { ref, onMounted, onUnmounted } from "vue"
 
-export const useCursor = (primaryColor: any) => {
+type RGB = [number, number, number]
+
+const INTERACTIVE = 'a, button, input, .cursor-pointer, .nav-link, label, [role="button"]'
+/* поверхности, залитые акцентом — на них курсор должен быть контрастным */
+const ACCENT_SURFACE = ".ds-card, .ds-pill, .ds-action, .ds-scallop, .ds-bar > span"
+
+const hexToRgb = (hex: string): RGB | null => {
+  let h = hex.trim().replace("#", "")
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("")
+  if (h.length < 6) return null
+  const n = Number.parseInt(h.slice(0, 6), 16)
+  if (Number.isNaN(n)) return null
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+
+export const useCursor = (primaryColor: any, contrastColor: any) => {
   const cursorRef = ref<HTMLElement | null>(null)
   const isCursorVisible = ref(false)
   const isHovering = ref(false)
@@ -17,10 +32,40 @@ export const useCursor = (primaryColor: any) => {
   let animationFrameId: number | null = null
   let cachedBorderRadius = "4px"
 
+  // --- цвет курсора: плавно интерполируем между акцентом и контрастом ---
+  const color = { r: 255, g: 255, b: 255 }
+  const colorTarget: RGB = [255, 255, 255]
+  const setTarget = (hex: string) => {
+    const rgb = hexToRgb(hex)
+    if (rgb) {
+      colorTarget[0] = rgb[0]
+      colorTarget[1] = rgb[1]
+      colorTarget[2] = rgb[2]
+    }
+  }
+  const syncTarget = () => {
+    setTarget(isOverAccent.value ? contrastColor.value : primaryColor.value)
+  }
+
+  const isOverAccent = ref(false)
+
+  const updateColor = () => {
+    const t = 0.12
+    color.r += (colorTarget[0] - color.r) * t
+    color.g += (colorTarget[1] - color.g) * t
+    color.b += (colorTarget[2] - color.b) * t
+    if (cursorRef.value) {
+      cursorRef.value.style.setProperty(
+        "--cursor-color",
+        `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`,
+      )
+    }
+  }
+
   const updateCursor = () => {
     if (cursorRef.value) {
-      cursorRef.value.style.setProperty("--cursor-color", primaryColor.value)
       cursorRef.value.style.setProperty("--cursor-radius", cachedBorderRadius)
+      updateColor()
 
       if (hoverTarget) {
         const rect = hoverTarget.getBoundingClientRect()
@@ -54,6 +99,7 @@ export const useCursor = (primaryColor: any) => {
   const onMouseMove = (e: MouseEvent) => {
     if (!hasMoved) {
       cursorX = e.clientX; cursorY = e.clientY
+      color.r = colorTarget[0]; color.g = colorTarget[1]; color.b = colorTarget[2]
       hasMoved = true
     }
     mouseX = e.clientX; mouseY = e.clientY
@@ -61,22 +107,30 @@ export const useCursor = (primaryColor: any) => {
   }
 
   const onMouseOver = (e: MouseEvent) => {
-    const target = (e.target as HTMLElement).closest(
-      'a, button, input, .cursor-pointer, .nav-link, label, [role="button"]',
-    ) as HTMLElement | null
+    const el = e.target as HTMLElement
+
+    isOverAccent.value = !!el.closest(ACCENT_SURFACE)
+    syncTarget()
+
+    const target = el.closest(INTERACTIVE) as HTMLElement | null
     if (target) {
       hoverTarget = target
       isHovering.value = true
-      let radius = window.getComputedStyle(target).borderRadius
+      const radius = window.getComputedStyle(target).borderRadius
       cachedBorderRadius = radius === "0px" ? "6px" : radius
     }
   }
 
   const onMouseOut = (e: MouseEvent) => {
-    const target = (e.target as HTMLElement).closest(
-      'a, button, input, .cursor-pointer, .nav-link, label, [role="button"]',
-    ) as HTMLElement | null
-    if (target && target === hoverTarget) {
+    const el = e.target as HTMLElement
+
+    // relatedTarget показывает, куда ушёл курсор — пересчитываем поверхность сразу
+    const to = e.relatedTarget as HTMLElement | null
+    isOverAccent.value = !!to?.closest?.(ACCENT_SURFACE)
+    syncTarget()
+
+    const target = el.closest(INTERACTIVE) as HTMLElement | null
+    if (target && target === hoverTarget && !to?.closest?.(INTERACTIVE)) {
       hoverTarget = null
       isHovering.value = false
       cachedBorderRadius = "4px"
@@ -86,6 +140,7 @@ export const useCursor = (primaryColor: any) => {
   const onMouseLeave = () => { isCursorVisible.value = false }
 
   const startCursor = () => {
+    syncTarget()
     window.addEventListener("mousemove", onMouseMove)
     document.addEventListener("mouseover", onMouseOver)
     document.addEventListener("mouseout", onMouseOut)

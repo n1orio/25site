@@ -5,7 +5,7 @@ import { projects } from "~/config"
 <template>
   <section class="ds-section">
     <header class="flex items-center gap-3 mb-4">
-      <h2 class="ds-meta">Мои работы</h2>
+      <h2 class="on-bg-meta">Мои работы</h2>
       <WaveDivider class="flex-1" />
     </header>
 
@@ -18,7 +18,7 @@ import { projects } from "~/config"
         <div class="flex items-start justify-between gap-3 mb-4">
           <span
             class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style="background: rgba(255,255,255,0.18); color: var(--accent-contrast)"
+            style="background: color-mix(in srgb, var(--accent-contrast) 18%, transparent); color: var(--accent-contrast)"
           >
             <Icon :name="project.icon" size="24" class="w-6 h-6" />
           </span>

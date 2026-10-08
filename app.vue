@@ -2,7 +2,8 @@
 import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
-  primaryColor, secondaryColor, bgPrimary, bgSecondary, accentContrast,
+  primaryColor, secondaryColor, bgPrimary, bgSecondary,
+  accentSurface, accentContrast,
 } = useSecretTheme()
 
 const { data: discord } = await useFetch("/api/discord")
@@ -20,7 +21,7 @@ const {
 
 const {
   cursorRef, isCursorVisible, isHovering, startCursor, stopCursor,
-} = useCursor(primaryColor)
+} = useCursor(primaryColor, accentContrast)
 
 const { onTouchStart, onTouchEnd, initNav, destroyNav } = useNavigation()
 
@@ -42,7 +43,7 @@ onUnmounted(() => {
 
 <template>
   <div class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
-    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-contrast': accentContrast, color: 'var(--text-primary)' }"
+    :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, color: 'var(--text-primary)' }"
   >
     <div ref="cursorRef" class="custom-cursor" v-show="isCursorVisible" :class="{ 'is-hovering': isHovering }">
       <div class="cursor-corner top-left"></div>
@@ -66,11 +67,11 @@ onUnmounted(() => {
             :bio-paragraph2="bioParagraph2"
           />
 
-          <WaveDivider />
+          <WaveDivider class="ds-wave-muted" />
 
           <section class="ds-section">
             <header class="flex items-center gap-3 mb-4">
-              <h2 class="ds-meta">Сейчас</h2>
+              <h2 class="on-bg-meta">Сейчас</h2>
             </header>
             <div class="ds-card p-5 flex flex-col gap-5">
               <DiscordStatus
@@ -152,6 +153,7 @@ onUnmounted(() => {
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #6366f1; }
 @property --accent-secondary { syntax: "<color>"; inherits: true; initial-value: #8a2387; }
 @property --accent-contrast { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --accent-surface { syntax: "<color>"; inherits: true; initial-value: #4f46e5; }
 @property --bg-1 { syntax: "<color>"; inherits: true; initial-value: #f4f4f5; }
 @property --bg-2 { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
 
@@ -163,6 +165,7 @@ onUnmounted(() => {
               --accent 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --accent-secondary 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --accent-contrast 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              --accent-surface 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --bg-1 1.5s cubic-bezier(0.22, 1, 0.36, 1),
               --bg-2 1.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -186,7 +189,7 @@ onUnmounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
-  color: color-mix(in srgb, var(--accent-contrast) 70%, var(--accent));
+  color: color-mix(in srgb, var(--accent-contrast) 88%, var(--accent-surface));
   transition: color 0.25s ease;
 }
 .nav-link:hover { color: var(--accent-contrast); }
@@ -221,7 +224,7 @@ onUnmounted(() => {
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   line-height: 1.65;
-  color: color-mix(in srgb, var(--accent-contrast) 72%, var(--accent));
+  color: color-mix(in srgb, var(--accent-contrast) 94%, var(--accent-surface));
 }
 .ds-meta {
   font-family: var(--font-mono);
@@ -229,20 +232,20 @@ onUnmounted(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--accent-contrast) 65%, var(--accent));
+  color: color-mix(in srgb, var(--accent-contrast) 88%, var(--accent-surface));
 }
 .ds-num {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--accent-contrast) 55%, var(--accent));
+  color: color-mix(in srgb, var(--accent-contrast) 82%, var(--accent-surface));
   flex-shrink: 0;
 }
 
 /* --- accent surfaces, no borders --- */
 .ds-card {
-  background: var(--accent);
+  background: var(--accent-surface);
   border: 0;
   border-radius: var(--radius-card);
   transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
@@ -337,6 +340,29 @@ onUnmounted(() => {
   z-index: 0;
 }
 .ds-scallop > * { position: relative; z-index: 1; }
+
+/* --- on page background (not on accent surfaces) --- */
+.on-bg-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.on-bg-body {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.on-bg-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+.ds-wave-muted { color: color-mix(in srgb, var(--text-secondary) 45%, transparent); }
 
 /* --- misc --- */
 .ds-stat {

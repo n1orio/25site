@@ -23,7 +23,7 @@ defineProps<{
     </div>
 
     <div class="flex items-center gap-3 p-3 transition-colors"
-      style="background: rgba(255,255,255,0.14); border-radius: var(--radius-pill)">
+      style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)">
       <template v-if="steam?.isPlaying && steam?.gameArt">
         <img :src="steam.gameArt" class="w-10 h-10 object-cover flex-shrink-0" style="border-radius: var(--radius-card)" loading="lazy" />
       </template>

@@ -23,7 +23,7 @@ onUnmounted(() => {
   <div class="flex flex-col gap-10">
     <section class="ds-section">
       <header class="flex items-center gap-3 mb-4">
-        <h2 class="ds-meta">Основное железо</h2>
+        <h2 class="on-bg-meta">Основное железо</h2>
         <WaveDivider class="flex-1" />
       </header>
 
@@ -56,7 +56,7 @@ onUnmounted(() => {
 
     <section class="ds-section">
       <header class="flex items-center gap-3 mb-4">
-        <h2 class="ds-meta">Дополнительно</h2>
+        <h2 class="on-bg-meta">Дополнительно</h2>
         <span class="ds-meta ml-auto">{{ currentFrame }}</span>
         <WaveDivider class="flex-1 !max-w-[120px]" />
       </header>

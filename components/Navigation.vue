@@ -38,9 +38,9 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
     >
       <div class="flex-1 relative overflow-hidden h-[34px] min-w-0">
         <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to right, var(--accent), transparent)" />
+          style="background: linear-gradient(to right, var(--accent-surface), transparent)" />
         <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
-          style="background: linear-gradient(to left, var(--accent), transparent)" />
+          style="background: linear-gradient(to left, var(--accent-surface), transparent)" />
 
         <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
           <div
@@ -94,7 +94,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
               style="border-radius: var(--radius-card); background: var(--bg-surface-elevated)"
             >
               <div class="flex flex-col gap-3">
-                <p class="ds-meta">Темы</p>
+                <p class="on-bg-meta">Темы</p>
                 <div class="grid grid-cols-2 gap-2">
                   <button
                     v-for="preset in gradientPresets"
@@ -111,7 +111,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                         background: `linear-gradient(135deg, ${preset.colors[0]} 10%, ${preset.colors[1]} 90%)`,
                         borderColor: 'transparent',
                       }" />
-                    <span class="ds-meta text-center">{{ preset.name }}</span>
+                    <span class="on-bg-meta text-center">{{ preset.name }}</span>
                   </button>
                 </div>
               </div>
@@ -119,7 +119,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
               <span class="w-full h-px" style="background: color-mix(in srgb, var(--accent-contrast) 22%, transparent)" />
 
               <div class="flex items-center justify-between">
-                <p class="ds-meta">Свой цвет</p>
+                <p class="on-bg-meta">Свой цвет</p>
                 <div class="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer flex items-center justify-center"
                   style="background: conic-gradient(red,yellow,lime,aqua,blue,magenta,red)">
                   <div class="absolute inset-0.5 rounded-full flex items-center justify-center" style="background: var(--bg-primary)">

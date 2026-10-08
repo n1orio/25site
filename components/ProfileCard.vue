@@ -26,12 +26,12 @@ defineProps<{
       </div>
 
       <div class="min-w-0">
-        <h1 class="ds-title text-2xl sm:text-3xl mb-1.5">{{ username }}</h1>
-        <p class="ds-meta">{{ bioTitle }}</p>
+        <h1 class="on-bg-title text-2xl sm:text-3xl mb-1.5">{{ username }}</h1>
+        <p class="on-bg-meta">{{ bioTitle }}</p>
       </div>
     </div>
 
-    <div class="ds-body space-y-2.5 max-w-prose">
+    <div class="on-bg-body space-y-2.5 max-w-prose">
       <p>{{ bioParagraph0 }}</p>
       <p>{{ bioParagraph1 }}</p>
       <p>{{ bioParagraph2 }}</p>

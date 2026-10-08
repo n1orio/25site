@@ -7,11 +7,11 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
 <template>
   <section class="ds-section">
     <header class="flex items-center gap-3 mb-4">
-      <h2 class="ds-meta">Топ аниме</h2>
+      <h2 class="on-bg-meta">Топ аниме</h2>
       <WaveDivider class="flex-1" />
     </header>
 
-    <p class="ds-body text-xs mb-4 max-w-prose">{{ animeDisclaimer }}</p>
+    <p class="on-bg-body text-xs mb-4 max-w-prose">{{ animeDisclaimer }}</p>
 
     <div class="ds-card p-5 sm:p-6">
       <div

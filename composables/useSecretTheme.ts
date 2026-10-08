@@ -95,21 +95,56 @@ export const useSecretTheme = () => {
     activeGradient.value = colors;
   };
 
-  // Контрастный текст поверх акцентной заливки: светлый акцент -> тёмный текст
-  const accentContrast = computed(() => {
-    const hex = (primaryColor.value || "#6366f1").replace("#", "");
-    if (hex.length < 6) return "#ffffff";
-    const r = parseInt(hex.slice(0, 2), 16) / 255;
-    const g = parseInt(hex.slice(2, 4), 16) / 255;
-    const b = parseInt(hex.slice(4, 6), 16) / 255;
-    const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-    const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-    return luminance > 0.45 ? "#101014" : "#ffffff";
-  });
+  // --- контраст и читаемая поверхность для акцента ---
+  const hexToRgb = (hex: string): [number, number, number] | null => {
+    let h = (hex || "").trim().replace("#", "")
+    if (h.length === 3) h = h.split("").map((c) => c + c).join("")
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) return null
+    const n = Number.parseInt(h, 16)
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+  }
+  const toHex = (rgb: [number, number, number]) =>
+    "#" + rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("")
+  const luminance = (rgb: [number, number, number]) => {
+    const f = (c: number) => {
+      const s = c / 255
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+    }
+    return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2])
+  }
+  const contrast = (a: [number, number, number], b: [number, number, number]) => {
+    const la = luminance(a); const lb = luminance(b)
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
+  }
+
+  const WHITE: [number, number, number] = [255, 255, 255]
+  const INK: [number, number, number] = [16, 16, 20]
+  /** Минимальный контраст текста на акцентной заливке */
+  const MIN_CR = 5.5
+
+  // Акцентная заливка + контрастный текст к ней
+  const accentPair = computed(() => {
+    const rgb = hexToRgb(primaryColor.value || "") ?? hexToRgb("#6366f1")!
+
+    if (contrast(rgb, INK) >= MIN_CR) {
+      return { surface: toHex(rgb), contrast: toHex(INK) }
+    }
+
+    // белым не хватает — затемняем акцент, сохраняя оттенок
+    let scaled = rgb
+    for (let i = 0; i < 24 && contrast(scaled, WHITE) < MIN_CR; i++) {
+      scaled = scaled.map((c) => c * 0.94) as [number, number, number]
+    }
+    return { surface: toHex(scaled), contrast: toHex(WHITE) }
+  })
+
+  const accentSurface = computed(() => accentPair.value.surface)
+  const accentContrast = computed(() => accentPair.value.contrast)
 
   return {
     isDark, themeMode, activeGradient, accentColor, gradientPresets,
-    bgPrimary, bgSecondary, primaryColor, secondaryColor, accentContrast,
+    bgPrimary, bgSecondary, primaryColor, secondaryColor,
+    accentSurface, accentContrast,
     setSingleColor, setGradient,
   };
 };
