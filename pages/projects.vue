@@ -1,11 +1,23 @@
 <script setup lang="ts">
 import type { GithubData } from "~/types/github"
 import type { ContributionsData } from "~/server/api/contributions"
+import type { ModrinthData } from "~/server/api/modrinth"
 import { projects } from "~/config"
 
 const { data: gh } = await useFetch<GithubData | null>("/api/github")
 const { data: contrib } = await useFetch<ContributionsData | null>("/api/contributions")
 const { info, statsFor, daysAgo, sizeLabel, compact } = useGithub(gh)
+
+const { data: mr } = await useFetch<ModrinthData | null>("/api/modrinth")
+
+/** slug проекта из ссылки на modrinth.com в карточке */
+const modrinthSlug = (links: { url: string }[]) => {
+  for (const l of links) {
+    const m = l.url.match(/modrinth\.com\/(?:mod|modpack|plugin|resourcepack|datapack|project|shader)\/([\w-]+)/i)
+    if (m) return m[1]!.toLowerCase()
+  }
+  return null
+}
 
 /** активные проекты и архив */
 const active = computed(() => projects.filter((p) => !p.archived))
@@ -13,7 +25,14 @@ const archived = computed(() => projects.filter((p) => p.archived))
 
 /** карточка + её статистика, считается один раз (в архиве GitHub не нужен) */
 const rows = computed(() =>
-  active.value.map((project) => ({ project, gh: statsFor(project.links) })),
+  active.value.map((project) => {
+    const slug = modrinthSlug(project.links)
+    return {
+      project,
+      gh: statsFor(project.links),
+      mr: slug ? mr.value?.projects?.[slug] ?? null : null,
+    }
+  }),
 )
 
 /** доли языков для полоски, в процентах от суммы */
@@ -51,7 +70,7 @@ const summary = computed(() => {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <article
-        v-for="{ project, gh } in rows"
+        v-for="{ project, gh, mr } in rows"
         :key="project.title"
         class="ds-card ds-card-hover p-6 flex flex-col relative"
       >
@@ -115,6 +134,21 @@ const summary = computed(() => {
           <p v-if="gh.languages.length" class="ds-meta mt-1.5">
             {{ gh.languages.map((l) => l.name).join(" · ") }}
           </p>
+        </div>
+
+        <!-- статистика с Modrinth -->
+        <div v-if="mr" class="mb-4">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span class="ds-meta flex items-center gap-1">
+              <Icon name="lucide:download" size="12" class="w-3 h-3" />
+              {{ compact(mr.downloads) }} скачиваний
+            </span>
+            <span v-if="mr.followers" class="ds-meta flex items-center gap-1">
+              <Icon name="lucide:heart" size="12" class="w-3 h-3" />
+              {{ mr.followers }}
+            </span>
+            <span v-if="mr.license" class="ds-meta ml-auto">{{ mr.license }}</span>
+          </div>
         </div>
 
         <div class="flex flex-wrap gap-2 mt-auto">

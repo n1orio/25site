@@ -39,6 +39,17 @@ export const bio = [
   "Имею опыт работы с Java, Kotlin, Python, Vue/Nuxt, React, TypeScript, JavaScript, Denizen, Figma, Blockbench, Aseprite.",
 ]
 
+// === Геолокация ===
+// Используется для локального времени и погоды
+export const location = {
+  city: "Армавир",
+  /** IANA-таймзона для Intl.DateTimeFormat */
+  timezone: "Europe/Moscow",
+  /** координаты для Open-Meteo (Армавир) */
+  lat: 44.9386,
+  lon: 40.1003,
+}
+
 // === Навигация ===
 export const navTabs: { label: string; to: string }[] = [
   { label: "Соцсети", to: "/" },

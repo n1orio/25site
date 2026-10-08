@@ -26,6 +26,29 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: "@Niorio — Максим, Армавир",
+      htmlAttrs: { lang: "ru" },
+      meta: [
+        { name: "description", content: "Сайт Максима: проекты, статистика Deadlock, сетап, Steam и Discord в реальном времени." },
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+        // Open Graph — превью при отправке ссылки в мессенджеры
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "nio." },
+        { property: "og:title", content: "@Niorio — Максим, Армавир" },
+        { property: "og:description", content: "Проекты, статистика Deadlock, сетап, Steam и Discord в реальном времени." },
+        { property: "og:image", content: "/og.png" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:locale", content: "ru_RU" },
+
+        // Twitter
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: "@Niorio — Максим, Армавир" },
+        { name: "twitter:description", content: "Проекты, статистика Deadlock, сетап, Steam и Discord в реальном времени." },
+        { name: "twitter:image", content: "/og.png" },
+      ],
       link: [
         { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
         { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },

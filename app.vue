@@ -71,6 +71,8 @@ onUnmounted(() => {
             :bio-paragraph2="bioParagraph2"
           />
 
+          <LocalStatus />
+
           <WaveDivider class="flex-1" />
 
           <section class="ds-section">
