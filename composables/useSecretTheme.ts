@@ -49,8 +49,8 @@ export const useSecretTheme = () => {
 
   // Пресеты градиентов
   const gradientPresets = [
-    { id: "ruby",  name: "Рубин",  colors: ["#E74C3C", "#C0392B"] },
-    { id: "gold",  name: "Золото", colors: ["#FFD93D", "#B8860B"] },
+    { id: "ruby",  name: "Рубин",  colors: ["#e53935", "#e35d5b"] },
+    { id: "sunset",name: "Закат",  colors: ["#f46b45", "#eea849"] },
     { id: "forest",name: "Лес",    colors: ["#2ECC71", "#145A32"] },
     { id: "teal",  name: "Бирюза", colors: ["#00D2D3", "#006266"] },
     { id: "ocean", name: "Океан",  colors: ["#3498DB", "#1A5276"] },
