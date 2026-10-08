@@ -65,10 +65,26 @@ const DEADLOCK = {
 
 /** шрифты темы грузятся отдельно, см. useDeadlockFonts */
 
+/**
+ * `useDark()` при каждом вызове отдаёт свой ref, а внутри одной вкладки
+ * они не синхронизируются: часть компонентов держала SSR-значение
+ * (подпись и иконка у тумблера оставались от сервера, пока по теме
+ * не кликнешь). Поэтому на клиенте экземпляр один на всё приложение.
+ * На сервере ref'ы остаются локальными — иначе состояние утечёт
+ * между запросами.
+ */
+let sharedDark: Ref<boolean> | undefined
+
+const useAppDark = (): Ref<boolean> => {
+  if (import.meta.server) return useDark()
+  sharedDark ??= useDark()
+  return sharedDark
+}
+
 // Управление темой
 export const useSecretTheme = () => {
-  // useDark: prefers-color-scheme + .dark на &lt;html&gt;
-  const isDark = useDark();
+  // useDark: prefers-color-scheme + .dark на <html>
+  const isDark = useAppDark();
   // Пресеты градиентов
   const gradientPresets = [
     { id: "ruby",  name: "Рубин",  colors: ["#e53935", "#e35d5b"] },

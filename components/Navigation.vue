@@ -14,6 +14,17 @@ const {
 const showPalette = ref(false)
 const paletteRef = shallowRef<HTMLElement | null>(null)
 
+/**
+ * Vue при гидрации не патчит атрибуты, поэтому подпись и иконка
+ * тумблера оставались от серверной отдачи: в тёмной теме кнопка
+ * с самого начала обещала «переключить на тёмную». Флаг заставляет
+ * компонент перерисоваться после монтирования — тогда обновятся
+ * и aria-label, и иконка.
+ */
+const hydrated = ref(false)
+onMounted(() => { hydrated.value = true })
+const isDarkNow = computed(() => hydrated.value && isDark.value)
+
 const {
   gradientPresets, themeMode, activeGradient,
   primaryColor, secondaryColor,
@@ -60,8 +71,8 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       <span class="nav-sep w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
-        <button @click="toggleTheme($event)" class="nav-ctl" :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'">
-          <Icon :name="isDark ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
+        <button @click="toggleTheme($event)" class="nav-ctl" :aria-label="isDarkNow ? 'Светлая тема' : 'Тёмная тема'">
+          <Icon :name="isDarkNow ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 
         <div class="relative" ref="paletteRef">
