@@ -7,6 +7,7 @@ const {
 
 const { data: discord } = await useFetch("/api/discord")
 const { data: steam } = await useFetch("/api/steam")
+const { data: deadlock } = await useFetch("/api/deadlock")
 
 const {
   discordStatus, discordStatusColor,
@@ -53,10 +54,10 @@ onUnmounted(() => {
 
     <AppBackground />
 
-    <div class="max-w-[1300px] mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-12 relative z-10 flex flex-col">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 items-start">
+    <div class="max-w-[1300px] mx-auto px-4 sm:px-6 md:px-10 py-6 md:py-10 relative z-10 flex flex-col">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-14 items-start">
 
-        <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 w-full lg:sticky lg:top-8 z-20">
+        <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-8 w-full lg:sticky lg:top-10 z-20">
           <ProfileCard
             :discord-avatar-url="discordAvatarUrl"
             :discord-status-color="discordStatusColor"
@@ -66,34 +67,46 @@ onUnmounted(() => {
             :bio-paragraph2="bioParagraph2"
           />
 
-          <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
-            <DiscordStatus
-              :discord-status-color="discordStatusColor"
-              :discord-status="discordStatus"
-              :visible-activities="visibleActivities"
-              :get-activity-type-label="getActivityTypeLabel"
-              :get-activity-title="getActivityTitle"
-              :get-activity-sublines="getActivitySublines"
-              :get-activity-icon="getActivityIcon"
-              :get-discord-asset-url="getDiscordAssetUrl"
-            />
+          <hr class="v2-rule">
 
-            <SteamStatus
-              :steam="steam"
-              :steam-pill-text="steamPillText"
-              :steam-headline-text="steamHeadlineText"
-              :steam-subline-text="steamSublineText"
-            />
-          </div>
-        </div>
+          <section class="v2-section">
+            <header class="flex items-baseline gap-3 mb-2">
+              <span class="v2-index">05</span>
+              <h2 class="v2-label">Сейчас</h2>
+            </header>
+            <div class="flex flex-col gap-4">
+              <DiscordStatus
+                :discord-status-color="discordStatusColor"
+                :discord-status="discordStatus"
+                :visible-activities="visibleActivities"
+                :get-activity-type-label="getActivityTypeLabel"
+                :get-activity-title="getActivityTitle"
+                :get-activity-sublines="getActivitySublines"
+                :get-activity-icon="getActivityIcon"
+                :get-discord-asset-url="getDiscordAssetUrl"
+              />
 
-        <div class="lg:col-span-7 xl:col-span-8 flex flex-col min-w-0 z-10 w-full mt-2 lg:mt-0">
+              <SteamStatus
+                :steam="steam"
+                :steam-pill-text="steamPillText"
+                :steam-headline-text="steamHeadlineText"
+                :steam-subline-text="steamSublineText"
+              />
+            </div>
+          </section>
+
+          <hr class="v2-rule">
+
+          <DeadlockStats :data="deadlock" />
+        </aside>
+
+        <main class="lg:col-span-8 xl:col-span-9 flex flex-col min-w-0 z-10 w-full">
           <Navigation />
 
           <div class="relative w-full" @touchstart="onTouchStart" @touchend="onTouchEnd">
             <NuxtPage :transition="{ name: 'tab', mode: 'out-in' }" />
           </div>
-        </div>
+        </main>
       </div>
       <AppFooter />
     </div>
@@ -187,15 +200,20 @@ onUnmounted(() => {
 ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 60%, #a1a1aa); }
 
 .nav-link {
-  padding: 0.4rem 1.2rem; border-radius: 8px;
-  color: #71717a; font-weight: 700; font-size: 0.875rem;
-  letter-spacing: 0.01em; transition: all 0.3s ease; white-space: nowrap;
+  padding: 0.35rem 0.1rem;
+  color: #71717a; font-weight: 700; font-size: 0.8125rem;
+  letter-spacing: 0.02em; transition: color 0.25s ease; white-space: nowrap;
 }
-.dark .nav-link { color: #a1a1aa; }
+.dark .nav-link { color: #71717a; }
 .nav-link:hover { color: #18181b; }
 .dark .nav-link:hover { color: #f4f4f5; }
+.nav-num {
+  font-size: 0.625rem; font-weight: 400; letter-spacing: 0.1em;
+  color: #a1a1aa; opacity: 0.7; font-variant-numeric: tabular-nums;
+}
 .router-link-exact-active { color: color-mix(in srgb, var(--accent) 90%, black); }
 .dark .router-link-exact-active { color: color-mix(in srgb, var(--accent) 20%, white); }
+.router-link-exact-active .nav-num { color: var(--accent); opacity: 1; }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -203,4 +221,59 @@ onUnmounted(() => {
 .pop-enter-from, .pop-leave-to { opacity: 0; transform: scale(0.9) translateY(-10px); }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* === v2 :: index-style design system (yzewe-inspired) === */
+
+.v2-section { position: relative; }
+.v2-index {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 65%, #71717a);
+  font-variant-numeric: tabular-nums;
+}
+.v2-label {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+.dark .v2-label { color: #71717a; }
+.v2-rule { height: 1px; background: currentColor; opacity: 0.12; border: 0; margin: 0; }
+
+.v2-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  transition: padding-left 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
+}
+.dark .v2-row { border-bottom-color: rgba(255, 255, 255, 0.08); }
+.v2-row:last-child { border-bottom: 0; }
+a.v2-row:hover { padding-left: 0.6rem; }
+.v2-num {
+  font-size: 0.6875rem;
+  color: #a1a1aa;
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5rem;
+}
+.dark .v2-num { color: #52525b; }
+
+.v2-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.v2-bar { height: 3px; background: color-mix(in srgb, #a1a1aa 25%, transparent); overflow: hidden; }
+.v2-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
 </style>

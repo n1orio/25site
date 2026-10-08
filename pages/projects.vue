@@ -1,68 +1,38 @@
-<template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-    <div
-      v-for="project in projects"
-      :key="project.title"
-      class="theme-card p-6 sm:p-8 rounded-2xl flex flex-col justify-between h-full"
-      :class="{ 'card-no-hover': project.noHover }"
-    >
-      <div>
-        <div class="w-12 h-12 rounded-2xl bg-[var(--accent)]/10 text-[var(--accent)] flex items-center justify-center mb-6">
-          <Icon :name="project.icon" class="w-6 h-6" />
-        </div>
-        <h3 class="font-heading text-zinc-900 dark:text-white text-xl sm:text-2xl font-black mb-3 transition-colors">
-          {{ project.title }}
-        </h3>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed transition-colors">
-          {{ project.desc }}
-        </p>
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <span
-          v-for="tag in project.tags"
-          :key="tag"
-          class="px-3 py-1 rounded-md bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 transition-colors"
-        >
-          {{ tag }}
-        </span>
-      </div>
-
-      <div v-if="project.links.length" class="flex flex-wrap gap-2 mt-3">
-        <a
-          v-for="link in project.links"
-          :key="link.label"
-          :href="link.url"
-          target="_blank"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--accent)]/20 transition-all duration-300"
-        >
-          <Icon :name="link.icon" class="w-4 h-4" />
-          {{ link.label }}
-        </a>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
+<script setup lang="ts">
 import { projects } from "~/config"
 </script>
 
-<style>
-.card-no-hover.theme-card:hover {
-  background: rgba(255, 255, 255, 0.65) !important;
-  border-color: rgba(255, 255, 255, 0.8) !important;
-  box-shadow:
-    0 4px 24px -8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
-  transform: none !important;
-}
-.dark .card-no-hover.theme-card:hover {
-  background: rgba(24, 24, 27, 0.55) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow:
-    0 4px 24px -8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-  transform: none !important;
-}
-</style>
+<template>
+  <section class="v2-section">
+    <header class="flex items-baseline gap-3 mb-3">
+      <span class="v2-index">03</span>
+      <h2 class="v2-label">Мои работы</h2>
+    </header>
+
+    <article v-for="(project, i) in projects" :key="project.title" class="py-5 border-b border-black/7 dark:border-white/8 last:border-0">
+      <div class="flex items-baseline gap-3 mb-1.5">
+        <span class="v2-num">{{ String(i + 1).padStart(2, '0') }}</span>
+        <Icon :name="project.icon" size="16" class="w-4 h-4 self-center flex-shrink-0" :style="{ color: 'var(--accent)' }" />
+        <h3 class="font-heading text-zinc-900 dark:text-white text-base sm:text-lg font-black transition-colors">
+          {{ project.title }}
+        </h3>
+        <a v-for="link in project.links" :key="link.url" :href="link.url" target="_blank" rel="noopener"
+          class="ml-auto flex items-center gap-1 text-[0.6875rem] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex-shrink-0">
+          <Icon :name="link.icon" size="13" class="w-3.5 h-3.5" />
+          {{ link.label }}
+        </a>
+      </div>
+
+      <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed mb-3 pl-[3.25rem] max-w-prose">
+        {{ project.desc }}
+      </p>
+
+      <div class="flex flex-wrap gap-2 pl-[3.25rem]">
+        <span v-for="tag in project.tags" :key="tag"
+          class="text-[0.625rem] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          {{ tag }}<span v-if="tag !== project.tags[project.tags.length - 1]" class="ml-2 opacity-40">/</span>
+        </span>
+      </div>
+    </article>
+  </section>
+</template>

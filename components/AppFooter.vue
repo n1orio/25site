@@ -1,15 +1,10 @@
 <template>
-  <footer class="w-full py-6 mt-12 border-t border-zinc-200 dark:border-white/5 transition-colors duration-700">
-    <div class="flex flex-col items-center gap-2">
-      <p class="text-xs text-zinc-500 dark:text-zinc-400 transition-colors duration-700">
-        <a href="https://github.com/n1orio/25site" target="_blank" rel="noopener noreferrer"
-          class="footer-link font-bold">Niorio</a>
-        <span class="mx-2 opacity-60">·</span>
-        <span>MIT</span>
-        <span class="mx-2 opacity-60">·</span>
-        <span>{{ new Date().getFullYear() }}</span>
+  <footer class="w-full py-6 mt-16 border-t border-black/10 dark:border-white/10 transition-colors duration-700">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <p class="v2-label normal-case tracking-normal">
+        <span class="font-bold">Niorio</span> · MIT · {{ new Date().getFullYear() }}
       </p>
-      <p class="text-[10px] text-zinc-400 dark:text-zinc-500 transition-colors duration-700">
+      <p class="v2-label normal-case tracking-normal">
         Сделано на
         <a href="https://nuxt.com" target="_blank" rel="noopener noreferrer" class="footer-link">Nuxt</a>
         <span class="mx-1 opacity-60">+</span>

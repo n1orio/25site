@@ -31,29 +31,29 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
 </script>
 
 <template>
-  <nav class="relative w-full mb-6 md:mb-8 z-50">
-    <div class="theme-card p-1.5 !rounded-2xl flex items-center w-full shadow-sm relative">
-      <div class="flex-1 relative overflow-hidden rounded-xl h-[40px]">
-        <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-zinc-900 to-transparent z-10 pointer-events-none"></div>
-        <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent z-10 pointer-events-none"></div>
-        <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
-          <div class="absolute top-0 bottom-0 my-auto h-[36px] rounded-md pointer-events-none z-0"
+  <nav class="relative w-full mb-8 md:mb-12 z-50">
+    <div class="flex items-center w-full relative border-b border-black/10 dark:border-white/10 pb-2">
+      <div class="flex-1 relative overflow-hidden h-[36px]">
+        <div v-if="showLeftArrow" class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-[#101014] to-transparent z-10 pointer-events-none"></div>
+        <div v-if="showRightArrow" class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#101014] to-transparent z-10 pointer-events-none"></div>
+        <div ref="navScrollRef" @scroll="handleNavScroll" class="flex items-center overflow-x-auto hide-scrollbar relative h-full">
+          <div class="absolute bottom-0 h-[2px] pointer-events-none z-0"
             :style="{
               transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
               left: navIndicator.visible ? navIndicator.left + 'px' : '0px',
               width: navIndicator.visible ? navIndicator.width + 'px' : '0px',
               opacity: navIndicator.visible ? 1 : 0,
-              background: `color-mix(in srgb, var(--accent) 15%, transparent)`,
-              boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent)`,
+              background: 'var(--accent)',
             }"></div>
-          <NuxtLink v-for="tab in navTabs" :key="tab.to" :to="tab.to"
-            class="nav-link cursor-pointer flex-shrink-0 z-10"
-            :class="{ 'mr-4': tab === navTabs[navTabs.length - 1] }">
+          <NuxtLink v-for="(tab, i) in navTabs" :key="tab.to" :to="tab.to"
+            class="nav-link cursor-pointer flex-shrink-0 z-10 flex items-baseline gap-1.5"
+            :class="{ 'mr-6': tab === navTabs[navTabs.length - 1] }">
+            <span class="nav-num">{{ String(i + 1).padStart(2, '0') }}</span>
             {{ tab.label }}
           </NuxtLink>
         </div>
       </div>
-      <div class="w-[1px] h-6 bg-zinc-200 dark:bg-white/10 mx-2 flex-shrink-0 transition-colors duration-700"></div>
+      <div class="w-[1px] h-5 bg-black/10 dark:bg-white/10 mx-3 flex-shrink-0 transition-colors duration-700"></div>
       <div class="flex items-center gap-1.5 pr-1 flex-shrink-0">
         <button @click="toggleDark()"
           class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer">
@@ -69,7 +69,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             </div>
           </button>
           <Transition name="pop">
-            <div v-if="showPalette" class="absolute right-0 top-full mt-4 p-4 theme-card !rounded-xl shadow-2xl flex flex-col gap-4 z-50 w-[260px] transition-colors duration-700 origin-top-right">
+            <div v-if="showPalette" class="absolute right-0 top-full mt-4 p-4 bg-white/90 dark:bg-[#1a1a1f]/95 backdrop-blur-xl border border-black/10 dark:border-white/10 shadow-2xl flex flex-col gap-4 z-50 w-[260px] transition-colors duration-700 origin-top-right" :style="{ borderRadius: 'var(--cursor-radius)' }">
               <div class="flex flex-col gap-3">
                 <p class="text-[10px] uppercase font-bold text-zinc-500 tracking-widest pl-1">Темы</p>
                 <div class="grid grid-cols-2 gap-2">

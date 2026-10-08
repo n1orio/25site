@@ -1,51 +1,36 @@
-<template>
-  <div class="flex flex-col gap-3">
-    <a
-      v-for="social in socials"
-      :key="social.name"
-      :href="social.url"
-      target="_blank"
-      class="group p-4 rounded-xl flex items-center gap-4 cursor-pointer transition-all duration-300 theme-card"
-      :style="{ '--brand': social.color }"
-    >
-      <Icon
-        :name="social.icon"
-        size="28"
-        class="social-icon flex-shrink-0 transition-colors duration-300"
-      />
-      <div class="min-w-0 flex-1">
-        <h3
-          class="font-heading font-bold text-base text-zinc-900 dark:text-white transition-colors duration-300 social-text truncate"
-        >
-          {{ social.name }}
-        </h3>
-        <p
-          class="text-xs text-zinc-500 dark:text-zinc-400 transition-colors duration-300 social-subtext truncate"
-        >
-          {{ social.desc }}
-        </p>
-      </div>
-    </a>
-  </div>
-</template>
-
-<script setup>
+<script setup lang="ts">
 import { socials } from "~/config"
 </script>
 
-<style scoped>
-/* Иконка в фирменный цвет */
-.social-icon {
-  color: var(--brand);
-}
+<template>
+  <section class="v2-section">
+    <header class="flex items-baseline gap-3 mb-3">
+      <span class="v2-index">02</span>
+      <h2 class="v2-label">Связь</h2>
+    </header>
 
-/* Ховер для светлой */
-a:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-/* Ховер для тёмной */
-.dark a:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-</style>
+    <a
+      v-for="(social, i) in socials"
+      :key="social.name"
+      :href="social.url"
+      target="_blank"
+      rel="noopener"
+      class="v2-row group"
+    >
+      <span class="v2-num">{{ String(i + 1).padStart(2, '0') }}</span>
+      <Icon
+        :name="social.icon"
+        size="18"
+        class="w-[18px] h-[18px] flex-shrink-0 self-center transition-colors duration-300"
+        :style="{ color: social.color }"
+      />
+      <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 decoration-1 transition-colors">
+        {{ social.name }}
+      </span>
+      <span class="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ social.desc }}</span>
+      <Icon name="lucide:arrow-up-right" size="14"
+        class="ml-auto flex-shrink-0 self-center text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        :style="{ color: social.color }" />
+    </a>
+  </section>
+</template>
