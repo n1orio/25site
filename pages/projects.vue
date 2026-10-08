@@ -23,16 +23,18 @@ import { projects } from "~/config"
             <Icon :name="project.icon" size="24" class="w-6 h-6" />
           </span>
 
-          <a
-            v-for="link in project.links"
-            :key="link.url"
-            :href="link.url"
-            target="_blank"
-            rel="noopener"
-            class="ds-action"
-          >
-            <Icon :name="link.icon" size="14" class="w-3.5 h-3.5" />
-          </a>
+          <div v-if="project.links.length" class="flex items-center gap-2 flex-shrink-0">
+            <a
+              v-for="link in project.links"
+              :key="link.url"
+              :href="link.url"
+              target="_blank"
+              rel="noopener"
+              class="ds-action"
+            >
+              <Icon :name="link.icon" size="14" class="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
 
         <h3 class="ds-title text-lg mb-2">{{ project.title }}</h3>
