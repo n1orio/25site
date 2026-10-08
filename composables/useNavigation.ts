@@ -1,14 +1,25 @@
 import { ref, nextTick, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
+/**
+ * Состояние навигации общее для приложения.
+ *
+ * `navScrollRef` привязывается только в компоненте Navigation, а
+ * `useNavigation()` вызывается ещё и в app.vue. Пока состояние было
+ * локальным, у app.vue всегда был null: подсказки о прокрутке не
+ * появлялись, активная вкладка не центрировалась, resize ни на что
+ * не влиял.
+ */
+const navScrollRef = ref<HTMLElement | null>(null)
+const showLeftArrow = ref(false)
+const showRightArrow = ref(false)
+const navIndicator = ref({ left: 0, width: 0, visible: false })
+/** слушатели и наблюдатель ставятся один раз на всё приложение */
+let initialized = false
+
 export const useNavigation = () => {
   const route = useRoute()
   const router = useRouter()
-
-  const navScrollRef = ref<HTMLElement | null>(null)
-  const showLeftArrow = ref(false)
-  const showRightArrow = ref(false)
-  const navIndicator = ref({ left: 0, width: 0, visible: false })
 
   const routesList = ["/", "/projects", "/uses", "/now"]
 
@@ -107,7 +118,15 @@ export const useNavigation = () => {
     }
   }
 
+  let resizeObserver: ResizeObserver | undefined
+
   const initNav = () => {
+    // повторные вызовы (например с других страниц) не плодят слушатели
+    if (initialized) {
+      updateArrows()
+      return
+    }
+    initialized = true
     setTimeout(() => {
       updateArrows()
       centerActiveTab()
@@ -117,6 +136,17 @@ export const useNavigation = () => {
       updateArrows()
       updateNavIndicator()
     })
+    // Ширина вкладок меняется после загрузки шрифтов и смены темы —
+    // без этого подсказки о прокрутке оставались бы неверными.
+    // ResizeObserver тут не годится: у прокручиваемого трека его
+    // собственная ширина не меняется, меняется только содержимое.
+    if (navScrollRef.value) {
+      resizeObserver = new ResizeObserver(() => updateArrows())
+      resizeObserver.observe(navScrollRef.value)
+    }
+    document.fonts?.ready
+      .then(() => { updateArrows(); centerActiveTab() })
+      .catch(() => {})
   }
 
   watch(() => route.path, () => {
@@ -129,6 +159,7 @@ export const useNavigation = () => {
 
   const destroyNav = () => {
     window.removeEventListener("resize", updateArrows)
+    resizeObserver?.disconnect()
   }
 
   return {
