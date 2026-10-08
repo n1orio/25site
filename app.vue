@@ -7,7 +7,6 @@ const {
 
 const { data: discord } = await useFetch("/api/discord")
 const { data: steam } = await useFetch("/api/steam")
-const { data: deadlock } = await useFetch("/api/deadlock")
 
 const {
   discordStatus, discordStatusColor,
@@ -74,7 +73,7 @@ onUnmounted(() => {
               <span class="v2-index">05</span>
               <h2 class="v2-label">Сейчас</h2>
             </header>
-            <div class="flex flex-col gap-4">
+            <div class="v2-panel p-5 flex flex-col gap-4">
               <DiscordStatus
                 :discord-status-color="discordStatusColor"
                 :discord-status="discordStatus"
@@ -95,9 +94,6 @@ onUnmounted(() => {
             </div>
           </section>
 
-          <hr class="v2-rule">
-
-          <DeadlockStats :data="deadlock" />
         </aside>
 
         <main class="lg:col-span-8 xl:col-span-9 flex flex-col min-w-0 z-10 w-full">
@@ -242,6 +238,22 @@ onUnmounted(() => {
 }
 .dark .v2-label { color: #71717a; }
 .v2-rule { height: 1px; background: currentColor; opacity: 0.12; border: 0; margin: 0; }
+
+.v2-panel {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: background-color 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dark .v2-panel {
+  background: rgba(30, 30, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
 
 .v2-row {
   display: flex;

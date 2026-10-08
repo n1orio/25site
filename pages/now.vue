@@ -16,13 +16,15 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
       {{ animeDisclaimer }}
     </p>
 
-    <div v-for="(anime, i) in topAnime" :key="anime.title" class="v2-row">
-      <span class="v2-num font-bold" :style="i < 3 ? { color: medal(i) } : undefined">
-        {{ String(i + 1).padStart(2, '0') }}
-      </span>
-      <div class="min-w-0 flex-1">
-        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ anime.title }}</h3>
-        <p v-if="anime.desc" class="text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ anime.desc }}</p>
+    <div class="v2-panel p-5 sm:p-6">
+      <div v-for="(anime, i) in topAnime" :key="anime.title" class="v2-row">
+        <span class="v2-num font-bold" :style="i < 3 ? { color: medal(i) } : undefined">
+          {{ String(i + 1).padStart(2, '0') }}
+        </span>
+        <div class="min-w-0 flex-1">
+          <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ anime.title }}</h3>
+          <p v-if="anime.desc" class="text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ anime.desc }}</p>
+        </div>
       </div>
     </div>
   </section>

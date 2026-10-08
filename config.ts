@@ -42,6 +42,7 @@ export const navTabs: { label: string; to: string }[] = [
   { label: "Соцсети", to: "/" },
   { label: "Проекты", to: "/projects" },
   { label: "Мой Сетап", to: "/uses" },
+  { label: "Deadlock", to: "/deadlock" },
   { label: "Топ Аниме", to: "/now" },
 ]
 
