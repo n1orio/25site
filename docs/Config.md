@@ -12,7 +12,7 @@
 | `bio` | string[] | Абзацы описания |
 | `navTabs` | { label, to }[] | Табы навигации |
 | `socials` | Social[] | Список соцсетей |
-| `projects` | Project[] | Карточки проектов |
+| `projects` | Project[] | Карточки проектов (с `archived` — уходят в архив) |
 | `workstationItems` | WorkstationItem[] | Железо |
 | `baseItems` | WorkstationItem[] | Дополнительно |
 | `topAnime` | Anime[] | Рейтинг аниме |

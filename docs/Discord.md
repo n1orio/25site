@@ -12,6 +12,8 @@
 const LANYARD_API = `https://api.lanyard.rest/v1/users/ТВОЙ_DISCORD_ID`
 ```
 
+Ответ кэшируется на 90 секунд.
+
 Узнать свой Discord ID: `Настройки → Расширенные → Режим разработчика` → ПКМ по себе → `Копировать ID`.
 
 ## Свой Lanyard
