@@ -5,9 +5,13 @@ import { projects } from "~/config"
 const { data: gh } = await useFetch<GithubData | null>("/api/github")
 const { info, statsFor, daysAgo, sizeLabel, compact } = useGithub(gh)
 
-/** карточка + её статистика, считается один раз */
+/** активные проекты и архив */
+const active = computed(() => projects.filter((p) => !p.archived))
+const archived = computed(() => projects.filter((p) => p.archived))
+
+/** карточка + её статистика, считается один раз (в архиве GitHub не нужен) */
 const rows = computed(() =>
-  projects.map((project) => ({ project, gh: statsFor(project.links) })),
+  active.value.map((project) => ({ project, gh: statsFor(project.links) })),
 )
 
 /** доли языков для полоски, в процентах от суммы */
@@ -116,5 +120,34 @@ const summary = computed(() => {
         </div>
       </article>
     </div>
+
+    <!-- архив -->
+    <section v-if="archived.length" class="mt-10">
+      <header class="flex items-center gap-3 mb-4">
+        <h2 class="on-bg-meta">Архив</h2>
+        <WaveDivider class="flex-1" />
+      </header>
+
+      <div class="flex flex-col">
+        <div
+          v-for="project in archived"
+          :key="project.title"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b last:border-0"
+          style="border-color: var(--border-subtle)"
+        >
+          <Icon :name="project.icon" size="16" class="w-4 h-4 self-center flex-shrink-0"
+            style="color: var(--accent-on-bg)" />
+          <h3 class="ds-title text-sm" style="color: var(--text-primary)">{{ project.title }}</h3>
+          <p class="on-bg-body text-xs truncate max-w-[46ch] hidden sm:block">{{ project.desc }}</p>
+          <div class="flex flex-wrap gap-2 ml-auto">
+            <span v-for="tag in project.tags" :key="tag" class="on-bg-meta">{{ tag }}</span>
+          </div>
+          <a v-for="link in project.links" :key="link.url" :href="link.url" target="_blank" rel="noopener"
+            class="ds-action flex-shrink-0" :aria-label="link.label">
+            <Icon :name="link.icon" size="14" class="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
+    </section>
   </section>
 </template>

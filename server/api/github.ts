@@ -31,10 +31,11 @@ interface ReleaseNode {
   tag_name?: string
 }
 
-/** owner/repo из ссылки на github.com в карточке проекта */
+/** owner/repo из ссылки на github.com в карточке проекта (архив не обогащаем) */
 const reposFromConfig = () => {
   const out: string[] = []
   for (const p of projects) {
+    if (p.archived) continue
     for (const l of p.links) {
       const m = l.url.match(/^https?:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?(?:\/|$)/i)
       if (m) {

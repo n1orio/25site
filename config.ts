@@ -11,6 +11,8 @@ export interface Project {
   title: string
   desc: string
   tags: string[]
+  /** проект в архиве: показывается отдельной секцией внизу, без статистики GitHub */
+  archived?: boolean
   noHover?: boolean
   links: { label: string; icon: string; url: string }[]
 }
@@ -137,11 +139,12 @@ export const projects: Project[] = [
   },
   {
     icon: "lucide:wind",
-    title: "Mistraly Site",
+    title: "Breeze Site",
     desc: "Сайт для невышедшего майнкрафт сервера Breeze",
     tags: ["Next.js", "TypeScript", "Prisma", "Bun"],
+    archived: true,
     links: [
-      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mistraly-site" },
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/breeze-site" },
     ],
   },
   {
@@ -149,6 +152,7 @@ export const projects: Project[] = [
     title: "Mono Launcher",
     desc: "Десктопный лаунчер для Minecraft-сборок (.mrpack) через GitHub Releases. Tauri 2 + Nuxt 3, автообновления, Microsoft-вход, несколько сборок.",
     tags: ["Tauri 2", "Rust", "Vue", "Nuxt 3"],
+    archived: true,
     links: [
       { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-launcher" },
     ],
