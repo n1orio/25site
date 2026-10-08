@@ -24,6 +24,7 @@ cachedFetch<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T
 | `/api/contributions` | 1 ч | HTML-страница GitHub |
 | `/api/modrinth` | 1 ч | Modrinth: скачивания и фоллверы |
 | `/api/weather` | 15 мин | Open-Meteo (ключ не нужен) |
+| `/api/visitors` | — | не ходит наружу, читает счётчик из тома |
 
 Кэш живёт в памяти процесса, поэтому после перезапуска контейнера первый
 запрос будет холодным.
@@ -39,6 +40,7 @@ cachedFetch<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T
 | `/api/contributions` | календарь вкладов (уровни, без точных чисел) |
 | `/api/modrinth` | данные модов: скачивания, фоллверы, лицензия |
 | `/api/weather` | текущая погода: температура, состояние, ветер, день/ночь |
+| `/api/visitors` | уникальные посетители: за день, за 30 дней, всего |
 
 ## Ограничения внешних API
 

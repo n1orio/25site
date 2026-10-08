@@ -20,6 +20,8 @@
 │   ├── DeadlockStats.vue     # Все блоки статистики Deadlock
 │   ├── ContributionGraph.vue # Календарь вкладов (кликабельные плитки)
 │   ├── LocalStatus.vue       # Локальное время + погода
+│   ├── ActivityProfile.vue   # Аналитика активности по дням недели
+│   ├── Donations.vue         # Ссылки на поддержку
 │   ├── Navigation.vue        # Табы, переключатель темы, палитра
 │   ├── WaveDivider.vue       # Волна-разделитель секций
 │   ├── AppBackground.vue     # Фон (blur-слои)
@@ -44,7 +46,10 @@
 │   │   ├── github.ts         # GitHub: репозитории, коммиты, языки, релизы
 │   │   ├── contributions.ts  # Календарь вкладов (парсинг HTML GitHub)
 │   │   ├── modrinth.ts       # Modrinth: скачивания и фоллверы
-│   │   └── weather.ts        # Open-Meteo, без ключа
+│   │   ├── weather.ts        # Open-Meteo, без ключа
+│   │   └── visitors.ts       # Счётчик уникальных посетителей
+│   └── middleware/
+│       └── visitors.ts       # Считает визиты, пишет хеши в том
 │   └── utils/
 │       └── cache.ts          # cachedFetch<T>(key, ttl, fetcher)
 │

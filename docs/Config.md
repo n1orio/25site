@@ -18,6 +18,7 @@
 | `topAnime` | Anime[] | Рейтинг аниме |
 | `animeDisclaimer` | string | Текст над топом |
 | `location` | { city, timezone, lat, lon } | Город, таймзона и координаты для времени и погоды |
+| `donations` | Donation[] | Ссылки на поддержку: сумма, подпись, адрес |
 
 ## Формат
 

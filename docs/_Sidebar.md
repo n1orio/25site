@@ -9,6 +9,7 @@
 - [Вкладка Deadlock](Deadlock)
 - [Статистика GitHub](Github)
 - [Погода и время](Weather)
+- [Поддержка и счётчик](Support)
 - [Топ аниме](Now)
 - [Discord статус](Discord)
 - [Steam статус](Steam)
