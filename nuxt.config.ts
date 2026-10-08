@@ -27,6 +27,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         { rel: "preload", href: "/fonts/MonaspaceArgon-Regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
