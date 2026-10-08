@@ -22,6 +22,8 @@ cachedFetch<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T
 | `/api/deadlock` | 180 с | ddlk.bio (4 запроса сразу) |
 | `/api/github` | 1 ч | GitHub (1 + 3 на проект) |
 | `/api/contributions` | 1 ч | HTML-страница GitHub |
+| `/api/modrinth` | 1 ч | Modrinth: скачивания и фоллверы |
+| `/api/weather` | 15 мин | Open-Meteo (ключ не нужен) |
 
 Кэш живёт в памяти процесса, поэтому после перезапуска контейнера первый
 запрос будет холодным.
@@ -35,6 +37,8 @@ cachedFetch<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T
 | `/api/deadlock` | ранг, ранкед/анранкед, герои, предметы, матчи |
 | `/api/github` | сводка по аккаунту + статистика по проектам |
 | `/api/contributions` | календарь вкладов (уровни, без точных чисел) |
+| `/api/modrinth` | данные модов: скачивания, фоллверы, лицензия |
+| `/api/weather` | текущая погода: температура, состояние, ветер, день/ночь |
 
 ## Ограничения внешних API
 

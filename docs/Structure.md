@@ -19,6 +19,7 @@
 │   ├── SteamStatus.vue       # Статус Steam
 │   ├── DeadlockStats.vue     # Все блоки статистики Deadlock
 │   ├── ContributionGraph.vue # Календарь вкладов (кликабельные плитки)
+│   ├── LocalStatus.vue       # Локальное время + погода
 │   ├── Navigation.vue        # Табы, переключатель темы, палитра
 │   ├── WaveDivider.vue       # Волна-разделитель секций
 │   ├── AppBackground.vue     # Фон (blur-слои)
@@ -32,7 +33,8 @@
 │   ├── useDiscord.ts         # Разбор активностей Discord
 │   ├── useSteam.ts           # Форматирование Steam
 │   ├── useDeadlock.ts        # Форматирование Deadlock + подписи режимов
-│   └── useGithub.ts          # Поиск репозитория и форматирование
+│   ├── useGithub.ts          # Поиск репозитория и форматирование
+│   └── useCopy.ts            # Копирование в буфер с обратной связью
 │
 ├── server/
 │   ├── api/
@@ -40,7 +42,9 @@
 │   │   ├── steam.ts          # Steam Web API (4 запроса)
 │   │   ├── deadlock.ts       # ddlk.bio: ранг, матчи, статистика, предметы
 │   │   ├── github.ts         # GitHub: репозитории, коммиты, языки, релизы
-│   │   └── contributions.ts  # Календарь вкладов (парсинг HTML GitHub)
+│   │   ├── contributions.ts  # Календарь вкладов (парсинг HTML GitHub)
+│   │   ├── modrinth.ts       # Modrinth: скачивания и фоллверы
+│   │   └── weather.ts        # Open-Meteo, без ключа
 │   └── utils/
 │       └── cache.ts          # cachedFetch<T>(key, ttl, fetcher)
 │
@@ -50,7 +54,9 @@
 │
 ├── assets/css/main.css       # Tailwind, шрифты, дизайн-токены
 ├── public/fonts/             # Inter (переменный) и Monaspace Argon, самохостинг
-├── public/favicon.ico        # Аватарка Discord
+├── public/favicon.ico        # Аватарка Discord (favicon + apple-touch-icon)
+├── public/og.png             # Превью для ссылок в мессенджерах, 1200x630
+├── public/robots.txt
 ├── Dockerfile                # oven/bun, два этапа
 ├── docker-compose.yml        # site + multi-scrobbler + caddy
 ├── Caddyfile                 # reverse_proxy, encode, кеш статики

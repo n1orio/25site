@@ -8,6 +8,7 @@
 - [Сетап](Uses)
 - [Вкладка Deadlock](Deadlock)
 - [Статистика GitHub](Github)
+- [Погода и время](Weather)
 - [Топ аниме](Now)
 - [Discord статус](Discord)
 - [Steam статус](Steam)

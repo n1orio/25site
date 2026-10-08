@@ -89,6 +89,14 @@ docker compose ps                                # все сервисы Up
 docker compose logs site --tail 20
 ```
 
+## Превью и индексация
+
+- `public/og.png` (1200×630) — картинка, которую видно при отправке ссылки в
+  Telegram или Discord. OG-теги заданы в `nuxt.config.ts`. Если поменяешь
+  аватарку или имя, картинку стоит перегенерировать.
+- `public/robots.txt` закрывает от индексации `/api/*` и указывает sitemap.
+- `sitemap.xml` отдаёт модуль `@nuxtjs/sitemap`.
+
 ## Vercel / Netlify
 
 Команда сборки: `bun run build`, папка `.output/public`.
