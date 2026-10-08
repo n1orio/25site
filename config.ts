@@ -128,6 +128,46 @@ export const projects: Project[] = [
     links: [],
   },
   {
+    icon: "lucide:server",
+    title: "Mono Launcher Backend",
+    desc: "Серверная часть лаунчера: каталог сборок, рейтинги, лицензии, аккаунты, телеметрия.",
+    tags: ["Rust", "Boosty OAuth", "API"],
+    archived: true,
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-launcher-backend" },
+    ],
+  },
+  {
+    icon: "lucide:globe",
+    title: "Mono Launcher Site",
+    desc: "Официальный сайт лаунчера: лендинг, загрузка, редирект deep-link, статистика.",
+    tags: ["Vue", "TypeScript"],
+    archived: true,
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-launcher-site" },
+    ],
+  },
+  {
+    icon: "lucide:hard-drive",
+    title: "Mono Launcher Storage",
+    desc: "Раздача сборок лаунчера: статический сервер файлов и манифест с хэшами SHA-1/SHA-512.",
+    tags: ["Rust", "Storage"],
+    archived: true,
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-launcher-storage" },
+    ],
+  },
+  {
+    icon: "lucide:package",
+    title: "Mono Pack Example",
+    desc: "Пример сборки в формате .mrpack — образец для авторов.",
+    tags: [".mrpack", "Minecraft"],
+    archived: true,
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/mono-pack-example" },
+    ],
+  },
+  {
     icon: "lucide:zap",
     title: "TFMG Energy Connector",
     desc: "Мод для Minecraft, который конвертирует энергию из Create: TFMG в Fe",

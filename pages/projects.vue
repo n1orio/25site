@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { GithubData } from "~/types/github"
+import type { ContributionsData } from "~/server/api/contributions"
 import { projects } from "~/config"
 
 const { data: gh } = await useFetch<GithubData | null>("/api/github")
+const { data: contrib } = await useFetch<ContributionsData | null>("/api/contributions")
 const { info, statsFor, daysAgo, sizeLabel, compact } = useGithub(gh)
 
 /** активные проекты и архив */
@@ -119,6 +121,11 @@ const summary = computed(() => {
           <span v-for="tag in project.tags" :key="tag" class="ds-pill">{{ tag }}</span>
         </div>
       </article>
+    </div>
+
+    <!-- календарь вкладов -->
+    <div v-if="contrib" class="mt-10">
+      <ContributionGraph :data="contrib" />
     </div>
 
     <!-- архив -->
