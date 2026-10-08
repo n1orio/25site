@@ -28,9 +28,9 @@ const riskLabel = computed(() => {
     <!-- ранг -->
     <section class="ds-card p-5 sm:p-6">
       <div class="flex items-center gap-5">
-        <div class="ds-scallop flex-shrink-0">
+        <div class="ds-scallop flex-shrink-0" style="width: 5.5rem; height: 5.5rem">
           <img v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data.rank.tier}`"
-            class="w-10 h-10 object-contain" loading="lazy">
+            class="w-14 h-14 object-contain" loading="lazy">
           <Icon v-else name="lucide:crosshair" size="22" class="w-5 h-5" />
         </div>
         <div class="min-w-0 flex-1">
@@ -75,9 +75,9 @@ const riskLabel = computed(() => {
       </p>
     </section>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
     <!-- ранкед vs анранкед -->
-    <section v-if="data.ranked || data.unranked" class="ds-card p-5 sm:p-6">
+    <section v-if="data.ranked || data.unranked" class="ds-card p-5 sm:p-6 flex flex-col">
       <p class="ds-meta mb-4">Ранкед против анранкеда</p>
 
       <div class="flex flex-col gap-4">
@@ -116,24 +116,17 @@ const riskLabel = computed(() => {
     </section>
 
     <!-- экономика и серии -->
-    <section class="ds-card p-5 sm:p-6">
+    <section class="ds-card p-5 sm:p-6 flex flex-col">
       <p class="ds-meta mb-3">Экономика и серии</p>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="ds-pill flex-col items-start gap-1 py-3">
-          <span class="ds-meta">Ср. нетворс</span>
-          <span class="ds-stat">{{ netWorth(data.economy.avgNetWorth) }}</span>
-        </div>
-        <div class="ds-pill flex-col items-start gap-1 py-3">
-          <span class="ds-meta">Макс. нетворс</span>
-          <span class="ds-stat">{{ netWorth(data.economy.bestNetWorth) }}</span>
-        </div>
-        <div class="ds-pill flex-col items-start gap-1 py-3">
-          <span class="ds-meta">Ср. длительность</span>
-          <span class="ds-stat">{{ matchDuration(data.economy.avgDuration) }}</span>
-        </div>
-        <div class="ds-pill flex-col items-start gap-1 py-3">
-          <span class="ds-meta">Серия</span>
-          <span class="ds-stat">{{ data.streak.current }} / {{ data.streak.best }}</span>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div v-for="s in [
+          { label: 'Ср. нетворс', value: netWorth(data.economy.avgNetWorth) },
+          { label: 'Макс. нетворс', value: netWorth(data.economy.bestNetWorth) },
+          { label: 'Ср. матч', value: matchDuration(data.economy.avgDuration) },
+          { label: 'Серия', value: data.streak.current + ' / ' + data.streak.best },
+        ]" :key="s.label" class="ds-pill flex-col items-start justify-center gap-0.5 py-2.5 h-full">
+          <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
+          <span class="ds-stat text-base">{{ s.value }}</span>
         </div>
       </div>
       <p class="ds-meta mt-3">текущая / рекордная серия побед подряд</p>
