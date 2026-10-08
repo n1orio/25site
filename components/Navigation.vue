@@ -4,7 +4,7 @@ import { onClickOutside } from "@vueuse/core"
 import { navTabs } from "~/config"
 
 const { isDark } = useSecretTheme()
-const { toggle: toggleTheme } = useThemeCircle(isDark)
+const { toggle: toggleTheme, flash } = useThemeCircle(isDark)
 
 const {
   navScrollRef, showLeftArrow, showRightArrow, navIndicator,
@@ -25,6 +25,10 @@ const setThemeColor = (color: string) => {
   if (color === "#000000") isDark.value = true
   else if (color === "#ffffff") isDark.value = false
 }
+
+// смена акцента тоже идёт кругом из точки клика
+const pickGradient = (event: MouseEvent, colors: string[]) =>
+  flash(event, () => setGradient(colors))
 
 onClickOutside(paletteRef, () => { showPalette.value = false })
 </script>
@@ -94,7 +98,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                   <button
                     v-for="preset in gradientPresets"
                     :key="preset.id"
-                    @click="setGradient(preset.colors)"
+                    @click="pickGradient($event, preset.colors)"
                     class="flex flex-col gap-2 p-2 rounded-xl transition-colors group cursor-pointer border"
                     :style="{
                       borderColor: themeMode === 'gradient' && activeGradient[0] === preset.colors[0]

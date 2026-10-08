@@ -347,7 +347,21 @@ onUnmounted(() => {
 }
 .ds-scallop > * { position: relative; z-index: 1; }
 
-/* --- круговое переключение темы --- */
+/* --- круговое переключение темы ---
+   Отключаем дефолтный cross-fade: старый снимок лежит поверх нового
+   и сжимается к точке клика, открывая новую тему. */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: 2;
+}
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: 1;
+}
+::view-transition-group(root) { animation-duration: 0s; }
+
 .theme-circle {
   position: fixed;
   inset: 0;

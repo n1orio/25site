@@ -1,95 +1,125 @@
 import type { Ref } from "vue"
 
 const DURATION = 520
-const FADE = 200
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)"
+
+type Apply = () => void
 
 /**
- * Круговое раскрытие новой темы из точки клика.
- * Тема переключается, когда круг уже закрыл бо́льшую часть экрана,
- * после чего слой мягко гаснет — без «щелчка» на середине.
+ * Переключение темы «радужкой»: старая тема отступает от краёв
+ * к точке клика, открывая новую.
+ *
+ * View Transitions позволяют анимировать не плоскую заливку,
+ * а реальный снимок старой темы — поэтому эффект лишён мигания.
+ * Без поддержки API используется слой с цветом текущего фона:
+ * он совпадает с фоном, поэтому стыка не видно.
  */
 export const useThemeCircle = (isDark: Ref<boolean>) => {
   const isAnimating = ref(false)
-
-  // слой ищем лениво: к моменту клика он гарантированно в DOM
-  const getLayer = () => document.getElementById("theme-circle")
   let layer: HTMLElement | null = null
 
-  const readVar = (name: string) =>
-    getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  const getLayer = () => document.getElementById("theme-circle")
+  const reduced = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false
+
+  const radiusAt = (x: number, y: number) =>
+    Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
 
   const reset = () => {
     if (!layer) return
-    layer.style.clipPath = ""
     layer.style.opacity = "0"
+    layer.style.clipPath = "circle(0px)"
     isAnimating.value = false
   }
 
-  /** Прямоугольник, в который круг должен вписаться, и сам слой — готовность. */
-  const prepare = (targetDark: boolean) => {
-    if (!layer) return false
-    const bg = readVar(targetDark ? "--theme-bg-dark" : "--theme-bg-light")
-    layer.style.background = bg || (targetDark ? "#101014" : "#f4f4f5")
-    layer.style.opacity = "1"
-    layer.style.clipPath = "circle(0px)"
-    // форсируем стиль, чтобы анимация стартовала с нулевого круга
-    void layer.offsetWidth
-    return true
-  }
-
-  const toggle = async (event?: MouseEvent) => {
-    if (isAnimating.value) return
-
-    const targetDark = !isDark.value
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  /** Сжимающийся круг со слоем — fallback без View Transitions. */
+  const shrink = async (event: MouseEvent, apply: Apply) => {
     layer = getLayer()
-
-    if (!layer || reduced || !event) {
-      isDark.value = targetDark
+    if (!layer) {
+      apply()
       return
     }
 
     isAnimating.value = true
-    if (!prepare(targetDark)) {
-      isDark.value = targetDark
-      isAnimating.value = false
-      return
-    }
+    const currentBg = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bg-primary").trim()
 
     const { clientX: x, clientY: y } = event
-    const radius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y),
-    )
+    const radius = radiusAt(x, y)
 
-    const grow = layer.animate(
+    layer.style.background = currentBg || "#101014"
+    layer.style.opacity = "1"
+    layer.style.clipPath = `circle(${radius}px at ${x}px ${y}px)`
+
+    const shrinkAnim = layer.animate(
       [
-        { clipPath: `circle(0px at ${x}px ${y}px)` },
         { clipPath: `circle(${radius}px at ${x}px ${y}px)` },
+        { clipPath: `circle(0px at ${x}px ${y}px)` },
       ],
-      {
-        duration: DURATION,
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-        fill: "forwards",
-      },
+      { duration: DURATION, easing: EASING, fill: "forwards" },
     )
 
-    // переключаем тему, когда круг закрыл большую часть экрана
-    const swap = window.setTimeout(() => { isDark.value = targetDark }, DURATION * 0.42)
-    await grow.finished.catch(() => {})
-
-    const fade = layer.animate([{ opacity: 1 }, { opacity: 0 }], {
-      duration: FADE,
-      easing: "ease-out",
-      fill: "forwards",
-    })
-    await fade.finished.catch(() => {})
-
+    // переключаем, когда радужка закрыла бо́льшую часть экрана
+    const swap = window.setTimeout(apply, DURATION * 0.45)
+    await shrinkAnim.finished.catch(() => {})
     window.clearTimeout(swap)
-    grow.cancel()
-    fade.cancel()
+    shrinkAnim.cancel()
     reset()
   }
 
-  return { toggle, isAnimating }
+  /** Основной путь: снимок старой темы сжимается, открывая новую. */
+  const iris = async (event: MouseEvent, apply: Apply) => {
+    if (isAnimating.value) return
+
+    if (reduced() || typeof document.startViewTransition !== "function") {
+      if (reduced()) apply()
+      else await shrink(event, apply)
+      return
+    }
+
+    isAnimating.value = true
+    const { clientX: x, clientY: y } = event
+    const radius = radiusAt(x, y)
+
+    const transition = document.startViewTransition(apply)
+    try {
+      await transition.ready
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(${radius}px at ${x}px ${y}px)`,
+            `circle(0px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: DURATION,
+          easing: EASING,
+          pseudoElement: "::view-transition-old(root)",
+        },
+      )
+    } catch {
+      /* анимация не запустилась — тема уже переключена */
+    }
+    await transition.finished.catch(() => {})
+    isAnimating.value = false
+  }
+
+  const toggle = (event?: MouseEvent) => {
+    const apply = () => { isDark.value = !isDark.value }
+    if (!event) {
+      apply()
+      return
+    }
+    return iris(event, apply)
+  }
+
+  /** Смена акцентного цвета — тем же эффектом, фон не меняется. */
+  const flash = (event: MouseEvent, apply: Apply) => {
+    if (!event) {
+      apply()
+      return Promise.resolve()
+    }
+    return iris(event, apply)
+  }
+
+  return { toggle, flash, isAnimating }
 }
