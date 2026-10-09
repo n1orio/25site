@@ -263,7 +263,6 @@ export const workstationItems: WorkstationItem[] = [
 
 export const baseItems: WorkstationItem[] = [
   { name: "Height", value: "185 см", comment: "Ощущается как 150 см" },
-  { name: "Penis size", value: "20 cm", comment: "👀" },
   { name: "Тряпочка", value: "50x90 см", comment: "Огромная, чтобы протирать сразу всё" },
   { name: "Зубочистка", value: "Пластиковая", comment: "Экологично и практично" },
 ]
