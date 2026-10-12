@@ -6,6 +6,14 @@ const BASE = "https://ddlk.bio/api/profile/niorio"
 const CDLK = "https://ddlk.bio"
 const SAMPLE_LIMIT = 50
 
+interface SummaryResponse {
+  profile?: {
+    personaname?: string
+    hours_played?: number | null
+    hours_source?: string | null
+  }
+}
+
 interface MmrResponse {
   rank_name?: string
   division?: number
@@ -117,11 +125,12 @@ const round = (n: number, digits = 2) => Number(n.toFixed(digits))
 export default defineEventHandler(async (): Promise<DeadlockData | null> => {
   return cachedFetch<DeadlockData | null>("deadlock", 180_000, async () => {
     try {
-      const [mmr, matchesRes, statsRes, favRes] = await Promise.all([
+      const [mmr, matchesRes, statsRes, favRes, summaryRes] = await Promise.all([
         $fetch<MmrResponse>(`${BASE}/mmr`),
         $fetch<MatchesResponse>(`${BASE}/matches?limit=${SAMPLE_LIMIT}`),
         $fetch<StatsResponse>(`${BASE}/stats`),
         $fetch<FavoritesResponse>(`${BASE}/favorites?limit=8`).catch(() => ({} as FavoritesResponse)),
+        $fetch<SummaryResponse>(`${BASE}/summary`).catch(() => ({} as SummaryResponse)),
       ])
 
       const raw = matchesRes?.recent_matches ?? []
@@ -246,6 +255,14 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
         : null
 
       return {
+        // часы за всё время есть только в /summary
+        profile: summaryRes?.profile
+          ? {
+              personaname: summaryRes.profile.personaname ?? null,
+              hoursPlayed: summaryRes.profile.hours_played ?? null,
+              hoursSource: summaryRes.profile.hours_source ?? null,
+            }
+          : null,
         rank: mmr?.rank_name
           ? {
               name: mmr.rank_name,

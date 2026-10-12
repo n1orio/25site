@@ -56,8 +56,20 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
     return `${Math.floor(days / 365)} г. назад`
   }
 
-  /** часы одним числом: 53.4 → «53 ч», 1.5 → «1 ч 30 м» */
+  /**
+   * Часы за всё время — из профиля Steam через /summary. Раньше здесь
+   * стояла сумма по окну активности, из-за чего «53 ч» выглядели как
+   * всё время в игре (реально 652).
+   */
   const hoursLabel = computed(() => {
+    const h = info.value?.profile?.hoursPlayed ?? 0
+    const whole = Math.floor(h)
+    const minutes = Math.round((h - whole) * 60)
+    return minutes ? `${whole} ч ${minutes} м` : `${whole} ч`
+  })
+
+  /** часы, накопленные только внутри окна активности */
+  const hoursWindowLabel = computed(() => {
     const h = info.value?.activity?.hours ?? 0
     const whole = Math.floor(h)
     const minutes = Math.round((h - whole) * 60)
@@ -115,6 +127,7 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
   return {
     info,
     hoursLabel,
+    hoursWindowLabel,
     activityWeeks,
     activityLevel,
     itemTypeLabel,

@@ -10,7 +10,7 @@ import { MODE_LABEL } from "~/composables/useDeadlock"
 const {
   rankLabel, rankProgress, winrateLabel, recordLabel,
   heroIconUrl, itemImageUrl, matchDuration, netWorth, deltaLabel, daysAgo,
-  hoursLabel, activityWeeks, activityLevel, itemTypeLabel, placeLabel,
+  hoursLabel, hoursWindowLabel, activityWeeks, activityLevel, itemTypeLabel, placeLabel,
 } = useDeadlock(data)
 
 /** активность одним окном: сколько недель покрыто */
@@ -80,11 +80,13 @@ const riskLabel = computed(() => {
         <p class="ds-meta">Активность</p>
         <span class="ds-meta tabular-nums">{{ activitySpan?.from }} → {{ activitySpan?.to }}</span>
       </div>
-      <p class="ds-meta mb-4 opacity-70">ddlk.bio отдаёт историю лишь за {{ activityDaysLabel }} — это не всё время в игре</p>
+      <p class="ds-meta mb-4 opacity-70">
+        хитмап только за {{ activityDaysLabel }} — всё время в игре выше, в «Ключевых показателях»
+      </p>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <div v-for="s in [
-          { label: 'В игре за окно', value: hoursLabel },
+          { label: 'Часов за окно', value: hoursWindowLabel },
           { label: 'Матчей за окно', value: String(data.activity.totalMatches) },
           { label: 'Матчей в день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
           { label: 'Максимум в день', value: String(data.activity.busiest?.matches ?? 0) },
@@ -134,15 +136,17 @@ const riskLabel = computed(() => {
       <p class="ds-meta mb-3">Ключевые показатели</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div v-for="s in [
-          { label: 'KDA', value: data.stats?.kda.toFixed(2) ?? '—' },
-          { label: 'Accuracy', value: data.stats ? data.stats.accuracy.toFixed(1) + '%' : '—' },
-          { label: 'Хедшоты', value: data.stats ? data.stats.headshot_rate.toFixed(1) + '%' : '—' },
-          { label: 'Матчей', value: data.totals?.matches ?? '—' },
-          { label: 'Винрейт', value: winrateLabel ?? '—' },
-          { label: 'Счёт', value: recordLabel ?? '—' },
+          { label: 'В игре', value: hoursLabel, hint: data.profile?.hoursPlayed ? 'по данным Steam' : null },
+          { label: 'KDA', value: data.stats?.kda.toFixed(2) ?? '—', hint: null },
+          { label: 'Accuracy', value: data.stats ? data.stats.accuracy.toFixed(1) + '%' : '—', hint: null },
+          { label: 'Хедшоты', value: data.stats ? data.stats.headshot_rate.toFixed(1) + '%' : '—', hint: null },
+          { label: 'Матчей', value: data.totals?.matches ?? '—', hint: null },
+          { label: 'Винрейт', value: winrateLabel ?? '—', hint: null },
+          { label: 'Счёт', value: recordLabel ?? '—', hint: null },
         ]" :key="s.label" class="ds-pill flex-col items-start gap-1 !items-start py-3">
           <span class="ds-meta">{{ s.label }}</span>
           <span class="ds-stat">{{ s.value }}</span>
+          <span v-if="s.hint" class="ds-meta opacity-60">{{ s.hint }}</span>
         </div>
       </div>
 

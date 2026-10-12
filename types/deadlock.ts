@@ -67,6 +67,14 @@ export interface DeadlockPlace {
   rated: number
 }
 
+/** Профиль из /summary: единственный источник часов за всё время */
+export interface DeadlockProfile {
+  personaname: string | null
+  /** часов в игре из Steam — ddlk берёт из профиля стима */
+  hoursPlayed: number | null
+  hoursSource: string | null
+}
+
 export interface DeadlockData {
   rank: {
     name: string
@@ -78,6 +86,7 @@ export interface DeadlockData {
     /** эмблема ранга с ddlk.bio: /assets/ranks/{division}_large_subrank{tier}_webp.webp */
     emblem: string | null
   } | null
+  profile: DeadlockProfile | null
   totals: { matches: number; wins: number; losses: number; winrate: number } | null
   stats: {
     kda: number
