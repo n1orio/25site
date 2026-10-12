@@ -20,6 +20,14 @@ const activitySpan = computed(() => {
   return { from: a.windowStart.slice(5), to: a.windowEnd.slice(5) }
 })
 
+const WEEKDAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+
+/** «44 дня»/«44 дня» — сколько дней реально в окне активности */
+const activityDaysLabel = computed(() => {
+  const n = data.value?.activity?.days.length ?? 0
+  return `${n} ${n === 1 ? "день" : n < 5 ? "дня" : "дней"}`
+})
+
 const confidenceLabel = computed(() => {
   const c = data.value?.stats?.confidence
   return c ? { low: "низкая", medium: "средняя", high: "высокая" }[c] ?? c : null
@@ -66,27 +74,32 @@ const riskLabel = computed(() => {
       </div>
     </section>
 
-    <!-- активность: хитмап и часы -->
+    <!-- активность: только окно ddlk.bio, не всё время в игре -->
     <section v-if="data.activity" class="ds-card p-5 sm:p-6">
-      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-4">
+      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-1">
         <p class="ds-meta">Активность</p>
         <span class="ds-meta tabular-nums">{{ activitySpan?.from }} → {{ activitySpan?.to }}</span>
       </div>
+      <p class="ds-meta mb-4 opacity-70">ddlk.bio отдаёт историю лишь за {{ activityDaysLabel }} — это не всё время в игре</p>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <div v-for="s in [
-          { label: 'В игре', value: hoursLabel },
-          { label: 'Матчей', value: String(data.activity.totalMatches) },
-          { label: 'В день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
-          { label: 'Больше всего', value: String(data.activity.busiest?.matches ?? 0) },
+          { label: 'В игре за окно', value: hoursLabel },
+          { label: 'Матчей за окно', value: String(data.activity.totalMatches) },
+          { label: 'Матчей в день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
+          { label: 'Максимум в день', value: String(data.activity.busiest?.matches ?? 0) },
         ]" :key="s.label" class="ds-pill flex-col items-start gap-1 !items-start py-3">
-          <span class="ds-meta">{{ s.label }}</span>
+          <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
           <span class="ds-stat">{{ s.value }}</span>
         </div>
       </div>
 
       <!-- сетка как у контрибуций: столбцы — недели, ряды — дни недели -->
-      <div class="flex gap-[3px] overflow-hidden" :title="`часов: ${hoursLabel}`">
+      <div class="flex gap-[3px] overflow-hidden">
+        <div class="flex flex-col gap-[3px] flex-shrink-0 mr-1">
+          <span v-for="(d, i) in WEEKDAYS" :key="i" class="flex items-center"
+            style="height: 11px; font-size: 8px; line-height: 1; opacity: .55;">{{ d }}</span>
+        </div>
         <div v-for="(week, wi) in activityWeeks" :key="wi" class="flex flex-col gap-[3px]">
           <div v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
             :style="{
@@ -100,7 +113,20 @@ const riskLabel = computed(() => {
             :title="day ? `${day.date} · ${day.matches} м · ${day.wins}W` : ''" />
         </div>
       </div>
-      <p class="ds-meta mt-2.5">{{ data.activity.days.length }} дней в окне ddlk.bio · больше всего матчей: {{ data.activity.busiest?.date ?? "—" }}</p>
+      <div class="flex items-center justify-between gap-3 mt-2.5 flex-wrap">
+        <p class="ds-meta">максимум в дне: {{ data.activity.busiest?.matches ?? 0 }} ({{ data.activity.busiest?.date ?? "—" }})</p>
+        <div class="flex items-center gap-1.5">
+          <span class="ds-meta opacity-70">меньше</span>
+          <span v-for="l in [0, 1, 2, 3, 4]" :key="l" class="w-[10px] h-[10px]"
+            :style="{
+              borderRadius: 'var(--radius-pill)',
+              background: l === 0
+                ? 'color-mix(in srgb, var(--accent-contrast) 10%, transparent)'
+                : `color-mix(in srgb, var(--accent-contrast) ${25 + l * 18}%, transparent)`,
+            }" />
+          <span class="ds-meta opacity-70">больше</span>
+        </div>
+      </div>
     </section>
 
     <!-- ключевые цифры -->

@@ -74,9 +74,9 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
     if (!days?.length) return []
     const byDate = new Map(days.map((d) => [d.date, d]))
     const last = new Date(`${days[days.length - 1]!.date}T00:00:00Z`)
-    // сдвигаем начало к воскресенью, чтобы колонки были неделями
+    // недели считаем с понедельника, как в календаре
     const start = new Date(last)
-    start.setUTCDate(start.getUTCDate() - start.getUTCDay() - 7 * 11)
+    start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7) - 7 * 11)
     const weeks: ({ date: string; matches: number; wins: number } | null)[][] = []
     for (let w = 0; w < 12; w++) {
       const week: ({ date: string; matches: number; wins: number } | null)[] = []
