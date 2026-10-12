@@ -56,8 +56,69 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
     return `${Math.floor(days / 365)} г. назад`
   }
 
+  /** часы одним числом: 53.4 → «53 ч», 1.5 → «1 ч 30 м» */
+  const hoursLabel = computed(() => {
+    const h = info.value?.activity?.hours ?? 0
+    const whole = Math.floor(h)
+    const minutes = Math.round((h - whole) * 60)
+    return minutes ? `${whole} ч ${minutes} м` : `${whole} ч`
+  })
+
+  /**
+   * Календарь активности: тот же вид, что у контрибуций —
+   * столбцы по неделям, ряды по дням недели. Пустые дни окна
+   * заполняем нулями, чтобы сетка не съезжала.
+   */
+  const activityWeeks = computed(() => {
+    const days = info.value?.activity?.days
+    if (!days?.length) return []
+    const byDate = new Map(days.map((d) => [d.date, d]))
+    const last = new Date(`${days[days.length - 1]!.date}T00:00:00Z`)
+    // сдвигаем начало к воскресенью, чтобы колонки были неделями
+    const start = new Date(last)
+    start.setUTCDate(start.getUTCDate() - start.getUTCDay() - 7 * 11)
+    const weeks: ({ date: string; matches: number; wins: number } | null)[][] = []
+    for (let w = 0; w < 12; w++) {
+      const week: ({ date: string; matches: number; wins: number } | null)[] = []
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(start)
+        day.setUTCDate(start.getUTCDate() + w * 7 + d)
+        const iso = day.toISOString().slice(0, 10)
+        if (day > last) { week.push(null); continue }
+        const found = byDate.get(iso)
+        week.push(found ? { date: iso, matches: found.matches, wins: found.wins } : { date: iso, matches: 0, wins: 0 })
+      }
+      weeks.push(week)
+    }
+    return weeks
+  })
+
+  /** уровень закраски клетки: 0..4 */
+  const activityLevel = (matches: number) => {
+    const max = info.value?.activity?.maxPerDay ?? 1
+    if (!matches) return 0
+    const ratio = matches / max
+    if (ratio > 0.75) return 4
+    if (ratio > 0.5) return 3
+    if (ratio > 0.25) return 2
+    return 1
+  }
+
+  const itemTypeLabel = (type: string) =>
+    ({ vitality: "живучесть", spirit: "дух", weapon: "оружие", armor: "броня", unknown: "—" })[type] ?? type
+
+  const placeLabel = computed(() => {
+    const p = info.value?.place
+    return p ? `${p.avg} из 12` : null
+  })
+
   return {
     info,
+    hoursLabel,
+    activityWeeks,
+    activityLevel,
+    itemTypeLabel,
+    placeLabel,
     rankLabel,
     rankProgress,
     winrateLabel,

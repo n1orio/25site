@@ -10,7 +10,20 @@ import { MODE_LABEL } from "~/composables/useDeadlock"
 const {
   rankLabel, rankProgress, winrateLabel, recordLabel,
   heroIconUrl, itemImageUrl, matchDuration, netWorth, deltaLabel, daysAgo,
+  hoursLabel, activityWeeks, activityLevel, itemTypeLabel, placeLabel,
 } = useDeadlock(data)
+
+/** активность одним окном: сколько недель покрыто */
+const activitySpan = computed(() => {
+  const a = data.value?.activity
+  if (!a) return null
+  return { from: a.windowStart.slice(5), to: a.windowEnd.slice(5) }
+})
+
+const confidenceLabel = computed(() => {
+  const c = data.value?.stats?.confidence
+  return c ? { low: "низкая", medium: "средняя", high: "высокая" }[c] ?? c : null
+})
 
 const riskLabel = computed(() => {
   const band = data.value?.stats?.riskBand
@@ -53,6 +66,43 @@ const riskLabel = computed(() => {
       </div>
     </section>
 
+    <!-- активность: хитмап и часы -->
+    <section v-if="data.activity" class="ds-card p-5 sm:p-6">
+      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-4">
+        <p class="ds-meta">Активность</p>
+        <span class="ds-meta tabular-nums">{{ activitySpan?.from }} → {{ activitySpan?.to }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div v-for="s in [
+          { label: 'В игре', value: hoursLabel },
+          { label: 'Матчей', value: String(data.activity.totalMatches) },
+          { label: 'В день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
+          { label: 'Больше всего', value: String(data.activity.busiest?.matches ?? 0) },
+        ]" :key="s.label" class="ds-pill flex-col items-start gap-1 !items-start py-3">
+          <span class="ds-meta">{{ s.label }}</span>
+          <span class="ds-stat">{{ s.value }}</span>
+        </div>
+      </div>
+
+      <!-- сетка как у контрибуций: столбцы — недели, ряды — дни недели -->
+      <div class="flex gap-[3px] overflow-hidden" :title="`часов: ${hoursLabel}`">
+        <div v-for="(week, wi) in activityWeeks" :key="wi" class="flex flex-col gap-[3px]">
+          <div v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
+            :style="{
+              borderRadius: 'var(--radius-pill)',
+              background: day === null
+                ? 'transparent'
+                : activityLevel(day.matches) === 0
+                  ? 'color-mix(in srgb, var(--accent-contrast) 10%, transparent)'
+                  : `color-mix(in srgb, var(--accent-contrast) ${25 + activityLevel(day.matches) * 18}%, transparent)`,
+            }"
+            :title="day ? `${day.date} · ${day.matches} м · ${day.wins}W` : ''" />
+        </div>
+      </div>
+      <p class="ds-meta mt-2.5">{{ data.activity.days.length }} дней в окне ddlk.bio · больше всего матчей: {{ data.activity.busiest?.date ?? "—" }}</p>
+    </section>
+
     <!-- ключевые цифры -->
     <section class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Ключевые показатели</p>
@@ -70,8 +120,21 @@ const riskLabel = computed(() => {
         </div>
       </div>
 
-      <p v-if="riskLabel" class="ds-meta mt-3">
-        Риск: {{ riskLabel }}
+      <div v-if="placeLabel || data.stats?.cheaterPercent !== undefined" class="grid grid-cols-2 gap-3 mt-3">
+        <div v-if="placeLabel" class="ds-pill flex-col items-start gap-1 !items-start py-3">
+          <span class="ds-meta">Ср. место</span>
+          <span class="ds-stat">{{ placeLabel }}</span>
+        </div>
+        <div v-if="data.stats" class="ds-pill flex-col items-start gap-1 !items-start py-3">
+          <span class="ds-meta">Подозрения</span>
+          <span class="ds-stat">{{ data.stats.cheaterPercent.toFixed(2) }}%</span>
+        </div>
+      </div>
+
+      <p v-if="riskLabel || confidenceLabel" class="ds-meta mt-3">
+        <template v-if="riskLabel">Риск: {{ riskLabel }}</template>
+        <template v-if="riskLabel && confidenceLabel"> · </template>
+        <template v-if="confidenceLabel">уверенность оценки: {{ confidenceLabel }}</template>
       </p>
     </section>
 
@@ -162,10 +225,12 @@ const riskLabel = computed(() => {
       <div class="flex flex-wrap gap-2">
         <div v-for="item in data.favorites" :key="item.name"
           class="flex items-center gap-2 pr-3 py-1.5 pl-1.5"
-          style="border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent-contrast) 12%, transparent)">
+          style="border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent-contrast) 12%, transparent)"
+          :title="`${itemTypeLabel(item.type)}${item.tier ? ` · тир ${item.tier}` : ''}`">
           <img :src="itemImageUrl(item.image)" :alt="item.name" width="28" height="28"
             class="w-7 h-7 object-contain flex-shrink-0" loading="lazy">
           <span class="ds-meta">{{ item.name }}</span>
+          <span v-if="item.tier" class="ds-meta tabular-nums opacity-60">{{ item.tier }}</span>
         </div>
       </div>
     </section>
@@ -184,6 +249,9 @@ const riskLabel = computed(() => {
                 ? { background: 'var(--accent-contrast)', color: 'var(--accent-surface)' }
                 : { background: 'color-mix(in srgb, var(--accent-contrast) 22%, transparent)', color: 'var(--accent-contrast)' }">
               {{ m.result === 'Win' ? 'Победа' : m.result === 'Loss' ? 'Поражение' : 'Без счёта' }}
+            </span>
+            <span v-if="m.place" class="ds-meta tabular-nums opacity-70" :title="`место ${m.place} из ${m.participants ?? 12}`">
+              {{ m.place }}/{{ m.participants ?? 12 }}
             </span>
           </div>
           <p class="ds-meta mt-0.5">{{ MODE_LABEL[m.mode] }}<template v-if="m.rank_label"> · {{ m.rank_label }}</template></p>

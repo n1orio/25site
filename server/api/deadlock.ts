@@ -15,6 +15,11 @@ interface MmrResponse {
   rank_updated_at?: number
 }
 
+interface RawPerformance {
+  place?: number | null
+  participants?: number | null
+}
+
 interface RawMatch {
   match_id: number
   start_time: number
@@ -31,11 +36,25 @@ interface RawMatch {
   match_rank_division: number | null
   match_rank_division_tier: number | null
   ranked_delta: number | null
+  performance?: RawPerformance
+}
+
+interface RawActivityDay {
+  date: string
+  matches: number
+  wins: number
+  losses: number
+  duration_s: number
 }
 
 interface MatchesResponse {
   totals?: DeadlockData["totals"]
   recent_matches?: RawMatch[]
+  activity?: {
+    window_start?: string
+    window_end?: string
+    days?: RawActivityDay[]
+  }
 }
 
 interface StatsResponse {
@@ -43,10 +62,12 @@ interface StatsResponse {
   accuracy?: number
   headshot_rate?: number
   risk_band?: string
+  cheater_probability_percent?: number
+  confidence?: string
 }
 
 interface FavoritesResponse {
-  favorite_items?: { name: string; image: string }[]
+  favorite_items?: { name: string; image: string; item_type?: string; item_tier?: number }[]
 }
 
 /** Логика режимов та же, что на ddlk.bio */
@@ -180,12 +201,49 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
         duration_s: m.duration_s,
         mode: modeOf(m),
         ranked_delta: m.ranked_delta,
+        place: m.performance?.place ?? null,
+        participants: m.performance?.participants ?? null,
         rank_label: m.match_rank_division
           ? `Sentinel ${ROMAN[m.match_rank_division_tier ?? 0] ?? m.match_rank_division_tier}.${m.match_rank_division}`
           : null,
       }))
 
       const netWorths = scored.map((m) => m.net_worth)
+
+      // --- активность: окно ddlk.bio — около трёх месяцев ---
+      const rawDays = matchesRes?.activity?.days ?? []
+      const activity = rawDays.length
+        ? {
+            days: rawDays.map((d) => ({
+              date: d.date,
+              matches: d.matches,
+              wins: d.wins,
+              losses: d.losses,
+              duration_s: d.duration_s ?? 0,
+            })),
+            windowStart: matchesRes?.activity?.window_start ?? rawDays[0]!.date,
+            windowEnd: matchesRes?.activity?.window_end ?? rawDays[rawDays.length - 1]!.date,
+            totalMatches: rawDays.reduce((sum, d) => sum + d.matches, 0),
+            hours: rawDays.reduce((sum, d) => sum + (d.duration_s ?? 0), 0) / 3600,
+            maxPerDay: Math.max(...rawDays.map((d) => d.matches), 1),
+            busiest: rawDays.reduce<{ date: string; matches: number } | null>(
+              (best, d) => (!best || d.matches > best.matches ? { date: d.date, matches: d.matches } : best),
+              null,
+            ),
+          }
+        : null
+
+      // --- место в матче: считает не каждый режим ---
+      const placed = raw.map((m) =>
+        m.performance?.place ? { place: m.performance.place, participants: m.performance.participants ?? 12 } : null,
+      ).filter((v): v is { place: number; participants: number } => !!v)
+      const place = placed.length >= 3
+        ? {
+            avg: round(avg(placed.map((p) => p.place)), 1),
+            best: Math.min(...placed.map((p) => p.place)),
+            rated: placed.length,
+          }
+        : null
 
       return {
         rank: mmr?.rank_name
@@ -206,6 +264,8 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
               accuracy: statsRes.accuracy ?? 0,
               headshot_rate: statsRes.headshot_rate ?? 0,
               riskBand: statsRes.risk_band ?? null,
+              cheaterPercent: statsRes.cheater_probability_percent ?? 0,
+              confidence: statsRes.confidence ?? null,
             }
           : null,
         ranked,
@@ -216,9 +276,16 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
           avgDuration: Math.round(avg(scored.map((m) => m.duration_s))),
         },
         streak: { current, best },
+        activity,
+        place,
         heroes,
         recent,
-        favorites: favRes?.favorite_items ?? [],
+        favorites: (favRes?.favorite_items ?? []).map((i) => ({
+          name: i.name,
+          image: i.image,
+          type: i.item_type ?? "unknown",
+          tier: i.item_tier ?? 0,
+        })),
         sample: raw.length,
       }
     } catch {
