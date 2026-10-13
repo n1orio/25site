@@ -1,242 +1,151 @@
 /**
- * Пружины и «сочные» микро-взаимодействия.
+ * Пружинные кривые (spring easing).
  *
- * ── Про пружины ─────────────────────────────────────────────
- * Кривые посчитаны аналитически для
+ * Кривые посчитаны аналитически для пружины
  *   x'' + 2ζω₀·x' + ω₀²·x = 0,  x(0) = 1, x'(0) = 0
- * Жёсткость ω₀ подобрана так, чтобы пик перелёта приходился на
- * заданную долю длительности. Амплитуда перелёта = демпфирование
- * ζ: чем меньше ζ, тем сильнее «отскок».
+ * жёсткость ω₀ подобрана так, чтобы пик перелёта приходился на ~62%
+ * длительности. Амплитуда перелёта задаётся демпфированием ζ:
+ * чем меньше ζ, тем заметнее «отскок».
  *
- * Зачем linear(), а не cubic-bezier: пружина проходит мимо цели и
- * возвращается. cubic-bezier умеет максимум один перелёт, linear() —
- * сколько угодно колебаний, то есть любую жёсткость.
+ * Зачем linear(), а не cubic-bezier: пружина по определению
+ * неоднозначна — проходит мимо цели и возвращается. cubic-bezier
+ * умеет только 0→1→0→1 (один перелёт максимум), linear() —
+ * произвольное число колебаний, то есть любую жёсткость.
  *
- * Под каждым значением стоит cubic-bezier-fallback: браузеры без
- * linear() получат корректную, хоть и менее упругую анимацию.
- *
- * ── Про «жвачку» ────────────────────────────────────────────
- * Нажатие построено как в iOS:
- *   1. палец касается — элемент мгновенно сжимается (60-90 мс,
- *      ease-out, без пружины: палец не ждёт отскока);
- *   2. палец отпускает — элемент распрямляется с перелётом
- *      (пружина, ζ≈0.26, перелёт ~43%).
- * Плюс сквош по осям (scaleX/scaleY вразнобой) и смена формы —
- * скругление растёт при нажатии, как у резиновой кнопки.
- *
- * Точка нажатия передаётся в --px/--py, чтобы блик шёл из-под
- * пальца, а не из центра: см. composables/useJuice.ts.
+ * Поддержка linear() — все современные браузеры (Chrome 113+,
+ * Safari 17.2+, Firefox 112+). Старые получат анимацию с
+ * fallback-кривой из того же блока.
  */
 
-/* ── кривые ──────────────────────────────────────────────── */
+/* ── сами кривые ─────────────────────────────────────────── */
 
+/* ζ=0.82, 300 мс, перелёт ~1% — быстрый отклик на нажатие */
 :root {
   --ease-spring-snap: cubic-bezier(0.2, 0, 0, 1);
-  --ease-spring-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-spring-bounce: cubic-bezier(0.22, 1.4, 0.36, 1);
-  --ease-spring-heavy: cubic-bezier(0.3, 0.9, 0.3, 1);
-  /* ζ=0.26, 500 мс, перелёт ~43% — «жвачка» */
-  --ease-juice: cubic-bezier(0.22, 1.2, 0.36, 1);
-  /* ζ=0.30, 420 мс, перелёт ~37% — распрямление после нажатия */
-  --ease-squash: cubic-bezier(0.2, 1.1, 0.4, 1);
-  /* ζ=0.34, 440 мс, перелёт ~32% — появление */
-  --ease-pop: cubic-bezier(0.2, 1.15, 0.4, 1);
 }
-
 @supports (transition-timing-function: linear(0, 1)) {
   :root {
-    /* ζ=0.82, 300 мс, перелёт ~1% */
     --ease-spring-snap: linear(0.0000 0.000, 0.0584 0.048, 0.1895 0.095, 0.3457 0.143, 0.4988 0.190, 0.6341 0.238, 0.7454 0.286, 0.8322 0.333, 0.8965 0.381, 0.9420 0.429, 0.9725 0.476, 0.9918 0.524, 1.0031 0.571, 1.0088 0.619, 1.0109 0.667, 1.0111 0.689, 1.0109 0.714, 1.0097 0.762, 1.0081 0.810, 1.0063 0.857, 1.0047 0.905, 1.0034 0.952, 1.0023 1.000);
-    /* ζ=0.70, 400 мс, перелёт ~5% */
-    --ease-spring-soft: linear(0.0000 0.000, 0.0400 0.048, 0.1379 0.095, 0.2663 0.143, 0.4050 0.190, 0.5400 0.238, 0.6626 0.286, 0.7680 0.333, 0.8541 0.381, 0.9213 0.429, 0.9711 0.476, 1.0057 0.524, 1.0280 0.571, 1.0404 0.619, 1.0455 0.667, 1.0460 0.689, 1.0454 0.714, 1.0420 0.762, 1.0366 0.810, 1.0304 0.857, 1.0240 0.905, 1.0181 0.952, 1.0128 1.000);
-    /* ζ=0.55, 500 мс, перелёт ~13% */
-    --ease-spring: linear(0.0000 0.000, 0.0306 0.048, 0.1103 0.095, 0.2222 0.143, 0.3517 0.190, 0.4870 0.238, 0.6185 0.286, 0.7397 0.333, 0.8459 0.381, 0.9347 0.429, 1.0053 0.476, 1.0580 0.524, 1.0942 0.571, 1.1158 0.619, 1.1254 0.667, 1.1263 0.689, 1.1252 0.714, 1.1177 0.762, 1.1052 0.810, 1.0897 0.857, 1.0728 0.905, 1.0558 0.952, 1.0398 1.000);
-    /* ζ=0.40, 650 мс, перелёт ~25% */
-    --ease-spring-bounce: linear(0.0000 0.000, 0.0263 0.048, 0.0975 0.095, 0.2025 0.143, 0.3299 0.190, 0.4694 0.238, 0.6118 0.286, 0.7494 0.333, 0.8760 0.381, 0.9870 0.429, 1.0796 0.476, 1.1521 0.524, 1.2043 0.571, 1.2371 0.619, 1.2522 0.667, 1.2538 0.689, 1.2519 0.714, 1.2388 0.762, 1.2157 0.810, 1.1857 0.857, 1.1514 0.905, 1.1154 0.952, 1.0796 1.000);
-    /* ζ=0.62, 600 мс, перелёт ~8% */
-    --ease-spring-heavy: linear(0.0000 0.000, 0.0341 0.048, 0.1205 0.095, 0.2384 0.143, 0.3712 0.190, 0.5059 0.238, 0.6333 0.286, 0.7474 0.333, 0.8445 0.381, 0.9235 0.429, 0.9844 0.476, 1.0287 0.524, 1.0582 0.571, 1.0754 0.619, 1.0828 0.667, 1.0835 0.689, 1.0827 0.714, 1.0773 0.762, 1.0684 0.810, 1.0578 0.857, 1.0465 0.905, 1.0355 0.952, 1.0254 1.000);
-    /* ζ=0.26, 500 мс, перелёт ~43% */
-    --ease-juice: linear(0.0000 0.000, 0.1140 0.053, 0.3954 0.105, 0.7440 0.158, 1.0682 0.211, 1.3028 0.263, 1.4172 0.316, 1.4292 0.340, 1.4141 0.368, 1.3212 0.421, 1.1796 0.474, 1.0313 0.526, 0.9104 0.579, 0.8369 0.632, 0.8160 0.684, 0.8401 0.737, 0.8936 0.789, 0.9580 0.842, 1.0167 0.895, 1.0583 0.947, 1.0776 1.000);
-    /* ζ=0.30, 420 мс, перелёт ~37% */
-    --ease-squash: linear(0.0000 0.000, 0.1289 0.053, 0.4349 0.105, 0.7942 0.158, 1.1041 0.211, 1.3025 0.263, 1.3720 0.316, 1.3723 0.320, 1.3312 0.368, 1.2208 0.421, 1.0871 0.474, 0.9691 0.526, 0.8915 0.579, 0.8619 0.632, 0.8743 0.684, 0.9140 0.737, 0.9637 0.789, 1.0084 0.842, 1.0387 0.895, 1.0512 0.947, 1.0476 1.000);
-    /* ζ=0.34, 440 мс, перелёт ~32% */
-    --ease-pop: linear(0.0000 0.000, 0.0950 0.053, 0.3276 0.105, 0.6187 0.158, 0.9001 0.211, 1.1235 0.263, 1.2643 0.316, 1.3195 0.368, 1.3212 0.380, 1.3021 0.421, 1.2349 0.474, 1.1434 0.526, 1.0508 0.579, 0.9740 0.632, 0.9226 0.684, 0.8991 0.737, 0.9001 0.789, 0.9189 0.842, 0.9472 0.895, 0.9774 0.947, 1.0036 1.000);
   }
 }
 
-/* ── жвачка: базовый на��им ───────────────────────────────── */
+/* ζ=0.70, 400 мс, перелёт ~5% — основная кривая интерфейса */
+:root {
+  --ease-spring-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring-soft: linear(0.0000 0.000, 0.0400 0.048, 0.1379 0.095, 0.2663 0.143, 0.4050 0.190, 0.5400 0.238, 0.6626 0.286, 0.7680 0.333, 0.8541 0.381, 0.9213 0.429, 0.9711 0.476, 1.0057 0.524, 1.0280 0.571, 1.0404 0.619, 1.0455 0.667, 1.0460 0.689, 1.0454 0.714, 1.0420 0.762, 1.0366 0.810, 1.0304 0.857, 1.0240 0.905, 1.0181 0.952, 1.0128 1.000);
+  }
+}
+
+/* ζ=0.55, 500 мс, перелёт ~13% — выразительное появление */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(0.0000 0.000, 0.0306 0.048, 0.1103 0.095, 0.2222 0.143, 0.3517 0.190, 0.4870 0.238, 0.6185 0.286, 0.7397 0.333, 0.8459 0.381, 0.9347 0.429, 1.0053 0.476, 1.0580 0.524, 1.0942 0.571, 1.1158 0.619, 1.1254 0.667, 1.1263 0.689, 1.1252 0.714, 1.1177 0.762, 1.1052 0.810, 1.0897 0.857, 1.0728 0.905, 1.0558 0.952, 1.0398 1.000);
+  }
+}
+
+/* ζ=0.40, 650 мс, перелёт ~25% — заметный «отскок» */
+:root {
+  --ease-spring-bounce: cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring-bounce: linear(0.0000 0.000, 0.0263 0.048, 0.0975 0.095, 0.2025 0.143, 0.3299 0.190, 0.4694 0.238, 0.6118 0.286, 0.7494 0.333, 0.8760 0.381, 0.9870 0.429, 1.0796 0.476, 1.1521 0.524, 1.2043 0.571, 1.2371 0.619, 1.2522 0.667, 1.2538 0.689, 1.2519 0.714, 1.2388 0.762, 1.2157 0.810, 1.1857 0.857, 1.1514 0.905, 1.1154 0.952, 1.0796 1.000);
+  }
+}
+
+/* ζ=0.62, 600 мс, перелёт ~8% — тяжёлые элементы */
+:root {
+  --ease-spring-heavy: cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring-heavy: linear(0.0000 0.000, 0.0341 0.048, 0.1205 0.095, 0.2384 0.143, 0.3712 0.190, 0.5059 0.238, 0.6333 0.286, 0.7474 0.333, 0.8445 0.381, 0.9235 0.429, 0.9844 0.476, 1.0287 0.524, 1.0582 0.571, 1.0754 0.619, 1.0828 0.667, 1.0835 0.689, 1.0827 0.714, 1.0773 0.762, 1.0684 0.810, 1.0578 0.857, 1.0465 0.905, 1.0355 0.952, 1.0254 1.000);
+  }
+}
+
+/* ── базовые интерактивные состояния ─────────────────────── */
 
 /**
- * Нажатие. Отпускание — пружина с перелётом ~37%, само нажатие
- * — быстрое и тугое. transform в списке обязателен: если класс
- * задаёт filter или другое свойство, без явного listing
- * браузер анимирует только его.
+ * Нажатие. Как на iOS: элемент слегка садится и отпускает с
+ * отскоком. Трансформация в transition перечислена явно,
+ * потому что класс .ds-card задаёт filter — без list
+ * браузер анимировал бы только его.
  */
-.juicy {
-  --_r: var(--radius-pill);
-  transform-origin: center;
+.press-spring {
   transition:
-    transform 0.42s var(--ease-squash),
-    border-radius 0.42s var(--ease-squash),
-    box-shadow 0.3s ease;
+    transform 0.42s var(--ease-spring-soft),
+    filter 0.42s var(--ease-spring-soft);
 }
-.juicy:active {
-  /* сквош по осям: по Y сильнее — палец продавливает, а не сжимает вбок */
-  transform: scale(0.9, 0.86) translateY(2px);
-  border-radius: calc(var(--_r) + 6px);
-  transition:
-    transform 0.075s cubic-bezier(0.3, 0, 0.2, 1),
-    border-radius 0.075s cubic-bezier(0.3, 0, 0.2, 1),
-    box-shadow 0.075s linear;
+.press-spring:active {
+  transform: scale(0.955);
+  transition-duration: 0.1s;
+  /* нажатие не должно «отскакивать» — оно мгновенное */
+  transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
 }
-
-/* для прямоугольных карточек: скругление при нажатии растёт сильнее */
-.juicy-card {
-  --_r: var(--radius-card);
-}
-.juicy-card:active {
-  transform: scale(0.965, 0.94) translateY(3px);
-  border-radius: calc(var(--radius-card) + 8px);
-  transition:
-    transform 0.08s cubic-bezier(0.3, 0, 0.2, 1),
-    border-radius 0.08s cubic-bezier(0.3, 0, 0.2, 1),
-    box-shadow 0.08s linear;
-}
-
-/* ── блик из-под пальца ──────────────────────────────────── */
+.press-spring-sm:active { transform: scale(0.97); }
 
 /**
- * Радиальный блик от точки нажатия. Отдельный класс, а не
- * ::after на .ds-card: в теме «Дедлок» на карточках уже заняты
- * оба псевдоэлемента под текстуру и подчёркивание.
+ * Появление при монтировании. Каскад задаётся через
+ * --i (индекс в разметке), чтобы не писать nth-child.
  */
-.juicy-sheen {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-.juicy-sheen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0;
-  background: radial-gradient(
-    circle 120px at var(--px, 50%) var(--py, 50%),
-    color-mix(in srgb, var(--accent-contrast) 45%, transparent),
-    transparent 70%
-  );
-  transition: opacity 0.28s ease;
-}
-.juicy-sheen:hover::after { opacity: 0.4; }
-.juicy-sheen:active::after {
-  opacity: 0.85;
-  /* на нажатии блик расплывается — как будто палец вдавил стекло */
-  transform: scale(1.35);
-  transition: opacity 0.06s linear, transform 0.5s var(--ease-juice);
-}
-
-/* ── наклон к курсору ────────────────────────────────────── */
-
-/**
- * Элемент слегка поворачивается к курсору, как будто тянется за
- * пальцем. Углы задаёт useJuiceScope через --tilt-x/--tilt-y.
- *
- * Наклон и подъём объединены в одном правиле намеренно: transform
- * — одно свойство, и если задать их раздельно, победит последнее,
- * и наклон или подъём пропадёт.
- */
-.juicy-tilt {
-  --_lift: 0px;
-  transform:
-    perspective(700px)
-    translateY(var(--_lift))
-    rotateX(var(--tilt-x, 0deg))
-    rotateY(var(--tilt-y, 0deg));
-  transition: transform 0.5s var(--ease-spring-soft);
-  will-change: transform;
-}
-.juicy-tilt:hover { --_lift: -4px; }
-.juicy-tilt:active {
-  transform: perspective(700px) scale(0.95);
-  transition: transform 0.08s cubic-bezier(0.3, 0, 0.2, 1);
-}
-/* пока курсор внутри, наклон отслеживается мгновенно: с пружиной
- * карточка «догоняет» его и движение ощущается вязким */
-.juicy-tilt.is-tracking {
-  transition: transform 0.09s linear;
-}
-
-/* ── появления ───────────────────────────────────────────── */
-
 .rise-in {
-  animation: rise-in 0.62s var(--ease-pop) both;
+  animation: rise-in 0.62s var(--ease-spring) both;
   animation-delay: calc(var(--i, 0) * 55ms);
 }
 @keyframes rise-in {
-  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.9) rotate(-0.6deg); }
-  60%  { opacity: 1; }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-}
-
-.rise-in-sm {
-  animation: rise-in-sm 0.52s var(--ease-pop) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
-}
-@keyframes rise-in-sm {
-  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.94); }
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.96); }
   to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* появление с поворотом — для плиток и превью */
-.pop-in {
-  animation: pop-in 0.5s var(--ease-pop) both;
-  animation-delay: calc(var(--i, 0) * 40ms);
+.rise-in-sm {
+  animation: rise-in-sm 0.5s var(--ease-spring-soft) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
 }
-@keyframes pop-in {
-  from { opacity: 0; transform: scale(0.6) rotate(-4deg); }
-  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+@keyframes rise-in-sm {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+/* появление сбоку — для выпадающих панелей и списков */
 .slide-in {
-  animation: slide-in 0.55s var(--ease-juice) both;
+  animation: slide-in 0.5s var(--ease-spring) both;
 }
 @keyframes slide-in {
-  from { opacity: 0; transform: translate3d(0, -14px, 0) scale(0.86) rotate(1.5deg); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  from { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.97); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* ── дыхание ─────────────────────────────────────────────── */
+/**
+ * Наведение с подъёмом. Отпускание — с отскоком, поэтому
+ * возврат выглядит живым, а наведение быстрым.
+ */
+.lift-spring {
+  transition:
+    transform 0.5s var(--ease-spring-soft),
+    filter 0.4s ease;
+}
+.lift-spring:hover {
+  transform: translate3d(0, -4px, 0);
+}
 
+/* «дыхание» — для точек статуса и живых индикаторов */
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(0.82); }
+  50%      { opacity: 0.55; transform: scale(0.88); }
 }
 .pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
 
-/**
- * Ячейка хитмапа. Наведение раздувает плитку с перелётом и
- * поднимает над соседями — по сетке сразу видно, сколько
- * матчей в этот день.
- */
-.heat-cell {
-  border-radius: var(--radius-pill);
-  transform-origin: center;
-  transition: transform 0.45s var(--ease-juice);
+/* список с каскадом: каждый пункт получает свой --i */
+.stagger > * {
+  animation: rise-in-sm 0.5s var(--ease-spring-soft) both;
 }
-.heat-cell:hover {
-  transform: scale(1.9);
-  z-index: 2;
-  position: relative;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-contrast) 55%, transparent);
-}
-
-/* ── каскад ──────────────────────────────────────────────── */
-
-.stagger > * { animation: rise-in-sm 0.52s var(--ease-pop) both; }
+/* шаг каскада подобран так, чтобы 12 элементов уложились в ~0.7 с */
 .stagger > *:nth-child(1)  { animation-delay: 0ms; }
 .stagger > *:nth-child(2)  { animation-delay: 40ms; }
 .stagger > *:nth-child(3)  { animation-delay: 80ms; }
@@ -251,23 +160,23 @@
 .stagger > *:nth-child(12) { animation-delay: 440ms; }
 .stagger > *:nth-child(n+13) { animation-delay: 480ms; }
 
-/* ── доступность ─────────────────────────────────────────── */
-
 /**
- * «Уменьшить движение» отключает всё: пружины тут самые
- * заметные, и они как раз противоположны этому режиму.
+ * Доступность: система «уменьшить движение» должна полностью
+ * отключать анимации. Пружины тут как раз самые заметные.
  */
 @media (prefers-reduced-motion: reduce) {
-  .rise-in, .rise-in-sm, .slide-in, .pop-in, .stagger > * {
+  .rise-in,
+  .rise-in-sm,
+  .slide-in,
+  .stagger > * {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
-  .juicy, .juicy-card, .juicy-tilt, .lift-spring, .press-spring {
+  .press-spring,
+  .press-spring-sm,
+  .lift-spring {
     transition: none !important;
   }
-  .juicy-sheen::after { display: none; }
   .pulse-soft { animation: none !important; }
-  /* наклон и блик всё ещё могут мешать — глушим */
-  .juicy-tilt { transform: none !important; }
 }

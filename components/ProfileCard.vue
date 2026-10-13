@@ -17,14 +17,14 @@ defineProps<{
         :href="profileUrl"
         target="_blank"
         rel="noopener"
-        class="profile-avatar-wrap relative flex-shrink-0 group block juicy-tilt"
-        data-tilt="9"
+        class="relative flex-shrink-0 group"
         :aria-label="`Профиль ${username}`"
       >
         <img
           :src="discordAvatarUrl"
           alt="avatar"
-          class="profile-avatar w-20 h-20 object-cover" >
+          class="profile-avatar w-20 h-20 object-cover"
+          style="border-radius: var(--radius-card); transition: transform 0.55s var(--ease-spring-soft)" >
         <span
           class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--accent)] pulse-soft"
           :style="{ backgroundColor: discordStatusColor }" />

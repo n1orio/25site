@@ -47,7 +47,7 @@ defineProps<{
       <div
         v-for="(activity, idx) in visibleActivities"
         :key="activity.name ?? idx"
-        class="juicy-card flex items-center gap-3 p-3"
+        class="flex items-center gap-3 p-3"
         style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)"
       >
         <div class="relative flex-shrink-0">
@@ -80,7 +80,7 @@ defineProps<{
     </div>
 
     <div
-v-else class="juicy-card flex items-center gap-3 p-3"
+v-else class="flex items-center gap-3 p-3"
       style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)">
       <div class="w-10 h-10 flex items-center justify-center flex-shrink-0" style="color: var(--text-secondary)">
         <Icon name="lucide:moon" size="20" class="w-5 h-5" />

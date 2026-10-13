@@ -106,9 +106,7 @@ v-for="(d, i) in WEEKDAYS" :key="i" class="flex items-center"
         </div>
         <div v-for="(week, wi) in activityWeeks" :key="wi" class="flex flex-col gap-[3px]">
           <div
-            v-for="(day, di) in week"
-            :key="di"
-            class="heat-cell w-[11px] h-[11px] flex-shrink-0"
+v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
             :style="{
               borderRadius: 'var(--radius-pill)',
               background: day === null
