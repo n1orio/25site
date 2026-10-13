@@ -71,12 +71,26 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
       if (!frame) frame = requestAnimationFrame(flush)
     }
 
-    /* курсор ушёл — форма возвращается в покой */
+    /*
+     * Курсор ушёл — форма возвращается в покой.
+     *
+     * Возврат пружинит: на время возврата вешаем is-settling, у
+     * которого transform анимируется 0.5s. Иначе элемент
+     * принимал бы исходную форму мгновенно, без отскока, и желе
+     * читалось бы как «элемент дёргается», а не как резинка.
+     */
+    let settleTimer: ReturnType<typeof setTimeout> | null = null
     const onLeave = () => {
       if (!wobble) return
+      node.classList.add("is-settling")
       node.style.setProperty("--_wx", "1")
       node.style.setProperty("--_wy", "1")
       node.style.setProperty("--_wobble-lift", "0px")
+      if (settleTimer) clearTimeout(settleTimer)
+      settleTimer = setTimeout(() => {
+        node.classList.remove("is-settling")
+        settleTimer = null
+      }, 520)
     }
 
     node.addEventListener("pointermove", onMove, { passive: true })
@@ -84,6 +98,7 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
     node.addEventListener("pointercancel", onLeave, { passive: true })
 
     cleanups.push(() => {
+      if (settleTimer) clearTimeout(settleTimer)
       node.removeEventListener("pointermove", onMove)
       node.removeEventListener("pointerleave", onLeave)
       node.removeEventListener("pointercancel", onLeave)
