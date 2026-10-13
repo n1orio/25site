@@ -76,10 +76,9 @@ const summary = computed(() => {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <article
-        v-for="({ project, stats, modrinth }, i) in rows"
+        v-for="{ project, stats, modrinth } in rows"
         :key="project.title"
-        class="ds-card ds-card-hover p-6 flex flex-col relative rise-in"
-        :style="{ '--i': Math.min(i, 8) }"
+        class="ds-card ds-card-hover p-6 flex flex-col relative"
       >
         <div class="flex items-start justify-between gap-3 mb-4">
           <span
@@ -127,12 +126,12 @@ const summary = computed(() => {
           <!-- состав по языкам -->
           <div v-if="stats.languages.length" class="flex h-1.5 rounded-full overflow-hidden">
             <span
-              v-for="(lang, langIdx) in stats.languages"
+              v-for="(lang, i) in stats.languages"
               :key="lang.name"
               class="h-full"
               :style="{
                 width: `${langShare(stats.languages, lang.bytes)}%`,
-                opacity: 1 - langIdx * 0.18,
+                opacity: 1 - i * 0.18,
                 background: 'var(--accent-contrast)',
               }"
               :title="`${lang.name} — ${sizeLabel(Math.round(lang.bytes / 1024))}`"

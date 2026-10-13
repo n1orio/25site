@@ -16,8 +16,7 @@ export default defineNuxtConfig({
     serverBundle: 'remote',
   },
   // порядок важен: слой «Дедлока» переопределяет токены из main.css
-  // spring.css идёт последним: он задаёт только кривые и классы
-  css: ["~/assets/css/main.css", "~/assets/css/deadlock.css", "~/assets/css/spring.css"],
+  css: ["~/assets/css/main.css", "~/assets/css/deadlock.css"],
   hooks: {
     // Tailwind v4 подключается плагином Vite, а не PostCSS.
 // Каст нужен из-за дублирующихся копий типов Vite в pnpm:

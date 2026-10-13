@@ -124,9 +124,7 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   box-shadow: none;
   filter: var(--dl-shadow-md);
   clip-path: polygon(0 0, 100% 0, 100% 99%, 99% 100%, 0 100%);
-  /* та же пружина, что и в основной теме, но чуть короче:
-     в Deadlock анимации должны ощущаться «злее» */
-  transition: filter 0.3s ease, transform 0.45s var(--ease-spring);
+  transition: filter 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* каждой карточке в ряду — свой срез, как у карточек модов */
@@ -380,13 +378,9 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 }
 [data-deadlock] ::-webkit-scrollbar-thumb:hover { background: var(--dl-accent); }
 
-/* Переходы между вкладками. Уходящая страница гаснет быстро,
-   приходящая припрыгивает — но в Deadlock всё короче на треть. */
-[data-deadlock] .tab-leave-active { transition-duration: 0.1s; }
-[data-deadlock] .tab-enter-active {
-  transition-duration: 0.36s, 0.42s;
-  transition-timing-function: var(--ease-spring-soft), var(--ease-spring);
-}
+/* переходы между вкладками — короче, как у mistraly */
+[data-deadlock] .tab-enter-active,
+[data-deadlock] .tab-leave-active { transition-duration: 0.12s; }
 
 @media (max-width: 640px) {
   /* На телефоне сдвиг вкладок вверх не нужен: из-за transform они

@@ -26,7 +26,7 @@ defineProps<{
         <p class="ds-meta">Discord</p>
       </div>
       <span class="ds-pill !py-0.5 !px-2">
-        <span class="w-1.5 h-1.5 rounded-full pulse-soft" :style="{ backgroundColor: discordStatusColor }" />
+        <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: discordStatusColor }" />
         {{ discordStatus === "offline" ? "оффлайн" : "в сети" }}
       </span>
     </div>
@@ -38,7 +38,7 @@ defineProps<{
       </span>
       <span class="opacity-40">·</span>
       <span class="flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-green-500 pulse-soft" />
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500" />
         {{ server.online }} в сети
       </span>
     </p>
