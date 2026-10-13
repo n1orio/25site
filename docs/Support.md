@@ -2,7 +2,7 @@
 
 ## Ссылки на поддержку
 
-Массив `donations` в `config.ts`, рендерится компонентом `Donations.vue` в
+Массив `donations` в `config.ts`, рендерится компонентом `DonateBlock.vue` в
 конце вкладки «Связь».
 
 ```ts

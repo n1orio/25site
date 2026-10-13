@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const raw = await storage.getItem<Record<string, number>>(STORAGE_KEY)
-    const seen: Record<string, number> = raw ?? {}
+    let seen: Record<string, number> = raw ?? {}
 
     const lastSeen = seen[hash]
     if (typeof lastSeen === "number" && now - lastSeen < TOUCH_WINDOW) return
@@ -50,8 +50,14 @@ export default defineEventHandler(async (event) => {
     const lastPrune = (await storage.getItem<number>(PRUNE_KEY)) ?? 0
     if (now - lastPrune > HOUR) {
       await storage.setItem(PRUNE_KEY, now)
-      for (const [key, ts] of Object.entries(seen)) {
-        if (typeof ts === "number" && now - ts > KEEP_DAYS * DAY) delete seen[key]
+      // пересобираем объект вместо delete по вычисленному ключу:
+      // так проще читать, и не нужно оперировать динамическими
+      // ключами (no-dynamic-delete)
+      const fresh = Object.entries(seen).filter(
+        ([, ts]) => typeof ts !== "number" || now - ts <= KEEP_DAYS * DAY,
+      )
+      if (fresh.length !== Object.keys(seen).length) {
+        seen = Object.fromEntries(fresh)
       }
     }
 

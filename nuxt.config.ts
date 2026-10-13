@@ -18,8 +18,16 @@ export default defineNuxtConfig({
   // порядок важен: слой «Дедлока» переопределяет токены из main.css
   css: ["~/assets/css/main.css", "~/assets/css/deadlock.css"],
   hooks: {
-    "vite:extendConfig": (config: any) => {
-      config.plugins?.push(tailwindcss())
+    // Tailwind v4 подключается плагином Vite, а не PostCSS.
+// Каст нужен из-за дублирующихся копий типов Vite в pnpm:
+// тип плагина из @tailwindcss/vite не совпадает с PluginOption Nuxt.
+"vite:extendConfig": (config) => {
+      // config.plugins помечен read-only, а дублирующиеся копии
+      // типов Vite в pnpm не дают положить плагин без каста
+      const mutable = config as { plugins?: unknown[] }
+      const plugins = mutable.plugins ?? []
+      plugins.push(tailwindcss() as unknown)
+      mutable.plugins = plugins
     },
   },
   sitemap: {

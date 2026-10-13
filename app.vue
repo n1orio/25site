@@ -3,13 +3,11 @@ import { bioTitle as bioTitleConfig, bio } from "~/config"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
-  accentSurface, accentContrast, accentOnBg, isDark, isDeadlock,
+  accentSurface, accentContrast, accentOnBg, isDeadlock,
 } = useSecretTheme()
 
 // шрифты темы «Дедлок» — только когда она включена
 useDeadlockFonts(isDeadlock)
-
-const { toggle: toggleThemeCircle } = useThemeCircle(isDark)
 
 const { data: discord } = await useFetch("/api/discord")
 const { data: steam } = await useFetch("/api/steam")
@@ -81,17 +79,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
+  <div
+ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-hidden"
     :data-deadlock="isDeadlock ? '' : undefined"
     :style="{ '--bg-1': bgPrimary, '--bg-2': bgSecondary, '--accent': primaryColor, '--accent-secondary': secondaryColor, '--accent-surface': accentSurface, '--accent-contrast': accentContrast, '--accent-on-bg': accentOnBg, color: 'var(--text-primary)' }"
   >
     <div id="theme-circle" class="theme-circle" aria-hidden="true" />
 
-    <div ref="cursorRef" class="custom-cursor" v-show="isCursorVisible" :class="{ 'is-hovering': isHovering }">
-      <div class="cursor-corner top-left"></div>
-      <div class="cursor-corner top-right"></div>
-      <div class="cursor-corner bottom-left"></div>
-      <div class="cursor-corner bottom-right"></div>
+    <div v-show="isCursorVisible" ref="cursorRef" class="custom-cursor" :class="{ 'is-hovering': isHovering }">
+      <div class="cursor-corner top-left"/>
+      <div class="cursor-corner top-right"/>
+      <div class="cursor-corner bottom-left"/>
+      <div class="cursor-corner bottom-right"/>
     </div>
 
     <AppBackground />
@@ -143,7 +142,7 @@ onUnmounted(() => {
         </aside>
 
         <main class="lg:col-span-8 xl:col-span-9 flex flex-col min-w-0 z-10 w-full">
-          <Navigation />
+          <AppNavigation />
 
           <div class="relative w-full" @touchstart="onTouchStart" @touchend="onTouchEnd">
             <NuxtPage :transition="{ name: 'tab', mode: 'out-in' }" />

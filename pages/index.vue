@@ -56,6 +56,6 @@ const { copy, copiedKey } = useCopy()
       Ссылка на {{ copiedKey }} скопирована
     </p>
 
-    <Donations />
+    <DonateBlock />
   </section>
 </template>

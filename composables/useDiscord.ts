@@ -1,9 +1,15 @@
 import { computed } from "vue"
+import type { Ref } from "vue"
+import type { LanyardActivity, LanyardData } from "~/types/steam"
 
-export const useDiscord = (discord: any) => {
-  const discordData = computed(() => {
-    if (discord.value?.data) return discord.value.data
-    return discord.value || {}
+/** useFetch отдаёт { data }, но компонент может передать и сам ответ */
+export type DiscordSource = Ref<LanyardData | { data?: LanyardData } | null | undefined>
+
+export const useDiscord = (discord: DiscordSource) => {
+  const discordData = computed<LanyardData>(() => {
+    const raw = discord.value
+    if (raw && "data" in raw && raw.data) return raw.data
+    return (raw as LanyardData | null) || {}
   })
 
   const discordUser = computed(() => discordData.value?.discord_user)
@@ -22,10 +28,10 @@ export const useDiscord = (discord: any) => {
 
   const visibleActivities = computed(() => {
     if (!discordData.value?.activities) return []
-    return discordData.value.activities.filter((a: any) => a.type !== 4)
+    return discordData.value.activities.filter((a: LanyardActivity) => a.type !== 4)
   })
 
-  const getActivityTypeLabel = (activity: any) => {
+  const getActivityTypeLabel = (activity: LanyardActivity) => {
     switch (activity.type) {
       case 0: return "Играет в"
       case 1: return "Стримит"
@@ -36,14 +42,16 @@ export const useDiscord = (discord: any) => {
     }
   }
 
-  const getActivityTitle = (activity: any) => {
-    if (activity.type === 2) return activity.details || activity.name
-    return activity.name
+  const getActivityTitle = (activity: LanyardActivity): string => {
+    if (activity.type === 2) return activity.details || activity.name || "Неизвестно"
+    return activity.name || "Неизвестно"
   }
 
-  const getActivitySublines = (activity: any) => {
-    if (activity.type === 2) return [activity.state].filter(Boolean)
-    return [activity.details, activity.state].filter(Boolean)
+  const getActivitySublines = (activity: LanyardActivity): string[] => {
+    const parts = activity.type === 2
+      ? [activity.state]
+      : [activity.details, activity.state]
+    return parts.filter((v): v is string => Boolean(v))
   }
 
   const getActivityIcon = (type: number) => {

@@ -21,8 +21,8 @@
 │   ├── ContributionGraph.vue # Календарь вкладов (кликабельные плитки)
 │   ├── LocalStatus.vue       # Локальное время + погода
 │   ├── ActivityProfile.vue   # Аналитика активности по дням недели
-│   ├── Donations.vue         # Ссылки на поддержку
-│   ├── Navigation.vue        # Табы, переключатель темы, палитра
+│   ├── DonateBlock.vue         # Ссылки на поддержку
+│   ├── AppNavigation.vue        # Табы, переключатель темы, палитра
 │   ├── WaveDivider.vue       # Волна-разделитель секций
 │   ├── AppBackground.vue     # Фон (blur-слои)
 │   └── AppFooter.vue         # Футер (атрибуция, лицензия)

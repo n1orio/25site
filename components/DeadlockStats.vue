@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { DeadlockData } from "~/types/deadlock"
+// карта подписей нужна и в шаблоне
+import { MODE_LABEL } from "~/composables/useDeadlock"
 
 const props = defineProps<{ data: DeadlockData | null | undefined }>()
 const data = toRef(props, "data")
-
-// карта подписей нужна и в шаблоне
-import { MODE_LABEL } from "~/composables/useDeadlock"
 
 const {
   rankLabel, rankProgress, winrateLabel, recordLabel,
@@ -50,7 +49,8 @@ const riskLabel = computed(() => {
     <section class="ds-card p-5 sm:p-6">
       <div class="flex items-center gap-5">
         <div class="flex-shrink-0 flex items-center justify-center" style="width: 5.5rem">
-          <img v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data.rank.tier}`"
+          <img
+v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data.rank.tier}`"
             class="h-16 w-auto object-contain" loading="lazy">
           <Icon v-else name="lucide:crosshair" size="22" class="w-5 h-5" />
         </div>
@@ -85,7 +85,8 @@ const riskLabel = computed(() => {
       </p>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        <div v-for="s in [
+        <div
+v-for="s in [
           { label: 'Часов за окно', value: hoursWindowLabel },
           { label: 'Матчей за окно', value: String(data.activity.totalMatches) },
           { label: 'Матчей в день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
@@ -99,11 +100,13 @@ const riskLabel = computed(() => {
       <!-- сетка как у контрибуций: столбцы — недели, ряды — дни недели -->
       <div class="flex gap-[3px] overflow-hidden">
         <div class="flex flex-col gap-[3px] flex-shrink-0 mr-1">
-          <span v-for="(d, i) in WEEKDAYS" :key="i" class="flex items-center"
+          <span
+v-for="(d, i) in WEEKDAYS" :key="i" class="flex items-center"
             style="height: 11px; font-size: 8px; line-height: 1; opacity: .55;">{{ d }}</span>
         </div>
         <div v-for="(week, wi) in activityWeeks" :key="wi" class="flex flex-col gap-[3px]">
-          <div v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
+          <div
+v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
             :style="{
               borderRadius: 'var(--radius-pill)',
               background: day === null
@@ -119,7 +122,8 @@ const riskLabel = computed(() => {
         <p class="ds-meta">максимум в дне: {{ data.activity.busiest?.matches ?? 0 }} ({{ data.activity.busiest?.date ?? "—" }})</p>
         <div class="flex items-center gap-1.5">
           <span class="ds-meta opacity-70">меньше</span>
-          <span v-for="l in [0, 1, 2, 3, 4]" :key="l" class="w-[10px] h-[10px]"
+          <span
+v-for="l in [0, 1, 2, 3, 4]" :key="l" class="w-[10px] h-[10px]"
             :style="{
               borderRadius: 'var(--radius-pill)',
               background: l === 0
@@ -135,7 +139,8 @@ const riskLabel = computed(() => {
     <section class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Ключевые показатели</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div v-for="s in [
+        <div
+v-for="s in [
           { label: 'В игре', value: hoursLabel, hint: data.profile?.hoursPlayed ? 'по данным Steam' : null },
           { label: 'KDA', value: data.stats?.kda.toFixed(2) ?? '—', hint: null },
           { label: 'Accuracy', value: data.stats ? data.stats.accuracy.toFixed(1) + '%' : '—', hint: null },
@@ -174,7 +179,8 @@ const riskLabel = computed(() => {
       <p class="ds-meta mb-4">Ранкед против анранкеда</p>
 
       <div class="flex flex-col gap-4">
-        <div v-for="row in [
+        <div
+v-for="row in [
           { key: 'ranked', label: 'Ранкед', side: data.ranked },
           { key: 'unranked', label: 'Анранкед', side: data.unranked },
         ].filter(r => r.side)" :key="row.key">
@@ -212,7 +218,8 @@ const riskLabel = computed(() => {
     <section class="ds-card p-5 sm:p-6 flex flex-col">
       <p class="ds-meta mb-3">Экономика и серии</p>
       <div class="grid grid-cols-2 gap-2.5">
-        <div v-for="s in [
+        <div
+v-for="s in [
           { label: 'Ср. нетворс', value: netWorth(data.economy.avgNetWorth) },
           { label: 'Макс. нетворс', value: netWorth(data.economy.bestNetWorth) },
           { label: 'Ср. матч', value: matchDuration(data.economy.avgDuration) },
@@ -233,7 +240,8 @@ const riskLabel = computed(() => {
 
       <div v-for="hero in data.heroes" :key="hero.name" class="py-3 border-b last:border-0 border-white/20">
         <div class="flex items-center gap-3">
-          <img v-if="hero.icon" :src="heroIconUrl(hero.icon)" :alt="hero.name" width="26" height="26"
+          <img
+v-if="hero.icon" :src="heroIconUrl(hero.icon)" :alt="hero.name" width="26" height="26"
             class="w-[26px] h-[26px] object-cover rounded-lg flex-shrink-0" loading="lazy">
           <span class="ds-title text-sm">{{ hero.name }}</span>
           <span class="ds-meta ml-auto tabular-nums">{{ hero.matches }} м · {{ hero.winrate }}%</span>
@@ -253,11 +261,13 @@ const riskLabel = computed(() => {
     <section v-if="data.favorites.length" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Любимые улучшения</p>
       <div class="flex flex-wrap gap-2">
-        <div v-for="item in data.favorites" :key="item.name"
+        <div
+v-for="item in data.favorites" :key="item.name"
           class="flex items-center gap-2 pr-3 py-1.5 pl-1.5"
           style="border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent-contrast) 12%, transparent)"
           :title="`${itemTypeLabel(item.type)}${item.tier ? ` · тир ${item.tier}` : ''}`">
-          <img :src="itemImageUrl(item.image)" :alt="item.name" width="28" height="28"
+          <img
+:src="itemImageUrl(item.image)" :alt="item.name" width="28" height="28"
             class="w-7 h-7 object-contain flex-shrink-0" loading="lazy">
           <span class="ds-meta">{{ item.name }}</span>
           <span v-if="item.tier" class="ds-meta tabular-nums opacity-60">{{ item.tier }}</span>
@@ -269,12 +279,14 @@ const riskLabel = computed(() => {
     <section v-if="data.recent.length" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Последние матчи</p>
       <div v-for="m in data.recent" :key="m.match_id" class="flex items-center gap-3 py-2.5 border-b last:border-0 border-white/20">
-        <img v-if="m.hero_icon" :src="heroIconUrl(m.hero_icon)" :alt="m.hero_name" width="22" height="22"
+        <img
+v-if="m.hero_icon" :src="heroIconUrl(m.hero_icon)" :alt="m.hero_name" width="22" height="22"
           class="w-[22px] h-[22px] object-cover rounded-lg flex-shrink-0" loading="lazy">
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
             <span class="ds-title text-sm truncate">{{ m.hero_name }}</span>
-            <span class="ds-pill !py-0.5 !px-2"
+            <span
+class="ds-pill !py-0.5 !px-2"
               :style="m.result === 'Win'
                 ? { background: 'var(--accent-contrast)', color: 'var(--accent-surface)' }
                 : { background: 'color-mix(in srgb, var(--accent-contrast) 22%, transparent)', color: 'var(--accent-contrast)' }">

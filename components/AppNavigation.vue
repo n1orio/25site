@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted, onUnmounted } from "vue"
+import { ref, shallowRef, onMounted } from "vue"
 import { onClickOutside } from "@vueuse/core"
 import { navTabs } from "~/config"
 
@@ -27,7 +27,7 @@ const isDarkNow = computed(() => hydrated.value && isDark.value)
 
 const {
   gradientPresets, themeMode, activeGradient,
-  primaryColor, secondaryColor,
+  primaryColor,
   setSingleColor, setGradient,
 } = useSecretTheme()
 
@@ -53,7 +53,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
         <div v-if="showLeftArrow" class="nav-fade nav-fade-left absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none" />
         <div v-if="showRightArrow" class="nav-fade nav-fade-right absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none" />
 
-        <div ref="navScrollRef" @scroll="handleNavScroll" class="nav-track flex items-center overflow-x-auto hide-scrollbar relative h-full px-1">
+        <div ref="navScrollRef" class="nav-track flex items-center overflow-x-auto hide-scrollbar relative h-full px-1" @scroll="handleNavScroll">
           <NuxtLink
             v-for="tab in navTabs"
             :key="tab.to"
@@ -69,11 +69,11 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       <span class="nav-sep w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
-        <button @click="toggleTheme($event)" class="nav-ctl" :aria-label="isDarkNow ? 'Светлая тема' : 'Тёмная тема'">
+        <button class="nav-ctl" :aria-label="isDarkNow ? 'Светлая тема' : 'Тёмная тема'" @click="toggleTheme($event)">
           <Icon :name="isDarkNow ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 
-        <div class="relative" ref="paletteRef">
+        <div ref="paletteRef" class="relative">
           <button
             class="nav-ctl"
             :class="{ 'is-active': showPalette }"
@@ -94,14 +94,15 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                   <button
                     v-for="preset in gradientPresets"
                     :key="preset.id"
-                    @click="pickGradient($event, preset.colors)"
                     class="flex flex-col gap-2 p-2 rounded-xl transition-colors group cursor-pointer border"
                     :style="{
                       borderColor: themeMode === 'gradient' && activeGradient[0] === preset.colors[0]
                         ? 'var(--accent)' : 'transparent',
                     }"
+                    @click="pickGradient($event, preset.colors)"
                   >
-                    <div class="w-full h-8 rounded-lg border"
+                    <div
+class="w-full h-8 rounded-lg border"
                       :style="{
                         background: `linear-gradient(135deg, ${preset.colors[0]} 10%, ${preset.colors[1]} 90%)`,
                         borderColor: 'transparent',
@@ -115,7 +116,8 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
 
               <div class="flex items-center justify-between">
                 <p class="on-bg-meta">Свой цвет</p>
-                <div class="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer flex items-center justify-center"
+                <div
+class="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer flex items-center justify-center"
                   style="background: conic-gradient(red,yellow,lime,aqua,blue,magenta,red)">
                   <div class="absolute inset-0.5 rounded-full flex items-center justify-center" style="background: var(--bg-primary)">
                     <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: themeMode === 'single' ? primaryColor : 'transparent' }" />
@@ -124,7 +126,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                     type="color"
                     :value="themeMode === 'single' ? primaryColor : '#ffffff'"
                     class="absolute inset-0 w-[150%] h-[150%] -translate-x-1/4 -translate-y-1/4 opacity-0 cursor-pointer"
-                    @input="setThemeColor(($event.target as HTMLInputElement).value)" />
+                    @input="setThemeColor(($event.target as HTMLInputElement).value)" >
                 </div>
               </div>
             </div>
