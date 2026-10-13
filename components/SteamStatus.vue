@@ -1,10 +1,27 @@
 <script setup lang="ts">
-defineProps<{
-  steam: any
+import { computed } from "vue"
+import type { SteamData } from "~/types/steam"
+import { isSteamOffline } from "~/types/steam"
+
+const props = defineProps<{
+  steam: SteamData | null | undefined
   steamPillText: string
   steamHeadlineText: string
   steamSublineText: string
 }>()
+
+/**
+ * Steam сообщает оффлайн несколькими строками («Не в сети», «Скрыт»),
+ * а при ошибке API поле state может быть пустым. Сравнение с одной
+ * строкой показывало синюю точку «в сети» офлайн-игрока, поэтому
+ * оффлайн определяем явно.
+ */
+const isOffline = computed(() => isSteamOffline(props.steam))
+
+const statusLabel = computed(() => (isOffline.value ? "оффлайн" : "в игре"))
+const statusDot = computed(() =>
+  props.steam?.isPlaying ? "bg-green-500" : isOffline.value ? "bg-zinc-500" : "bg-blue-500",
+)
 </script>
 
 <template>
@@ -15,21 +32,21 @@ defineProps<{
         <p class="ds-meta">Steam</p>
       </div>
       <span class="ds-pill !py-0.5 !px-2">
-        <span
-          class="w-1.5 h-1.5 rounded-full"
-          :class="steam?.isPlaying ? 'bg-green-500' : steam?.state !== 'Не в сети' ? 'bg-blue-500' : 'bg-zinc-500'" />
-        {{ steam?.isPlaying ? "в игре" : steam?.state !== "Не в сети" ? "в сети" : "оффлайн" }}
+        <span class="w-1.5 h-1.5 rounded-full" :class="statusDot" />
+        {{ statusLabel }}
       </span>
     </div>
 
-    <div class="flex items-center gap-3 p-3 transition-colors"
+    <div
+class="flex items-center gap-3 p-3 transition-colors"
       style="background: color-mix(in srgb, var(--accent-contrast) 14%, transparent); border-radius: var(--radius-pill)">
       <template v-if="steam?.isPlaying && steam?.gameArt">
-        <img :src="steam.gameArt" class="w-10 h-10 object-cover flex-shrink-0" style="border-radius: var(--radius-card)" loading="lazy" />
+        <img :src="steam.gameArt" class="w-10 h-10 object-cover flex-shrink-0" style="border-radius: var(--radius-card)" loading="lazy" >
       </template>
       <template v-else-if="steam?.recentGameArt">
-        <img :src="steam.recentGameArt" class="w-10 h-10 object-cover opacity-70 grayscale group-hover:grayscale-0 transition duration-300 flex-shrink-0"
-          style="border-radius: var(--radius-card)" loading="lazy" />
+        <img
+:src="steam.recentGameArt" class="w-10 h-10 object-cover opacity-70 grayscale group-hover:grayscale-0 transition duration-300 flex-shrink-0"
+          style="border-radius: var(--radius-card)" loading="lazy" >
       </template>
       <template v-else>
         <div class="w-10 h-10 flex items-center justify-center flex-shrink-0" style="color: var(--text-secondary)">

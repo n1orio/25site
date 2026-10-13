@@ -1,5 +1,6 @@
 import { ref, nextTick, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { navTabs } from "~/config"
 
 /**
  * Состояние навигации общее для приложения.
@@ -16,17 +17,53 @@ const showRightArrow = ref(false)
 const navIndicator = ref({ left: 0, width: 0, visible: false })
 /** слушатели и наблюдатель ставятся один раз на всё приложение */
 let initialized = false
+/** router-хуки тоже ставятся один раз: useNavigation() зовут и app.vue, и Navigation */
+let guardsRegistered = false
+/** позиция скролла, запомненная перед уходом со страницы раздела */
+let savedScrollPosition = 0
+
+/**
+ * Порядок страниц берём из config, а не из отдельного массива:
+ * здесь он раньше разошёлся с navTabs (потерялась /deadlock), и
+ * свайп на этой вкладке просто не срабатывал.
+ */
+const routesList = navTabs.map((tab) => tab.to)
+
+const cleanPath = (path: string) => {
+  const p = path.replace(/\/$/, "")
+  return p === "" ? "/" : p
+}
+
+/** обе страницы — разделы сайта, между ними скролл не сбрасываем */
+const isTabRoute = (path: string) => routesList.includes(cleanPath(path))
+
+/**
+ * Блокировка прыжка скролла. Регистрируется один раз на роутер:
+ * повторная регистрация дублировала бы и сохранение позиции,
+ * и её восстановление на каждом переходе.
+ */
+const registerGuards = (router: ReturnType<typeof useRouter>) => {
+  if (guardsRegistered) return
+  guardsRegistered = true
+  router.beforeEach((to, from) => {
+    if (isTabRoute(to.path) && isTabRoute(from.path)) {
+      savedScrollPosition = window.scrollY
+    }
+  })
+  router.afterEach((to, from) => {
+    if (isTabRoute(to.path) && isTabRoute(from.path)) {
+      nextTick(() => {
+        window.scrollTo({ top: savedScrollPosition, behavior: "instant" })
+      })
+    }
+  })
+}
 
 export const useNavigation = () => {
   const route = useRoute()
   const router = useRouter()
 
-  const routesList = ["/", "/projects", "/uses", "/now"]
-
-  const cleanPath = (path: string) => {
-    const p = path.replace(/\/$/, "")
-    return p === "" ? "/" : p
-  }
+  registerGuards(router)
 
   const updateArrows = () => {
     if (!navScrollRef.value) return
@@ -76,21 +113,6 @@ export const useNavigation = () => {
     })
   }
 
-  // Блокировка прыжка скролла
-  let savedScrollPosition = 0
-  router.beforeEach((to, from) => {
-    if (routesList.includes(cleanPath(to.path)) && routesList.includes(cleanPath(from.path))) {
-      savedScrollPosition = window.scrollY
-    }
-  })
-  router.afterEach((to, from) => {
-    if (routesList.includes(cleanPath(to.path)) && routesList.includes(cleanPath(from.path))) {
-      nextTick(() => {
-        window.scrollTo({ top: savedScrollPosition, behavior: "instant" })
-      })
-    }
-  })
-
   // Свайп по контенту
   let touchStartX = 0, touchStartY = 0
   const onTouchStart = (e: TouchEvent) => {
@@ -120,6 +142,16 @@ export const useNavigation = () => {
 
   let resizeObserver: ResizeObserver | undefined
 
+  /**
+   * Именованная функция, а не анонимная стрелка: destroyNav() зовёт
+   * removeEventListener именно с ней, иначе слушатель оставался бы
+   * висеть до перезагрузки страницы.
+   */
+  const onWindowResize = () => {
+    updateArrows()
+    updateNavIndicator()
+  }
+
   const initNav = () => {
     // повторные вызовы (например с других страниц) не плодят слушатели
     if (initialized) {
@@ -132,10 +164,7 @@ export const useNavigation = () => {
       centerActiveTab()
       updateNavIndicator()
     }, 350)
-    window.addEventListener("resize", () => {
-      updateArrows()
-      updateNavIndicator()
-    })
+    window.addEventListener("resize", onWindowResize)
     // Ширина вкладок меняется после загрузки шрифтов и смены темы —
     // без этого подсказки о прокрутке оставались бы неверными.
     // ResizeObserver тут не годится: у прокручиваемого трека его
@@ -158,8 +187,10 @@ export const useNavigation = () => {
   })
 
   const destroyNav = () => {
-    window.removeEventListener("resize", updateArrows)
+    window.removeEventListener("resize", onWindowResize)
     resizeObserver?.disconnect()
+    resizeObserver = undefined
+    initialized = false
   }
 
   return {

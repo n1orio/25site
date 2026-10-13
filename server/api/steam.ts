@@ -1,4 +1,10 @@
-export default defineEventHandler(async (event) => {
+import type {
+  SteamData, SteamGame, SteamPlayer,
+  SteamPlayerSummaryResponse, SteamLevelResponse,
+  SteamRecentGamesResponse, SteamOwnedGamesResponse,
+} from "~/types/steam"
+
+export default defineEventHandler(async (): Promise<SteamData> => {
   const config = useRuntimeConfig();
   const key = config.steamApiKey;
   const steamid = config.steamId;
@@ -24,24 +30,24 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  return cachedFetch("steam", 120_000, async () => {
+  return cachedFetch<SteamData>("steam", 120_000, async () => {
     try {
-      const [summaryRes, levelRes, recentRes, ownedRes]: any = await Promise.all([
-      $fetch(
+      const [summaryRes, levelRes, recentRes, ownedRes] = await Promise.all([
+      $fetch<SteamPlayerSummaryResponse>(
         `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamid}`,
       ).catch(() => null),
-      $fetch(
+      $fetch<SteamLevelResponse>(
         `https://api.steampowered.com/IPlayerService/GetSteamLevel/v1/?key=${key}&steamid=${steamid}`,
       ).catch(() => null),
-      $fetch(
+      $fetch<SteamRecentGamesResponse>(
         `https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${key}&steamid=${steamid}&format=json`,
       ).catch(() => null),
-      $fetch(
+      $fetch<SteamOwnedGamesResponse>(
         `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${key}&steamid=${steamid}&format=json`,
       ).catch(() => null),
     ]);
 
-    const player = summaryRes?.response?.players?.[0] || {};
+    const player: SteamPlayer = summaryRes?.response?.players?.[0] ?? {};
     let isPlaying = false;
     let gameName = "";
     let gameArt = "";
@@ -61,15 +67,17 @@ export default defineEventHandler(async (event) => {
     let recentHours = 0;
     let totalRecentHours = 0;
 
-    if (recentRes?.response?.games?.length > 0) {
-      const games = recentRes.response.games;
-      const topGame = games[0];
-      recentGame = topGame.name;
+    const games: SteamGame[] = recentRes?.response?.games ?? [];
+    const topGame = games[0];
+    if (topGame) {
+      recentGame = topGame.name ?? "Ничего";
       recentGameArt = `https://cdn.akamai.steamstatic.com/steam/apps/${topGame.appid}/header.jpg`;
-      recentHours = Number((topGame.playtime_2weeks / 60).toFixed(1));
+      // playtime_2weeks у Steam опционален: без него было
+      // undefined / 60 → NaN, и в шапке вылезало «NaN ч.»
+      recentHours = Number(((topGame.playtime_2weeks ?? 0) / 60).toFixed(1));
 
       const totalMins = games.reduce(
-        (acc: number, curr: any) => acc + curr.playtime_2weeks,
+        (acc, curr) => acc + (curr.playtime_2weeks ?? 0),
         0,
       );
       totalRecentHours = Number((totalMins / 60).toFixed(1));
@@ -84,9 +92,15 @@ export default defineEventHandler(async (event) => {
       "Готов играть",
       "Готов обмениваться",
     ];
+    /**
+     * personastate — индекс в states. Если Steam не ответил или
+     * аккаунт приватный, поля нет: раньше states[undefined]
+     * давало undefined → «Скрыт», и клиент показывал это как
+     * «в сети». Отсутствие состояния — это оффлайн.
+     */
     const stateText = isPlaying
       ? "В игре"
-      : states[player.personastate] || "Скрыт";
+      : states[player.personastate ?? 0] ?? "Не в сети";
 
     return {
       personaname: player.personaname || "Неизвестно",
@@ -103,8 +117,25 @@ export default defineEventHandler(async (event) => {
       totalRecentHours,
       totalGames: ownedRes?.response?.game_count || 0,
     };
-  } catch (error) {
-    return null;
+  } catch {
+    // null здесь превращался на клиенте в state === undefined,
+    // а проверка «всё, что не „Не в сети“ — онлайн» показывала
+    // синюю точку. Отдаём явный оффлайн.
+    return {
+      personaname: "",
+      profileurl: "",
+      avatar: "",
+      state: "Не в сети",
+      isPlaying: false,
+      gameName: "",
+      gameArt: "",
+      level: 0,
+      recentGame: "",
+      recentGameArt: "",
+      recentHours: 0,
+      totalRecentHours: 0,
+      totalGames: 0,
+    };
   }
 });
 });

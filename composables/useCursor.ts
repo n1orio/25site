@@ -1,4 +1,5 @@
 import { ref, onUnmounted, watch } from "vue"
+import type { Ref } from "vue"
 
 type RGB = [number, number, number]
 
@@ -15,7 +16,7 @@ const hexToRgb = (hex: string): RGB | null => {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
-export const useCursor = (primaryColor: any, contrastColor: any) => {
+export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>) => {
   const cursorRef = ref<HTMLElement | null>(null)
   const isCursorVisible = ref(false)
   const isHovering = ref(false)
@@ -36,8 +37,6 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
   /** окно, в котором mouseover считается «настоящим» наведением */
   const MOVE_WINDOW = 120
   /** цикл rAF остановлен, пока курсор доехал до цели */
-  let resting = false
-  /** вкладка скрыта — не считаем совсем */
   let paused = false
 
   // --- цвет курсора: плавно интерполируем между акцентом и контрастом ---
@@ -84,7 +83,6 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
       applied.b === Math.round(color.b)
 
     if (settled) {
-      resting = true
       animationFrameId = null
       return
     }
@@ -94,7 +92,6 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
   const wake = () => {
     if (paused) return
     if (animationFrameId === null) {
-      resting = false
       animationFrameId = requestAnimationFrame(tick)
     }
   }
@@ -262,7 +259,6 @@ export const useCursor = (primaryColor: any, contrastColor: any) => {
     document.removeEventListener("visibilitychange", onVisibility)
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId)
     animationFrameId = null
-    resting = true
   }
 
   // тема поменялась, а мышь стоит на месте — цвет курсора пересчитывает

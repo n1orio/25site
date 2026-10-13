@@ -86,7 +86,7 @@ const modeOf = (m: Pick<RawMatch, "game_mode" | "match_mode">): Mode => {
 }
 
 const ROMAN: Record<number, string> = {
-  1: "I", 2: "II", 3: "III", 4: "IV", 5: "V",
+  1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI",
 }
 
 /** Эмблема ранга: division — индекс ранга, tier — подранг (1..6) */
@@ -141,6 +141,7 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
       const unrankedMatches = raw.filter((m) => modeOf(m) !== "ranked")
 
       const rankedSide = sideOf(rankedMatches)
+      const unrankedSide = sideOf(unrankedMatches)
       const deltas = rankedMatches
         .map((m) => m.ranked_delta)
         .filter((v): v is number => typeof v === "number")
@@ -286,7 +287,7 @@ export default defineEventHandler(async (): Promise<DeadlockData | null> => {
             }
           : null,
         ranked,
-        unranked: sideOf(unrankedMatches).matches ? sideOf(unrankedMatches) : null,
+        unranked: unrankedSide.matches ? unrankedSide : null,
         economy: {
           avgNetWorth: Math.round(avg(netWorths)),
           bestNetWorth: netWorths.length ? Math.max(...netWorths) : 0,

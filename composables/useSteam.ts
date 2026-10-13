@@ -1,6 +1,8 @@
 import { computed } from "vue"
+import type { Ref } from "vue"
+import type { SteamData } from "~/types/steam"
 
-export const useSteam = (steam: any) => {
+export const useSteam = (steam: Ref<SteamData | null | undefined>) => {
   const steamPillText = computed(() => {
     if (steam.value?.isPlaying) return "Запущено сейчас"
     if (steam.value?.recentGame) return "Недавняя активность"
@@ -28,10 +30,9 @@ export const useSteam = (steam: any) => {
     "https://avatars.steamstatic.com/fef4412077fe1a2f08056c8531da75c2b0c22c0f_full.jpg"
   )
 
-  const isOnline = computed(() => {
-    const steamOnline = steam.value?.isPlaying || steam.value?.state === "В сети"
-    return steamOnline
-  })
+  const isOnline = computed(
+    () => Boolean(steam.value?.isPlaying || steam.value?.state === "В сети"),
+  )
 
   return {
     steamPillText, steamHeadlineText, steamSublineText,

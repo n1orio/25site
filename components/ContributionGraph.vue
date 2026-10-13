@@ -68,12 +68,19 @@ const popStyle = ref<Record<string, string>>({})
 
 const showPop = (day: { date: string; level: number } | null, el?: HTMLElement | null) => {
   if (!day || !wrapRef.value) return
+  const cell = (el ?? null)?.getBoundingClientRect()
+  // без прямоугольника нечего позиционировать: если выставить
+  // active раньше, поповер остался бы висеть на месте прошлой ячейки
+  if (!cell) return
   active.value = day
   const box = wrapRef.value.getBoundingClientRect()
-  const cell = (el ?? null)?.getBoundingClientRect()
-  if (!cell) return
-  // держим поповер внутри графика, не даём уехать за края
-  const left = Math.min(Math.max(cell.left - box.left + cell.width / 2, 70), box.width - 70)
+  // держим поповер внутри графика, не даём уехать за края.
+  // На узком графике box.width < 140, и Math.max дал бы отрицательную
+  // левую границу — поэтому ограничиваем и правый край тоже.
+  const left = Math.min(
+    Math.max(cell.left - box.left + cell.width / 2, 70),
+    Math.max(box.width - 70, 70),
+  )
   popStyle.value = {
     left: `${left}px`,
     top: `${cell.top - box.top + cell.height / 2}px`,
