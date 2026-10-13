@@ -162,39 +162,6 @@
 /* наведение: подъём */
 .juicy:hover { --_lift: -3px; }
 
-/*
- * Элементы с data-wobble тянутся за курсором, и им нужен другой
- * transition. По умолчанию transform анимируется 0.42s пружиной,
- * но useJuiceScope переписывает --_wx/--_wy каждый кадр — transition
- * перезапускался бы 60 раз в секунду и желе просто не успевало бы
- * проявиться: карточка еле заметно дёргалась.
- *
- * Здесь transform следует за курсором мгновенно (0s), а нажатие
- * и возврат формы анимируются пружиной — они задаются отдельными
- * правилами ниже с :active и сбросом при уходе курсора.
- */
-[data-wobble] {
-  transition:
-    transform 0s linear,
-    border-radius 0.42s var(--ease-squash),
-    box-shadow 0.3s ease;
-}
-
-/* нажатие на «желе» — быстрое сжатие, как у всех .juicy */
-/* возврат формы после ухода курсора — с отскоком */
-[data-wobble].is-settling {
-  transition:
-    transform 0.5s var(--ease-juice),
-    border-radius 0.5s var(--ease-juice);
-}
-
-[data-wobble]:active {
-  transition:
-    transform 0.08s cubic-bezier(0.3, 0, 0.2, 1),
-    border-radius 0.08s cubic-bezier(0.3, 0, 0.2, 1),
-    box-shadow 0.08s linear;
-}
-
 /* ── блик из-под пальца ──────────────────────────────────── */
 
 /*
