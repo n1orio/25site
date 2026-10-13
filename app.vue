@@ -419,18 +419,8 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--accent-contrast);
-  /*
-   * НЕ 'all'. transition:all анимирует вообще всё, включая
-   * width, height, padding и font-size — из-за чего у кнопок
-   * и пилюль дёргалась вёрстка, а не только цвет.
-   * Перечисляем ровно то, что меняется визуально.
-   */
-  transition:
-    transform 0.45s var(--ease-spring-soft),
-    background-color 0.45s var(--ease-spring-soft),
-    color 0.45s var(--ease-spring-soft),
-    border-color 0.45s var(--ease-spring-soft),
-    border-radius 0.45s var(--ease-spring-soft);
+  /* all намеренно: пилюли ещё и подпрыгивают на наведении */
+  transition: all 0.45s var(--ease-spring-soft);
 }
 .ds-pill-accent {
   background: var(--accent-contrast);
@@ -452,12 +442,7 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   border: 0;
   background: color-mix(in srgb, var(--accent-contrast) 16%, transparent);
   color: var(--accent-contrast);
-  /* тот же случай: all тянет за собой раскладку, нужен точный список */
-  transition:
-    transform 0.45s var(--ease-spring-soft),
-    background-color 0.45s var(--ease-spring-soft),
-    color 0.45s var(--ease-spring-soft),
-    border-radius 0.45s var(--ease-spring-soft);
+  transition: all 0.45s var(--ease-spring-soft);
 }
 .ds-action:hover {
   background: var(--accent-contrast);
