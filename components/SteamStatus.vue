@@ -32,7 +32,9 @@ const statusDot = computed(() =>
         <p class="ds-meta">Steam</p>
       </div>
       <span class="ds-pill !py-0.5 !px-2">
-        <span class="w-1.5 h-1.5 rounded-full" :class="statusDot" />
+        <span
+          class="w-1.5 h-1.5 rounded-full"
+          :class="[statusDot, !isOffline && 'pulse-soft']" />
         {{ statusLabel }}
       </span>
     </div>

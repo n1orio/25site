@@ -13,11 +13,12 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
 
     <p class="on-bg-body text-xs mb-4 max-w-prose">{{ animeDisclaimer }}</p>
 
-    <div class="ds-card p-5 sm:p-6">
+    <div class="ds-card p-5 sm:p-6 stagger">
       <div
         v-for="(anime, i) in topAnime"
         :key="anime.title"
-        class="flex items-baseline gap-3 py-3 border-b border-white/20 last:border-0"
+        class="anime-row flex items-baseline gap-3 py-3 border-b border-white/20 last:border-0"
+        :style="{ '--i': Math.min(i, 12) }"
       >
         <span class="ds-num w-8 font-bold" :style="i < 3 ? { color: medal(i) } : undefined">
           {{ String(i + 1).padStart(2, '0') }}
@@ -30,3 +31,13 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
     </div>
   </section>
 </template>
+
+<style>
+/* строка топ-листа: при наведении сдвигается с пружинным отскоком */
+.anime-row {
+  transition: transform 0.5s var(--ease-spring-soft);
+}
+.anime-row:hover {
+  transform: translateX(6px);
+}
+</style>

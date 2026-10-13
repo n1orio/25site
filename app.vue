@@ -100,6 +100,7 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 
         <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-8 w-full lg:sticky lg:top-10 z-20">
           <ProfileCard
+            class="rise-in"
             :discord-avatar-url="discordAvatarUrl"
             :discord-status-color="discordStatusColor"
             :bio-title="bioTitle"
@@ -108,11 +109,11 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
             :bio-paragraph2="bioParagraph2"
           />
 
-          <LocalStatus />
+          <LocalStatus class="rise-in" style="--i: 1" />
 
           <WaveDivider class="flex-1" />
 
-          <section class="ds-section">
+          <section class="ds-section rise-in" style="--i: 2">
             <header class="flex items-center gap-3 mb-4">
               <h2 class="on-bg-meta">Сейчас</h2>
             </header>
@@ -155,11 +156,18 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 </template>
 
 <style>
-.tab-enter-active, .tab-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+/* Переход между вкладками: уходящая страница быстро гаснет,
+   приходящая припрыгивает на пружине. mode="out-in" в app.vue
+   отвечает за порядок, поэтому тайминги тут разные. */
+.tab-leave-active {
+  transition: opacity 0.14s ease, transform 0.14s ease;
 }
-.tab-enter-from { opacity: 0; transform: translateY(6px); }
-.tab-leave-to   { opacity: 0; transform: translateY(-6px); }
+.tab-enter-active {
+  transition: opacity 0.5s var(--ease-spring-soft),
+              transform 0.62s var(--ease-spring);
+}
+.tab-enter-from { opacity: 0; transform: translateY(12px) scale(0.97); }
+.tab-leave-to   { opacity: 0; transform: translateY(-8px) scale(0.99); }
 
 @media (pointer: fine) {
   .theme-wrapper, .theme-wrapper * { cursor: none !important; }
@@ -228,9 +236,12 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   letter-spacing: 0.05em;
   white-space: nowrap;
   color: color-mix(in srgb, var(--accent-contrast) 88%, var(--accent-surface));
-  transition: color 0.25s ease, background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  /* цвет — плавно, а нажатие — пружиной: отпускание с отскоком */
+  transition: color 0.25s ease, background-color 0.45s var(--ease-spring-soft),
+              transform 0.4s var(--ease-spring-soft);
 }
 .nav-link:hover { color: var(--accent-contrast); }
+.nav-link:active { transform: scale(0.94); transition-duration: 0.1s; }
 /* Активная вкладка красит себя сама — не зависит от измерений DOM */
 .router-link-exact-active {
   background: var(--accent-contrast);
@@ -239,8 +250,15 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 
 .fade-enter-active, .fade-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-.pop-enter-active, .pop-leave-active { transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-.pop-enter-from, .pop-leave-to { opacity: 0; transform: scale(0.9) translateY(-10px); }
+/* Палитра выпадает с пружиной: чуть перелетает и садится */
+.pop-enter-active {
+  transition: opacity 0.4s var(--ease-spring), transform 0.5s var(--ease-spring);
+}
+.pop-leave-active {
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.pop-enter-from { opacity: 0; transform: scale(0.88) translateY(-12px); }
+.pop-leave-to { opacity: 0; transform: scale(0.96) translateY(-6px); }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -285,12 +303,19 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   background: var(--accent-surface);
   border: 0;
   border-radius: var(--radius-card);
+  /* transform в списке обязателен: иначе анимируется только filter */
   transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+              transform 0.55s var(--ease-spring);
 }
 .ds-card-hover:hover {
   filter: brightness(1.12) saturate(1.05);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+}
+/* нажатие — мгновенное, отпускание с отскоком */
+.ds-card-hover:active {
+  transform: translateY(-1px) scale(0.985);
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
 }
 
 /* --- оболочка навигации и выпадашка палитры ---
@@ -333,7 +358,8 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--accent-contrast);
-  transition: all 0.3s ease;
+  /* all намеренно: пилюли ещё и подпрыгивают на наведении */
+  transition: all 0.45s var(--ease-spring-soft);
 }
 .ds-pill-accent {
   background: var(--accent-contrast);
@@ -355,11 +381,16 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   border: 0;
   background: color-mix(in srgb, var(--accent-contrast) 16%, transparent);
   color: var(--accent-contrast);
-  transition: all 0.3s ease;
+  transition: all 0.45s var(--ease-spring-soft);
 }
 .ds-action:hover {
   background: var(--accent-contrast);
   color: var(--accent);
+  transform: scale(1.12);
+}
+.ds-action:active {
+  transform: scale(0.92);
+  transition-duration: 0.1s;
 }
 
 /* --- wave divider ---
@@ -446,14 +477,18 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   cursor: pointer;
   color: var(--accent-contrast);
   background: var(--nav-ctl-bg);
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.5s var(--ease-spring);
 }
 .nav-ctl:hover {
   background: var(--accent-contrast);
   color: var(--accent-surface);
-  transform: scale(1.08);
+  transform: scale(1.12);
 }
-.nav-ctl:active { transform: scale(0.96); }
+.nav-ctl:active {
+  transform: scale(0.9);
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+}
 .nav-ctl.is-active {
   background: var(--accent-contrast);
   color: var(--accent-surface);

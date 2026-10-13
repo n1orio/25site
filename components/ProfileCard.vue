@@ -23,11 +23,10 @@ defineProps<{
         <img
           :src="discordAvatarUrl"
           alt="avatar"
-          class="profile-avatar w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
-          style="border-radius: var(--radius-card)"
-        >
+          class="profile-avatar w-20 h-20 object-cover"
+          style="border-radius: var(--radius-card); transition: transform 0.55s var(--ease-spring-soft)" >
         <span
-          class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--accent)]"
+          class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--accent)] pulse-soft"
           :style="{ backgroundColor: discordStatusColor }" />
       </a>
 
