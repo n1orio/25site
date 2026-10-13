@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { DeadlockData } from "~/types/deadlock"
 
-const { data } = await useFetch<DeadlockData | null>("/api/deadlock")
+const { data } = await useFetch<DeadlockData | null>("/api/deadlock", {
+  default: () => null,
+})
 </script>
 
 <template>

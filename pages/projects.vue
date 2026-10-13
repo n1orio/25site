@@ -4,11 +4,17 @@ import type { ContributionsData } from "~/server/api/contributions"
 import type { ModrinthData } from "~/server/api/modrinth"
 import { projects } from "~/config"
 
-const { data: gh } = await useFetch<GithubData | null>("/api/github")
-const { data: contrib } = await useFetch<ContributionsData | null>("/api/contributions")
+const { data: gh } = await useFetch<GithubData | null>("/api/github", {
+  default: () => null,
+})
+const { data: contrib } = await useFetch<ContributionsData | null>("/api/contributions", {
+  default: () => null,
+})
 const { info, statsFor, daysAgo, sizeLabel, compact } = useGithub(gh)
 
-const { data: mr } = await useFetch<ModrinthData | null>("/api/modrinth")
+const { data: mr } = await useFetch<ModrinthData | null>("/api/modrinth", {
+  default: () => null,
+})
 
 /** slug проекта из ссылки на modrinth.com в карточке */
 const modrinthSlug = (links: { url: string }[]) => {

@@ -2,7 +2,9 @@
 import type { DiscordServerData } from "~/server/api/discord-server"
 import type { LanyardActivity } from "~/types/steam"
 
-const { data: server } = await useFetch<DiscordServerData | null>("/api/discord-server")
+const { data: server } = await useFetch<DiscordServerData | null>("/api/discord-server", {
+  default: () => null,
+})
 
 defineProps<{
   discordStatusColor: string

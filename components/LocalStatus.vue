@@ -2,7 +2,15 @@
 import type { WeatherData } from "~/server/api/weather"
 import { location } from "~/config"
 
-const { data: weather } = await useFetch<WeatherData | null>("/api/weather")
+/**
+ * default: null обязателен. Эндпоинт отдаёт null, когда внешний
+ * API недоступен, и без default useFetch отдаёт undefined — на
+ * этом Nuxt пишет предупреждение «must return a value» и
+ * повторяет запрос на клиенте.
+ */
+const { data: weather } = await useFetch<WeatherData | null>("/api/weather", {
+  default: () => null,
+})
 
 // время тикает только на клиенте: на сервере рендерим заглушку,
 // иначе гидрация получит другое значение и выдаст расхождение

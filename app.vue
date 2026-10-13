@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { bioTitle as bioTitleConfig, bio } from "~/config"
+import type { LanyardData, SteamData } from "~/types/steam"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
@@ -9,8 +10,30 @@ const {
 // шрифты темы «Дедлок» — только когда она включена
 useDeadlockFonts(isDeadlock)
 
-const { data: discord } = await useFetch("/api/discord")
-const { data: steam } = await useFetch("/api/steam")
+// default у обоих обязателен: при недоступном внешнем API эндпоинты
+// отдают пустой объект/оффлайн-заглушку, а без default useFetch
+// отдаёт undefined и Nuxt пишет предупреждение «must return a
+// value», после чего запрос дублируется на клиенте
+const { data: discord } = await useFetch<LanyardData>("/api/discord", {
+  default: () => ({}),
+})
+const { data: steam } = await useFetch<SteamData>("/api/steam", {
+  default: () => ({
+    personaname: "",
+    profileurl: "",
+    avatar: "",
+    state: "Не в сети",
+    isPlaying: false,
+    gameName: "",
+    gameArt: "",
+    level: 0,
+    recentGame: "",
+    recentGameArt: "",
+    recentHours: 0,
+    totalRecentHours: 0,
+    totalGames: 0,
+  }),
+})
 
 const {
   discordStatus, discordStatusColor,
