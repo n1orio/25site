@@ -78,9 +78,9 @@ const summary = computed(() => {
       <article
         v-for="({ project, stats, modrinth }, i) in rows"
         :key="project.title"
-        class="ds-card juicy-card juicy-sheen juicy-tilt p-6 flex flex-col relative rise-in"
+        class="ds-card juicy-card juicy-sheen p-6 flex flex-col relative rise-in"
         data-juice
-        data-tilt="5"
+        data-wobble="10"
         :style="{ '--i': Math.min(i, 8) }"
       >
         <div class="flex items-start justify-between gap-3 mb-4">
