@@ -33,19 +33,11 @@ const medal = (i: number) => ["#f59e0b", "#a1a1aa", "#d97706"][i]
 </template>
 
 <style>
-/*
- * Строка топ-листа. Сдвиг задаётся через --_shift, потому что у
- * строки есть .juicy и transform собирается в одном месте из
- * переменных — прямое translateX здесь перебило бы сжатие
- * от нажатия.
- */
+/* строка топ-листа: при наведении сдвигается с пружинным отскоком */
 .anime-row {
-  --_shift: 0px;
-  transition:
-    transform 0.5s var(--ease-spring-soft),
-    padding-left 0.5s var(--ease-spring-soft);
+  transition: transform 0.5s var(--ease-spring-soft);
 }
 .anime-row:hover {
-  --_shift: 6px;
+  transform: translateX(6px);
 }
 </style>

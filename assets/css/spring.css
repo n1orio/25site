@@ -67,68 +67,23 @@
 
 /* ── жвачка: базовый на��им ───────────────────────────────── */
 
-/*
- * Здесь transform собирается из переменных в ОДНОМ месте.
- *
- * Раньше нажатие и наклон задавали transform напрямую и дрались
- * за одно свойство: .juicy-card:active (специфичность 0,2,0)
- * перебивал .juicy-tilt (0,1,0), и на карточке с обоими классами
- * наклон исчезал мгновенно при нажатии — читалось как рывок.
- * Теперь обе части пишут только в переменные.
- *
- *   --_sx, --_sy — сжатие от нажатия
- *   --_lift      — подъём при наведении
- *   --_shift     — сдвиг по X (строки списков)
- *   --_tilt-x/y  — наклон к курсору
- *   --_r         — радиус, из которого растёт при нажатии
+/**
+ * Нажатие. Отпускание — пружина с перелётом ~37%, само нажатие
+ * — быстрое и тугое. transform в списке обязателен: если класс
+ * задаёт filter или другое свойство, без явного listing
+ * браузер анимирует только его.
  */
-.juicy,
-.juicy-tilt {
-  --_sx: 1;
-  --_sy: 1;
-  --_lift: 0px;
-  --_shift: 0px;
-  --_tilt-x: 0deg;
-  --_tilt-y: 0deg;
+.juicy {
   --_r: var(--radius-pill);
-
-  transform:
-    perspective(700px)
-    translate(var(--_shift), var(--_lift))
-    rotateX(var(--_tilt-x))
-    rotateY(var(--_tilt-y))
-    scale(var(--_sx), var(--_sy));
-
   transform-origin: center;
   transition:
     transform 0.42s var(--ease-squash),
     border-radius 0.42s var(--ease-squash),
     box-shadow 0.3s ease;
-  /*
-   * will-change: transform здесь намеренно не стоит. Он держит
-   * отдельный композиторный слой для каждой карточки всё время,
-   * даже когда ничего не анимируется, а на странице их десятки.
-   * Слои съедают видеопамять. transform и так уходит на отдельный
-   * слой, если анимируется в кадре.
-   */
 }
-
-/* для прямоугольных карточек — свой радиус и своё сжатие */
-.juicy-card { --_r: var(--radius-card); }
-
-/*
- * Нажатие. Палец касается — элемент сжимается быстро и туго,
- * без пружины: палец не ждёт отскока. Отпускание — пружина,
- * она задана в базовом правиле выше.
- *
- * Сжатие по вертикали сильнее: палец продавливает сверху.
- * Значения подобраны так, чтобы перелёт на распрямлении не
- * превышал ~104% — иначе карточка щёлкает через край.
- */
 .juicy:active {
-  --_sx: 0.93;
-  --_sy: 0.88;
-  --_lift: 2px;
+  /* сквош по осям: по Y сильнее — палец продавливает, а не сжимает вбок */
+  transform: scale(0.9, 0.86) translateY(2px);
   border-radius: calc(var(--_r) + 6px);
   transition:
     transform 0.075s cubic-bezier(0.3, 0, 0.2, 1),
@@ -136,10 +91,12 @@
     box-shadow 0.075s linear;
 }
 
+/* для прямоугольных карточек: скругление при нажатии растёт сильнее */
+.juicy-card {
+  --_r: var(--radius-card);
+}
 .juicy-card:active {
-  --_sx: 0.975;
-  --_sy: 0.955;
-  --_lift: 3px;
+  transform: scale(0.965, 0.94) translateY(3px);
   border-radius: calc(var(--radius-card) + 8px);
   transition:
     transform 0.08s cubic-bezier(0.3, 0, 0.2, 1),
@@ -147,37 +104,16 @@
     box-shadow 0.08s linear;
 }
 
-/* наведение: подъём; наклон приходит через --_tilt */
-.juicy-tilt:hover { --_lift: -4px; }
-
-/*
- * Пока курсор внутри карточки, наклон отслеживается мгновенно
- * (is-tracking ставит useJuiceScope): с пружиной карточка
- * догоняет курсор и движение ощущается вязким.
- */
-.juicy-tilt.is-tracking {
-  transition:
-    transform 0.09s linear,
-    border-radius 0.09s linear;
-}
-
 /* ── блик из-под пальца ──────────────────────────────────── */
 
-/*
- * Радиальный блик от точки нажатия.
- *
- * Отдельный класс, а не ::after на .ds-card: в теме «Дедлок» на
- * карточках оба псевдоэлемента заняты под текстуру и подчёркивание.
- *
- * overflow:hidden здесь намеренно НЕ ставится. Он обрезает
- * содержимое по прямоугольнику и ломает срезанные углы темы
- * «Дедлок» (clip-path на .ds-card). Вместо этого блик сам
- * наследует скругление и не выходит за края: inset:0 плюс
- * border-radius:inherit. Побочный плюс — блик виден поверх
- * текста, как настоящее стекло, и не требует лишнего слоя.
+/**
+ * Радиальный блик от точки нажатия. Отдельный класс, а не
+ * ::after на .ds-card: в теме «Дедлок» на карточках уже заняты
+ * оба псевдоэлемента под текстуру и подчёркивание.
  */
 .juicy-sheen {
   position: relative;
+  overflow: hidden;
   isolation: isolate;
 }
 .juicy-sheen::after {
@@ -195,29 +131,49 @@
   );
   transition: opacity 0.28s ease;
 }
-.juicy-sheen:hover::after { opacity: 0.35; }
+.juicy-sheen:hover::after { opacity: 0.4; }
 .juicy-sheen:active::after {
-  opacity: 0.7;
-  transition: opacity 0.07s linear;
+  opacity: 0.85;
+  /* на нажатии блик расплывается — как будто палец вдавил стекло */
+  transform: scale(1.35);
+  transition: opacity 0.06s linear, transform 0.5s var(--ease-juice);
 }
-
 
 /* ── наклон к курсору ────────────────────────────────────── */
 
+/**
+ * Элемент слегка поворачивается к курсору, как будто тянется за
+ * пальцем. Углы задаёт useJuiceScope через --tilt-x/--tilt-y.
+ *
+ * Наклон и подъём объединены в одном правиле намеренно: transform
+ * — одно свойство, и если задать их раздельно, победит последнее,
+ * и наклон или подъём пропадёт.
+ */
+.juicy-tilt {
+  --_lift: 0px;
+  transform:
+    perspective(700px)
+    translateY(var(--_lift))
+    rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.5s var(--ease-spring-soft);
+  will-change: transform;
+}
+.juicy-tilt:hover { --_lift: -4px; }
+.juicy-tilt:active {
+  transform: perspective(700px) scale(0.95);
+  transition: transform 0.08s cubic-bezier(0.3, 0, 0.2, 1);
+}
+/* пока курсор внутри, наклон отслеживается мгновенно: с пружиной
+ * карточка «догоняет» его и движение ощущается вязким */
+.juicy-tilt.is-tracking {
+  transition: transform 0.09s linear;
+}
+
 /* ── появления ───────────────────────────────────────────── */
 
-/*
- * ВАЖНО: fill-mode именно backwards, а не both.
- *
- * `both` оставляет конечный кадр анимации применённым навсегда,
- * и анимация побеждает обычные правила в каскаде. Элемент с
- * rise-in + .juicy-tilt навсегда терял бы transform от наклона
- * и нажатия — они просто не срабатывали бы. `backwards` берёт
- * начальный кадр только на время задержки, а после конца
- * отпускает transform обычным правилам.
- */
 .rise-in {
-  animation: rise-in 0.62s var(--ease-pop) backwards;
+  animation: rise-in 0.62s var(--ease-pop) both;
   animation-delay: calc(var(--i, 0) * 55ms);
 }
 @keyframes rise-in {
@@ -227,7 +183,7 @@
 }
 
 .rise-in-sm {
-  animation: rise-in-sm 0.52s var(--ease-pop) backwards;
+  animation: rise-in-sm 0.52s var(--ease-pop) both;
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 @keyframes rise-in-sm {
@@ -237,7 +193,7 @@
 
 /* появление с поворотом — для плиток и превью */
 .pop-in {
-  animation: pop-in 0.5s var(--ease-pop) backwards;
+  animation: pop-in 0.5s var(--ease-pop) both;
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 @keyframes pop-in {
@@ -246,7 +202,7 @@
 }
 
 .slide-in {
-  animation: slide-in 0.55s var(--ease-juice) backwards;
+  animation: slide-in 0.55s var(--ease-juice) both;
 }
 @keyframes slide-in {
   from { opacity: 0; transform: translate3d(0, -14px, 0) scale(0.86) rotate(1.5deg); }
@@ -280,8 +236,7 @@
 
 /* ── каскад ──────────────────────────────────────────────── */
 
-/* backwards, а не both: см. объяснение у .rise-in выше */
-.stagger > * { animation: rise-in-sm 0.52s var(--ease-pop) backwards; }
+.stagger > * { animation: rise-in-sm 0.52s var(--ease-pop) both; }
 .stagger > *:nth-child(1)  { animation-delay: 0ms; }
 .stagger > *:nth-child(2)  { animation-delay: 40ms; }
 .stagger > *:nth-child(3)  { animation-delay: 80ms; }

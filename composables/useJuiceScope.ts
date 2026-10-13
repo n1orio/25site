@@ -61,16 +61,7 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
       if (!frame) frame = requestAnimationFrame(flush)
     }
 
-    /**
-     * Курсор ушёл с элемента — возвращаем наклон в ноль и снимаем
-     * мгновенное слежение.
-     *
-     * Раньше сброс стоял ещё и на pointerup, и это было ошибкой:
-     * после отпускания кнопки мыши курсор остаётся над карточкой,
-     * а наклон пропадал и карточка дёргалась обратно. Убираем
-     * наклон только когда курсор действительно ушёл.
-     */
-    const onLeave = () => {
+    const reset = () => {
       node.classList.remove("is-tracking")
       if (!useTilt) return
       node.style.setProperty("--tilt-x", "0deg")
@@ -78,13 +69,15 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
     }
 
     node.addEventListener("pointermove", onMove, { passive: true })
-    node.addEventListener("pointerleave", onLeave, { passive: true })
-    node.addEventListener("pointercancel", onLeave, { passive: true })
+    node.addEventListener("pointerleave", reset, { passive: true })
+    node.addEventListener("pointerup", reset, { passive: true })
+    node.addEventListener("pointercancel", reset, { passive: true })
 
     cleanups.push(() => {
       node.removeEventListener("pointermove", onMove)
-      node.removeEventListener("pointerleave", onLeave)
-      node.removeEventListener("pointercancel", onLeave)
+      node.removeEventListener("pointerleave", reset)
+      node.removeEventListener("pointerup", reset)
+      node.removeEventListener("pointercancel", reset)
     })
   }
 

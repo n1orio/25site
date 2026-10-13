@@ -15,7 +15,7 @@ const { copy, copiedKey } = useCopy()
       <div
         v-for="social in socials"
         :key="social.name"
-        class="ds-card ds-card-hover juicy-card p-5 flex items-center gap-4 group relative"
+        class="ds-card ds-card-hover p-5 flex items-center gap-4 group relative"
       >
         <a
           :href="social.url"
@@ -38,7 +38,7 @@ const { copy, copiedKey } = useCopy()
         </a>
 
         <button
-          class="ds-action juicy flex-shrink-0"
+          class="ds-action flex-shrink-0"
           :aria-label="`Скопировать ссылку ${social.name}`"
           :title="`Скопировать ссылку ${social.name}`"
           @click="copy(social.url, social.name)"
