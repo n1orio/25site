@@ -58,7 +58,7 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             v-for="tab in navTabs"
             :key="tab.to"
             :to="tab.to"
-            class="nav-link cursor-pointer flex-shrink-0 z-10"
+            class="nav-link juicy cursor-pointer flex-shrink-0 z-10"
             :style="{ paddingRight: tab === navTabs[navTabs.length - 1] ? '0' : undefined }"
           >
             {{ tab.label }}
@@ -69,16 +69,22 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
       <span class="nav-sep w-px h-5 mx-1.5 flex-shrink-0" style="background: color-mix(in srgb, var(--accent-contrast) 30%, transparent)" />
 
       <div class="flex items-center gap-1 flex-shrink-0">
-        <button class="nav-ctl" :aria-label="isDarkNow ? 'Светлая тема' : 'Тёмная тема'" @click="toggleTheme($event)">
+        <button
+          class="nav-ctl juicy juicy-sheen"
+          :aria-label="isDarkNow ? 'Светлая тема' : 'Тёмная тема'"
+          data-juice
+          @click="toggleTheme($event)"
+        >
           <Icon :name="isDarkNow ? 'lucide:moon' : 'lucide:sun'" size="16" class="w-4 h-4" />
         </button>
 
         <div ref="paletteRef" class="relative">
           <button
-            class="nav-ctl"
+            class="nav-ctl juicy juicy-sheen"
             :class="{ 'is-active': showPalette }"
             :aria-label="showPalette ? 'Закрыть палитру' : 'Цвета темы'"
             :aria-expanded="showPalette"
+            data-juice
             @click="showPalette = !showPalette">
             <Icon name="lucide:palette" size="16" class="w-4 h-4" />
           </button>
@@ -94,7 +100,8 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
                   <button
                     v-for="preset in gradientPresets"
                     :key="preset.id"
-                    class="flex flex-col gap-2 p-2 rounded-xl transition-colors group cursor-pointer border"
+                    class="juicy juicy-card flex flex-col gap-2 p-2 rounded-xl group cursor-pointer border"
+                    data-juice
                     :style="{
                       borderColor: themeMode === 'gradient' && activeGradient[0] === preset.colors[0]
                         ? 'var(--accent)' : 'transparent',

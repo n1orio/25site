@@ -16,7 +16,7 @@ import { donations } from "~/config"
         :href="d.url"
         target="_blank"
         rel="noopener"
-        class="ds-card p-5 flex items-center gap-4 group relative"
+        class="ds-card juicy-card juicy-sheen flex items-center gap-4 group relative"
         :class="d.featured ? 'ds-card-hover' : ''"
       >
         <span

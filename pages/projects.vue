@@ -72,7 +72,9 @@ const summary = computed(() => {
       <article
         v-for="({ project, stats, modrinth }, i) in rows"
         :key="project.title"
-        class="ds-card ds-card-hover p-6 flex flex-col relative rise-in"
+        class="ds-card juicy-card juicy-sheen juicy-tilt p-6 flex flex-col relative rise-in"
+        data-juice
+        data-tilt="5"
         :style="{ '--i': Math.min(i, 8) }"
       >
         <div class="flex items-start justify-between gap-3 mb-4">
@@ -175,7 +177,7 @@ const summary = computed(() => {
         <div
           v-for="project in archived"
           :key="project.title"
-          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b last:border-0"
+          class="archived-row flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b last:border-0"
           style="border-color: var(--border-subtle)"
         >
           <Icon
@@ -196,3 +198,23 @@ v-for="link in project.links" :key="link.url" :href="link.url" target="_blank" r
     </section>
   </section>
 </template>
+
+<style>
+/* строка архива: при наведении подъезжает и подсвечивается */
+.archived-row {
+  transition:
+    transform 0.5s var(--ease-juice),
+    padding-left 0.5s var(--ease-spring-soft),
+    opacity 0.4s ease;
+}
+.archived-row:hover {
+  transform: translateX(7px);
+  padding-left: 0.6rem;
+}
+.archived-row .ds-action {
+  transition: transform 0.45s var(--ease-juice), background-color 0.3s ease;
+}
+.archived-row:hover .ds-action {
+  transform: scale(1.25) rotate(8deg);
+}
+</style>

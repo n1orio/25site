@@ -28,6 +28,13 @@ const {
 
 const { onTouchStart, onTouchEnd, initNav, destroyNav } = useNavigation()
 
+// «жвачка» на всех [data-juice] / [data-tilt] страницы.
+// Пересканируем по смене маршрута: NuxtPage пересоздаёт содержимое
+// внутри одного и того же div, так что ref на обёртку не меняется
+const pageRef = ref<HTMLElement | null>(null)
+const route = useRoute()
+useJuiceScope(pageRef, () => route.fullPath)
+
 const bioTitle = ref(bioTitleConfig)
 const bioParagraph0 = ref(bio[0] ?? "")
 const bioParagraph1 = ref(bio[1] ?? "")
@@ -145,7 +152,12 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
         <main class="lg:col-span-8 xl:col-span-9 flex flex-col min-w-0 z-10 w-full">
           <AppNavigation />
 
-          <div class="relative w-full" @touchstart="onTouchStart" @touchend="onTouchEnd">
+          <div
+            ref="pageRef"
+            class="relative w-full"
+            @touchstart="onTouchStart"
+            @touchend="onTouchEnd"
+          >
             <NuxtPage :transition="{ name: 'tab', mode: 'out-in' }" />
           </div>
         </main>
@@ -164,10 +176,16 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 }
 .tab-enter-active {
   transition: opacity 0.5s var(--ease-spring-soft),
-              transform 0.62s var(--ease-spring);
+              transform 0.62s var(--ease-juice);
 }
-.tab-enter-from { opacity: 0; transform: translateY(12px) scale(0.97); }
-.tab-leave-to   { opacity: 0; transform: translateY(-8px) scale(0.99); }
+.tab-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.92) rotate(-1deg);
+}
+.tab-leave-to {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.97) rotate(1deg);
+}
 
 @media (pointer: fine) {
   .theme-wrapper, .theme-wrapper * { cursor: none !important; }
