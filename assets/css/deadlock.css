@@ -135,7 +135,8 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .ds-card:nth-child(4n + 3) { clip-path: polygon(0 2.5%, 100% 0.5%, 98.5% 99%, 1.5% 97.5%); }
 
 [data-deadlock] .ds-card-hover:hover {
-  transform: translate(-3px, -4px);
+  --_shift: -3px;
+  --_lift: -4px;
   filter: var(--dl-shadow-lg);
 }
 
@@ -258,7 +259,10 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   color: var(--dl-ink-soft);
   clip-path: polygon(0 0, 100% 0, 100% 86%, 0 100%);
   filter: var(--dl-shadow-sm);
-  transform: translateY(-7px);
+  /* «приподнятость» вкладки в теме Deadlock идёт через --_lift:
+     transform собирается в .juicy из переменных, и прямое
+     translateY здесь перебивало бы наклон и сжатие от нажатия */
+  --_lift: -7px;
   font-family: var(--font-heading);
   font-size: 13px;
   font-weight: 400;
@@ -273,13 +277,13 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .nav-link:nth-child(4n) { clip-path: polygon(0 0, 100% 0, 100% 89%, 0 100%); }
 
 [data-deadlock] .nav-link:hover {
-  transform: translateY(0);
+  --_lift: 0px;
   background: var(--dl-accent);
   color: var(--dl-ink);
   filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.55));
 }
 [data-deadlock] .router-link-exact-active {
-  transform: translateY(1px);
+  --_lift: 1px;
   background: var(--dl-accent);
   color: var(--dl-ink);
 }
@@ -293,7 +297,7 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   background: var(--dl-tab-bg);
   color: var(--dl-ink);
   filter: var(--dl-shadow-sm);
-  transform: translateY(-7px);
+  --_lift: -7px;
   clip-path: polygon(0 0, 100% 0, 100% 87%, 0 100%);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease,
               background-color 0.18s ease;
@@ -301,7 +305,7 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
 [data-deadlock] .nav-ctl:hover,
 [data-deadlock] .nav-ctl:active,
 [data-deadlock] .nav-ctl.is-active {
-  transform: translateY(0);
+  --_lift: 0px;
   background: var(--dl-accent);
   color: var(--dl-ink);
   filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.55));
@@ -326,7 +330,6 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
   transition: filter 0.2s ease, background-color 0.18s ease;
 }
 [data-deadlock] .ds-action:hover {
-  transform: none;
   background: var(--dl-accent);
   color: var(--dl-ink);
   filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.55));
@@ -393,7 +396,7 @@ html:not(.dark) [data-deadlock] { --dl-bg-top: #f4f1e7; --dl-bg-bottom: #e7e3d5;
      рисуются поверх соседей и накрывают кнопки темы (попадая по
      клику в ссылку). Поэтому оставляем прокрутку по горизонтали. */
   [data-deadlock] .nav-link,
-  [data-deadlock] .nav-ctl { transform: none; }
+  [data-deadlock] .nav-ctl { --_lift: 0px; --_shift: 0px; }
   [data-deadlock] .nav-window { overflow: hidden; height: auto; }
   [data-deadlock] .nav-track { overflow-x: auto; }
   [data-deadlock] .nav-link {

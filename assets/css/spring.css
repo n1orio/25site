@@ -92,11 +92,15 @@
   --_tilt-y: 0deg;
   --_r: var(--radius-pill);
 
+  /*
+   * Без perspective() здесь намеренно. Перспектива нужна только
+   * для наклона, а на кнопках и пилюлях, где наклона нет, она
+   * заставляла браузер считать их 3D и поднимать в отдельный
+   * композиторный слой. На мелких круглых элементах это мылило
+   * границы и добавляло задержку на первом кадре нажатия.
+   */
   transform:
-    perspective(700px)
     translate(var(--_shift), var(--_lift))
-    rotateX(var(--_tilt-x))
-    rotateY(var(--_tilt-y))
     scale(var(--_sx), var(--_sy));
 
   transform-origin: center;
@@ -147,18 +151,49 @@
     box-shadow 0.08s linear;
 }
 
-/* наведение: подъём; наклон приходит через --_tilt */
+/* наведение: подъём */
 .juicy-tilt:hover { --_lift: -4px; }
+
+/*
+ * Наклон к курсору. Переопределяет transform целиком, поэтому
+ * перспектива появляется только здесь — ровно на карточках,
+ * которым она нужна. Порядок функций тот же, что был в .juicy,
+ * чтобы при переключении наклон не «прыгал».
+ */
+.juicy-tilt {
+  transform:
+    perspective(700px)
+    translate(var(--_shift), var(--_lift))
+    rotateX(var(--_tilt-x))
+    rotateY(var(--_tilt-y))
+    scale(var(--_sx), var(--_sy));
+}
 
 /*
  * Пока курсор внутри карточки, наклон отслеживается мгновенно
  * (is-tracking ставит useJuiceScope): с пружиной карточка
  * догоняет курсор и движение ощущается вязким.
+ *
+ * Селектор двойной — .juicy-tilt.is-tracking:active. Одинаковая
+ * специфичность (0,3,0), но приоритет по порядку: раньше это
+ * правило стояло ПОСЛЕ .juicy-card:active (0,2,0) и перебивало
+ * его transition, из-за чего нажатие на карточке с наклоном
+ * отпускало пружиной вместо мгновенного сжатия.
  */
-.juicy-tilt.is-tracking {
+.juicy-tilt.is-tracking,
+.juicy-tilt.is-tracking:active {
   transition:
     transform 0.09s linear,
     border-radius 0.09s linear;
+}
+
+/* нажатие на карточке с наклоном: сжатие всё равно быстрое */
+.juicy-tilt:active,
+.juicy-tilt.is-tracking:active {
+  transition:
+    transform 0.08s cubic-bezier(0.3, 0, 0.2, 1),
+    border-radius 0.08s cubic-bezier(0.3, 0, 0.2, 1),
+    box-shadow 0.08s linear;
 }
 
 /* ── блик из-под пальца ──────────────────────────────────── */
