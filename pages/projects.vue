@@ -92,7 +92,7 @@ const summary = computed(() => {
               :href="link.url"
               target="_blank"
               rel="noopener"
-              class="ds-action"
+              class="ds-action juicy"
             >
               <Icon :name="link.icon" size="14" class="w-3.5 h-3.5" />
             </a>
@@ -190,7 +190,7 @@ const summary = computed(() => {
           </div>
           <a
 v-for="link in project.links" :key="link.url" :href="link.url" target="_blank" rel="noopener"
-            class="ds-action flex-shrink-0" :aria-label="link.label">
+            class="ds-action juicy flex-shrink-0" :aria-label="link.label">
             <Icon :name="link.icon" size="14" class="w-3.5 h-3.5" />
           </a>
         </div>
@@ -201,20 +201,27 @@ v-for="link in project.links" :key="link.url" :href="link.url" target="_blank" r
 
 <style>
 /* строка архива: при наведении подъезжает и подсвечивается */
+/*
+ * Строка архива: подъезд при наведении. Через переменные, потому
+ * что у .ds-action внутри есть .juicy с общим transform.
+ */
 .archived-row {
+  --_shift: 0px;
   transition:
     transform 0.5s var(--ease-juice),
     padding-left 0.5s var(--ease-spring-soft),
     opacity 0.4s ease;
 }
 .archived-row:hover {
-  transform: translateX(7px);
+  --_shift: 7px;
   padding-left: 0.6rem;
 }
 .archived-row .ds-action {
   transition: transform 0.45s var(--ease-juice), background-color 0.3s ease;
 }
 .archived-row:hover .ds-action {
-  transform: scale(1.25) rotate(8deg);
+  --_sx: 1.25;
+  --_sy: 1.25;
+  --_r: var(--radius-pill);
 }
 </style>

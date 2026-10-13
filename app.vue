@@ -259,7 +259,13 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
               transform 0.4s var(--ease-spring-soft);
 }
 .nav-link:hover { color: var(--accent-contrast); }
-.nav-link:active { transform: scale(0.94); transition-duration: 0.1s; }
+/* через переменные, а не transform напрямую: у вкладки есть
+   .juicy, и прямое присваивание перебивало бы сжатие */
+.nav-link:active {
+  --_sx: 0.94;
+  --_sy: 0.92;
+  transition-duration: 0.1s;
+}
 /* Активная вкладка красит себя сама — не зависит от измерений DOM */
 .router-link-exact-active {
   background: var(--accent-contrast);
@@ -321,17 +327,31 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   background: var(--accent-surface);
   border: 0;
   border-radius: var(--radius-card);
-  /* transform в списке обязателен: иначе анимируется только filter */
-  transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.55s var(--ease-spring);
+  /*
+   * transition transform здесь НЕ задаётся намеренно. У карточки
+   * проекта стоят и .ds-card, и .juicy — оба описывали бы один и
+   * тот же transform, и побеждал бы тот, кто ниже в каскаде, а
+   * тайминги от второго класса терялись. Пружину задаёт .juicy.
+   * filter остаётся здесь: он есть только у этого класса.
+   */
+  transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/*
+ * Подъём карточки при наведении задаётся через --_lift, а не
+ * через transform напрямую: transform в этой системе собирается
+ * в одном месте (.juicy в spring.css) из переменных. Прямое
+ * присваивание перебивало бы наклон и сжатие — они просто
+ * исчезали бы на карточках с .juicy.
+ */
 .ds-card-hover:hover {
   filter: brightness(1.12) saturate(1.05);
-  transform: translateY(-4px);
+  --_lift: -4px;
 }
-/* нажатие — мгновенное, отпускание с отскоком */
+/* нажатие — тоже через переменные, по той же причине */
 .ds-card-hover:active {
-  transform: translateY(-1px) scale(0.985);
+  --_sx: 0.985;
+  --_sy: 0.975;
+  --_lift: -1px;
   transition-duration: 0.1s;
   transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
 }
@@ -404,10 +424,12 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 .ds-action:hover {
   background: var(--accent-contrast);
   color: var(--accent);
-  transform: scale(1.12);
+  --_sx: 1.12;
+  --_sy: 1.12;
 }
 .ds-action:active {
-  transform: scale(0.92);
+  --_sx: 0.92;
+  --_sy: 0.9;
   transition-duration: 0.1s;
 }
 
@@ -500,10 +522,12 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 .nav-ctl:hover {
   background: var(--accent-contrast);
   color: var(--accent-surface);
-  transform: scale(1.12);
+  --_sx: 1.12;
+  --_sy: 1.12;
 }
 .nav-ctl:active {
-  transform: scale(0.9);
+  --_sx: 0.9;
+  --_sy: 0.88;
   transition-duration: 0.1s;
   transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
 }

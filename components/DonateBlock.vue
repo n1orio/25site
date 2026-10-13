@@ -33,7 +33,7 @@ import { donations } from "~/config"
           <p class="ds-body text-xs leading-snug truncate">{{ d.note }}</p>
         </div>
 
-        <span class="ds-action flex-shrink-0">
+        <span class="ds-action juicy flex-shrink-0">
           <Icon name="lucide:arrow-up-right" size="14" class="w-3.5 h-3.5" />
         </span>
       </a>
