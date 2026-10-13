@@ -51,7 +51,7 @@ const {
 
 const { onTouchStart, onTouchEnd, initNav, destroyNav } = useNavigation()
 
-// «желе» на всех [data-juice] / [data-wobble] страницы.
+// «жвачка» на всех [data-juice] / [data-tilt] страницы.
 // Пересканируем по смене маршрута: NuxtPage пересоздаёт содержимое
 // внутри одного и того же div, так что ref на обёртку не меняется
 const pageRef = ref<HTMLElement | null>(null)

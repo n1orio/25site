@@ -19,14 +19,13 @@
  * Нажатие построено как в iOS:
  *   1. палец касается — элемент мгновенно сжимается (60-90 мс,
  *      ease-out, без пружины: палец не ждёт отскока);
- *   2. палец отпускает — элемент распрямляется с перелётом.
+ *   2. палец отпускает — элемент распрямляется с перелётом
+ *      (пружина, ζ≈0.26, перелёт ~43%).
  * Плюс сквош по осям (scaleX/scaleY вразнобой) и смена формы —
  * скругление растёт при нажатии, как у резиновой кнопки.
  *
- * «Желе» на курсоре (data-wobble) — упругая деформация по осям
- * без поворота: элемент тянется в сторону курсора и остаётся
- * плоским. Точка нажатия идёт в --px/--py, чтобы блик шёл из-под
- * пальца. См. composables/useJuiceScope.ts.
+ * Точка нажатия передаётся в --px/--py, чтобы блик шёл из-под
+ * пальца, а не из центра: см. composables/useJuice.ts.
  */
 
 /* ── кривые ──────────────────────────────────────────────── */
@@ -66,50 +65,43 @@
   }
 }
 
-/* ── желе: базовый нажим ──────────────────────────────────── */
+/* ── жвачка: базовый на��им ───────────────────────────────── */
 
 /*
-/*
  * Здесь transform собирается из переменных в ОДНОМ месте.
- * Раньше нажатие и наклон задавали transform напрямую и дрались за
- * одно свойство — вторая часть просто перебивала первую.
  *
- *   --_sx, --_sy  — сжатие от нажатия
- *   --_wx, --_wy  — желе от курсора (пишется из JS)
- *   --_lift       — подъём при наведении
- *   --_shift      — сдвиг по X (строки списков)
- *   --_r          — радиус, из которого растёт при нажатии
+ * Раньше нажатие и наклон задавали transform напрямую и дрались
+ * за одно свойство: .juicy-card:active (специфичность 0,2,0)
+ * перебивал .juicy-tilt (0,1,0), и на карточке с обоими классами
+ * наклон исчезал мгновенно при нажатии — читалось как рывок.
+ * Теперь обе части пишут только в переменные.
+ *
+ *   --_sx, --_sy — сжатие от нажатия
+ *   --_lift      — подъём при наведении
+ *   --_shift     — сдвиг по X (строки списков)
+ *   --_tilt-x/y  — наклон к курсору
+ *   --_r         — радиус, из которого растёт при нажатии
  */
-.juicy {
+.juicy,
+.juicy-tilt {
   --_sx: 1;
   --_sy: 1;
   --_lift: 0px;
   --_shift: 0px;
+  --_tilt-x: 0deg;
+  --_tilt-y: 0deg;
   --_r: var(--radius-pill);
 
   /*
-   * Желе (--_wx/--_wy) и нажатие (--_sx/--_sy) — разные
-   * переменные, и в transform они перемножаются. Разделены
-   * потому, что желе пишется из JS инлайном, а инлайн-стиль
-   * сильнее CSS: если бы оба писали в --_sx, сжатие от нажатия
-   * перестало бы работать на карточке с data-wobble.
-   *
-   * Ни perspective, ни rotate: желе не крутится, оно тянется.
-   * 3D-поворот карточки вслед за курсором читался как переворот.
+   * Без perspective() здесь намеренно. Перспектива нужна только
+   * для наклона, а на кнопках и пилюлях, где наклона нет, она
+   * заставляла браузер считать их 3D и поднимать в отдельный
+   * композиторный слой. На мелких круглых элементах это мылило
+   * границы и добавляло задержку на первом кадре нажатия.
    */
-  --_wx: 1;
-  --_wy: 1;
-  --_wobble-lift: 0px;
-
   transform:
-    translate(
-      var(--_shift),
-      calc(var(--_lift) + var(--_wobble-lift))
-    )
-    scale(
-      calc(var(--_sx) * var(--_wx)),
-      calc(var(--_sy) * var(--_wy))
-    );
+    translate(var(--_shift), var(--_lift))
+    scale(var(--_sx), var(--_sy));
 
   transform-origin: center;
   transition:
@@ -160,7 +152,49 @@
 }
 
 /* наведение: подъём */
-.juicy:hover { --_lift: -3px; }
+.juicy-tilt:hover { --_lift: -4px; }
+
+/*
+ * Наклон к курсору. Переопределяет transform целиком, поэтому
+ * перспектива появляется только здесь — ровно на карточках,
+ * которым она нужна. Порядок функций тот же, что был в .juicy,
+ * чтобы при переключении наклон не «прыгал».
+ */
+.juicy-tilt {
+  transform:
+    perspective(700px)
+    translate(var(--_shift), var(--_lift))
+    rotateX(var(--_tilt-x))
+    rotateY(var(--_tilt-y))
+    scale(var(--_sx), var(--_sy));
+}
+
+/*
+ * Пока курсор внутри карточки, наклон отслеживается мгновенно
+ * (is-tracking ставит useJuiceScope): с пружиной карточка
+ * догоняет курсор и движение ощущается вязким.
+ *
+ * Селектор двойной — .juicy-tilt.is-tracking:active. Одинаковая
+ * специфичность (0,3,0), но приоритет по порядку: раньше это
+ * правило стояло ПОСЛЕ .juicy-card:active (0,2,0) и перебивало
+ * его transition, из-за чего нажатие на карточке с наклоном
+ * отпускало пружиной вместо мгновенного сжатия.
+ */
+.juicy-tilt.is-tracking,
+.juicy-tilt.is-tracking:active {
+  transition:
+    transform 0.09s linear,
+    border-radius 0.09s linear;
+}
+
+/* нажатие на карточке с наклоном: сжатие всё равно быстрое */
+.juicy-tilt:active,
+.juicy-tilt.is-tracking:active {
+  transition:
+    transform 0.08s cubic-bezier(0.3, 0, 0.2, 1),
+    border-radius 0.08s cubic-bezier(0.3, 0, 0.2, 1),
+    box-shadow 0.08s linear;
+}
 
 /* ── блик из-под пальца ──────────────────────────────────── */
 
@@ -203,6 +237,8 @@
 }
 
 
+/* ── наклон к курсору ────────────────────────────────────── */
+
 /* ── появления ───────────────────────────────────────────── */
 
 /*
@@ -210,8 +246,8 @@
  *
  * `both` оставляет конечный кадр анимации применённым навсегда,
  * и анимация побеждает обычные правила в каскаде. Элемент с
- * rise-in + .juicy навсегда терял бы transform от нажатия
- * и желе — они просто не срабатывали бы. `backwards` берёт
+ * rise-in + .juicy-tilt навсегда терял бы transform от наклона
+ * и нажатия — они просто не срабатывали бы. `backwards` берёт
  * начальный кадр только на время задержки, а после конца
  * отпускает transform обычным правилам.
  */
@@ -220,9 +256,9 @@
   animation-delay: calc(var(--i, 0) * 55ms);
 }
 @keyframes rise-in {
-  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.92, 0.86); }
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.9) rotate(-0.6deg); }
   60%  { opacity: 1; }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1, 1); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
 }
 
 .rise-in-sm {
@@ -234,22 +270,22 @@
   to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* появление с масштабом — для плиток и превью */
+/* появление с поворотом — для плиток и превью */
 .pop-in {
   animation: pop-in 0.5s var(--ease-pop) backwards;
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 @keyframes pop-in {
-  from { opacity: 0; transform: scale(0.7, 0.62); }
-  to   { opacity: 1; transform: scale(1, 1); }
+  from { opacity: 0; transform: scale(0.6) rotate(-4deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 
 .slide-in {
   animation: slide-in 0.55s var(--ease-juice) backwards;
 }
 @keyframes slide-in {
-  from { opacity: 0; transform: translate3d(0, -12px, 0) scale(0.88, 0.84); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1, 1); }
+  from { opacity: 0; transform: translate3d(0, -14px, 0) scale(0.86) rotate(1.5deg); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
 }
 
 /* ── дыхание ─────────────────────────────────────────────── */
@@ -307,9 +343,11 @@
     opacity: 1 !important;
     transform: none !important;
   }
-  .juicy, .juicy-card, .lift-spring, .press-spring {
+  .juicy, .juicy-card, .juicy-tilt, .lift-spring, .press-spring {
     transition: none !important;
   }
   .juicy-sheen::after { display: none; }
   .pulse-soft { animation: none !important; }
+  /* наклон и блик всё ещё могут мешать — глушим */
+  .juicy-tilt { transform: none !important; }
 }

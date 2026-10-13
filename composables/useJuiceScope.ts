@@ -1,33 +1,35 @@
-import { onBeforeUnmount, onMounted, watch } from "vue"
+import { onMounted, onBeforeUnmount, watch } from "vue"
 
 /**
- * «Желе» для элементов: точка блика и упругая деформация по осям.
+ * Глобальная «жвачка»: цепляется ко всем элементам с
+ * [data-juicy] внутри контейнера и на очистку.
  *
- * Почему без поворота. Раньше карточка тянулась за курсором через
- * perspective + rotateX/rotateY. Это 3D-поворот, и на плоской
- * карточке он читался как переворот, а не как резинка. Желе —
- * это когда элемент тянется в ту сторону, куда его тянут, но
- * остаётся плоским: scaleX растёт, scaleY сжимается.
- *
- * Деформация считается по смещению курсора от центра элемента.
- * Смещение ограничено 22%: при большем элемент вытягивается в
- * блин и форма рассыпается.
+ * Зачем сканировать DOM, а не вести ref в каждом компоненте:
+ * разметка помечает себя сама (data-juicy="4" — это ещё и
+ * максимальный наклон в градусах), а composable один на
+ * приложение. Иначе в каждом из десятка компонентов дублировался
+ * бы одинаковый код.
  *
  * Атрибуты на элементе:
  *   data-juice      — блик из-под пальца (--px/--py)
- *   data-wobble="N" — упругая деформация, N = амплитуда в процентах
+ *   data-tilt="N"   — наклон к курсору на N градусов (--tilt-x/--tilt-y);
+ *                     сам наклон применяет CSS-класс .juicy-tilt,
+ *                     этот атрибут только считает значения
+ *
+ * Пересчёт идёт через rAF: pointermove шлёт события заметно
+ * чаще, чем браузер рисует кадры.
  */
 export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => string) => {
   const cleanups: (() => void)[] = []
   let frame = 0
 
-  /** максимальная деформация в долях размера */
-  const MAX_STRETCH = 0.22
-
   const bind = (node: HTMLElement) => {
     const juice = node.hasAttribute("data-juice")
-    const wobble = Number(node.dataset.wobble || 0)
-    if (!juice && !wobble) return
+    const maxTilt = Number(node.dataset.tilt || 0)
+    const useTilt = maxTilt > 0
+
+    // без блика и без наклона вешать слушатели незачем
+    if (!juice && !useTilt) return
 
     let pending: { x: number; y: number } | null = null
 
@@ -38,31 +40,19 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
       if (!p) return
       const r = node.getBoundingClientRect()
       if (!r.width || !r.height) return
+      // наведение: переключаем на мгновенное слежение за курсором
+      if (useTilt) node.classList.add("is-tracking")
 
       if (juice) {
         node.style.setProperty("--px", `${(((p.x - r.left) / r.width) * 100).toFixed(2)}%`)
         node.style.setProperty("--py", `${(((p.y - r.top) / r.height) * 100).toFixed(2)}%`)
       }
-
-      if (wobble) {
-        // смещение от центра, нормированное на половину размера
+      if (useTilt) {
         const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v)
-        const ox = clamp((p.x - (r.left + r.width / 2)) / (r.width / 2))
-        const oy = clamp((p.y - (r.top + r.height / 2)) / (r.height / 2))
-        const amp = wobble / 100
-        /*
-         * Тянемся к курсору: смещение вправо тянет правый край,
-         * поэтому элемент шире по X и ниже по Y. Значения
-         * взаимно компенсируются — иначе желе «раздувается».
-         *
-         * Пишем в --_wx/--_wy, а не в --_sx/--_sy: инлайн-стиль
-         * из JS сильнее любого CSS-правила, и если писать в те же
-         * переменные, сжатие от нажатия просто перестало бы
-         * работать на карточке с data-wobble.
-         */
-        node.style.setProperty("--_wx", (1 + ox * amp).toFixed(4))
-        node.style.setProperty("--_wy", (1 - ox * amp * 0.75).toFixed(4))
-        node.style.setProperty("--_wobble-lift", `${(-oy * MAX_STRETCH * r.height * 0.35).toFixed(1)}px`)
+        const ox = (p.x - (r.left + r.width / 2)) / (r.width / 2)
+        const oy = (p.y - (r.top + r.height / 2)) / (r.height / 2)
+        node.style.setProperty("--tilt-y", `${(clamp(ox) * maxTilt).toFixed(2)}deg`)
+        node.style.setProperty("--tilt-x", `${(-clamp(oy) * maxTilt).toFixed(2)}deg`)
       }
     }
 
@@ -71,12 +61,20 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
       if (!frame) frame = requestAnimationFrame(flush)
     }
 
-    /* курсор ушёл — форма возвращается в покой */
+    /**
+     * Курсор ушёл с элемента — возвращаем наклон в ноль и снимаем
+     * мгновенное слежение.
+     *
+     * Раньше сброс стоял ещё и на pointerup, и это было ошибкой:
+     * после отпускания кнопки мыши курсор остаётся над карточкой,
+     * а наклон пропадал и карточка дёргалась обратно. Убираем
+     * наклон только когда курсор действительно ушёл.
+     */
     const onLeave = () => {
-      if (!wobble) return
-      node.style.setProperty("--_wx", "1")
-      node.style.setProperty("--_wy", "1")
-      node.style.setProperty("--_wobble-lift", "0px")
+      node.classList.remove("is-tracking")
+      if (!useTilt) return
+      node.style.setProperty("--tilt-x", "0deg")
+      node.style.setProperty("--tilt-y", "0deg")
     }
 
     node.addEventListener("pointermove", onMove, { passive: true })
@@ -95,7 +93,7 @@ export const useJuiceScope = (root?: Ref<HTMLElement | null>, rescanOn?: () => s
     cleanups.length = 0
     const scope = root?.value ?? document.body
     if (!scope) return
-    for (const node of scope.querySelectorAll<HTMLElement>("[data-juice], [data-wobble]")) {
+    for (const node of scope.querySelectorAll<HTMLElement>("[data-juicy], [data-tilt]")) {
       bind(node)
     }
   }

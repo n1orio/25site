@@ -17,8 +17,8 @@ defineProps<{
         :href="profileUrl"
         target="_blank"
         rel="noopener"
-        class="profile-avatar-wrap relative flex-shrink-0 group block juicy"
-        data-wobble="14"
+        class="profile-avatar-wrap relative flex-shrink-0 group block juicy-tilt"
+        data-tilt="9"
         :aria-label="`Профиль ${username}`"
       >
         <img
