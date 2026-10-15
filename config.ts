@@ -168,6 +168,15 @@ export const projects: Project[] = [
     ],
   },
   {
+    icon: "lucide:send",
+    title: "Taurigram",
+    desc: "Настраиваемый десктопный клиент Telegram на Tauri — форк Ethernet. Редактор тем, живые обои, Ghost Mode, плагины и встроенный прокси-движок.",
+    tags: ["Tauri 2", "Rust", "TypeScript", "Telegram"],
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/taurigram" },
+    ],
+  },
+  {
     icon: "lucide:server",
     title: "Mono Launcher Backend",
     desc: "Серверная часть лаунчера: каталог сборок, рейтинги, лицензии, аккаунты, телеметрия.",
