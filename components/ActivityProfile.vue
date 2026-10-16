@@ -11,19 +11,19 @@ const WEEKDAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
     <p class="ds-meta mb-4">Профиль разработчика</p>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-      <div class="ds-pill flex-col items-start gap-1 py-3">
+      <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
         <span class="ds-stat">{{ data.activityRate }}%</span>
         <span class="ds-meta">дней с активностью</span>
       </div>
-      <div class="ds-pill flex-col items-start gap-1 py-3">
+      <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
         <span class="ds-stat">{{ WEEKDAYS[data.topWeekday] }}</span>
         <span class="ds-meta">самый активный день</span>
       </div>
-      <div class="ds-pill flex-col items-start gap-1 py-3">
+      <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
         <span class="ds-stat">{{ data.topWeekCount }}</span>
         <span class="ds-meta">дней в лучшей неделе</span>
       </div>
-      <div class="ds-pill flex-col items-start gap-1 py-3">
+      <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
         <span class="ds-stat">{{ data.longestStreak }}</span>
         <span class="ds-meta">дней подряд</span>
       </div>

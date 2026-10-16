@@ -18,7 +18,10 @@ const props = defineProps<{
  */
 const isOffline = computed(() => isSteamOffline(props.steam))
 
-const statusLabel = computed(() => (isOffline.value ? "оффлайн" : "в игре"))
+// «в игре» — только когда реально что-то запущено, иначе просто «в сети»
+const statusLabel = computed(() =>
+  props.steam?.isPlaying ? "в игре" : isOffline.value ? "оффлайн" : "в сети",
+)
 const statusDot = computed(() =>
   props.steam?.isPlaying ? "bg-green-500" : isOffline.value ? "bg-zinc-500" : "bg-blue-500",
 )

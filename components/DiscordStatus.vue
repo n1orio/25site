@@ -6,7 +6,7 @@ const { data: server } = await useFetch<DiscordServerData | null>("/api/discord-
   default: () => null,
 })
 
-defineProps<{
+const props = defineProps<{
   discordStatusColor: string
   discordStatus: string
   visibleActivities: LanyardActivity[]
@@ -16,6 +16,19 @@ defineProps<{
   getActivityIcon: (type: number) => string
   getDiscordAssetUrl: (appId: string | undefined, image: string | null | undefined) => string | undefined
 }>()
+
+/**
+ * Подпись по реальному статусу. Раньше всё, кроме offline, было
+ * «в сети» — рядом с красной точкой «не беспокоить», а в карточке
+ * без активности при этом стояло «Оффлайн».
+ */
+const STATUS_TEXT: Record<string, string> = {
+  online: "в сети",
+  idle: "отошёл",
+  dnd: "не беспокоить",
+  offline: "оффлайн",
+}
+const statusText = computed(() => STATUS_TEXT[props.discordStatus] ?? "оффлайн")
 </script>
 
 <template>
@@ -27,7 +40,7 @@ defineProps<{
       </div>
       <span class="ds-pill !py-0.5 !px-2">
         <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: discordStatusColor }" />
-        {{ discordStatus === "offline" ? "оффлайн" : "в сети" }}
+        {{ statusText }}
       </span>
     </div>
 
@@ -88,7 +101,7 @@ v-else class="flex items-center gap-3 p-3"
       <div class="min-w-0">
         <p class="ds-meta mb-0.5">Статус</p>
         <p class="ds-title text-sm truncate">Нет активности</p>
-        <p class="ds-body text-xs">Оффлайн</p>
+        <p class="ds-body text-xs first-letter:uppercase">{{ statusText }}</p>
       </div>
     </div>
   </div>

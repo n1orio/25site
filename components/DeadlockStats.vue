@@ -91,7 +91,7 @@ v-for="s in [
           { label: 'Матчей за окно', value: String(data.activity.totalMatches) },
           { label: 'Матчей в день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
           { label: 'Максимум в день', value: String(data.activity.busiest?.matches ?? 0) },
-        ]" :key="s.label" class="ds-pill flex-col items-start gap-1 !items-start py-3">
+        ]" :key="s.label" class="ds-pill ds-tile flex-col items-start gap-1 !items-start py-3">
           <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
           <span class="ds-stat">{{ s.value }}</span>
         </div>
@@ -148,21 +148,14 @@ v-for="s in [
           { label: 'Матчей', value: data.totals?.matches ?? '—', hint: null },
           { label: 'Винрейт', value: winrateLabel ?? '—', hint: null },
           { label: 'Счёт', value: recordLabel ?? '—', hint: null },
-        ]" :key="s.label" class="ds-pill flex-col items-start gap-1 !items-start py-3">
+          // место и подозрения раньше шли отдельной сеткой, и «Счёт»
+          // оставался один на строке — теперь все плитки в одной сетке
+          ...(placeLabel ? [{ label: 'Ср. место', value: placeLabel, hint: null }] : []),
+          ...(data.stats ? [{ label: 'Подозрения', value: data.stats.cheaterPercent.toFixed(2) + '%', hint: null }] : []),
+        ]" :key="s.label" class="ds-pill ds-tile flex-col items-start gap-1 !items-start py-3">
           <span class="ds-meta">{{ s.label }}</span>
           <span class="ds-stat">{{ s.value }}</span>
           <span v-if="s.hint" class="ds-meta opacity-60">{{ s.hint }}</span>
-        </div>
-      </div>
-
-      <div v-if="placeLabel || data.stats?.cheaterPercent !== undefined" class="grid grid-cols-2 gap-3 mt-3">
-        <div v-if="placeLabel" class="ds-pill flex-col items-start gap-1 !items-start py-3">
-          <span class="ds-meta">Ср. место</span>
-          <span class="ds-stat">{{ placeLabel }}</span>
-        </div>
-        <div v-if="data.stats" class="ds-pill flex-col items-start gap-1 !items-start py-3">
-          <span class="ds-meta">Подозрения</span>
-          <span class="ds-stat">{{ data.stats.cheaterPercent.toFixed(2) }}%</span>
         </div>
       </div>
 
@@ -203,11 +196,11 @@ v-for="row in [
       </div>
 
       <div v-if="data.ranked && (data.ranked.deltaBest !== 0 || data.ranked.deltaWorst !== 0)" class="grid grid-cols-2 gap-3 mt-5">
-        <div class="ds-pill flex-col items-start gap-1 py-3">
+        <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
           <span class="ds-meta">Лучший плюс</span>
           <span class="ds-stat">{{ data.ranked.deltaBest > 0 ? '+' : '' }}{{ data.ranked.deltaBest }}</span>
         </div>
-        <div class="ds-pill flex-col items-start gap-1 py-3">
+        <div class="ds-pill ds-tile flex-col items-start gap-1 py-3">
           <span class="ds-meta">Худший минус</span>
           <span class="ds-stat">{{ data.ranked.deltaWorst }}</span>
         </div>
@@ -224,7 +217,7 @@ v-for="s in [
           { label: 'Макс. нетворс', value: netWorth(data.economy.bestNetWorth) },
           { label: 'Ср. матч', value: matchDuration(data.economy.avgDuration) },
           { label: 'Серия', value: data.streak.current + ' / ' + data.streak.best },
-        ]" :key="s.label" class="ds-pill flex-col items-start justify-center gap-0.5 py-2.5 h-full">
+        ]" :key="s.label" class="ds-pill ds-tile flex-col items-start justify-center gap-0.5 py-2.5 h-full">
           <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
           <span class="ds-stat text-base">{{ s.value }}</span>
         </div>

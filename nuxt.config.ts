@@ -69,6 +69,16 @@ export default defineNuxtConfig({
         { rel: "preload", href: "/fonts/inter-cyr.woff2", as: "font", type: "font/woff2", crossorigin: "" },
         { rel: "preload", href: "/fonts/inter-latin.woff2", as: "font", type: "font/woff2", crossorigin: "" },
       ],
+      script: [
+        {
+          // Сервер не видит тему посетителя и рендерит светлую: в тёмной
+          // теме страница мигала светлым до гидрации. Этот скрипт до первой
+          // отрисовки ставит .dark и подкладывает акцентные переменные,
+          // сохранённые app.vue в прошлый визит (снимается после гидрации).
+          tagPosition: "head",
+          innerHTML: `(function(){try{var d=document.documentElement,m=localStorage.getItem("vueuse-color-scheme"),k=m==="dark"||(m!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);if(k)d.classList.add("dark");var v=localStorage.getItem("nio-theme-vars-"+(k?"dark":"light"));if(v&&/^[-\\w#:;!. ]+$/.test(v)){var s=document.createElement("style");s.id="nio-theme-boot";s.textContent=".theme-wrapper{"+v+"}";document.head.appendChild(s)}}catch(e){}})()`,
+        },
+      ],
     },
   },
   // Хранилище счётчика посетителей. Путь фиксирован и совпадает с точкой

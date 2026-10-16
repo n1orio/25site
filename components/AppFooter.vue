@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VisitorsData } from "~/server/api/visitors"
+import { navTabs } from "~/config"
 
 const { data: visitors } = await useFetch<VisitorsData>("/api/visitors", {
   // счётчик не должен кэшироваться на клиенте надолго
@@ -18,6 +19,14 @@ const { data: visitors } = await useFetch<VisitorsData>("/api/visitors", {
       <p class="on-bg-meta flex items-center gap-1.5">
         <Icon name="lucide:eye" size="12" class="w-3 h-3" />
         <span class="tabular-nums">{{ visitors.month }}</span> за 30 дней
+      </p>
+
+      <!-- только там, где есть клавиатура: на телефоне вкладки листаются свайпом -->
+      <p class="on-bg-meta items-center gap-1.5 hidden pointer-fine:flex">
+        <kbd class="footer-kbd">←</kbd><kbd class="footer-kbd">→</kbd>
+        <span>или</span>
+        <kbd class="footer-kbd">1</kbd>–<kbd class="footer-kbd">{{ navTabs.length }}</kbd>
+        <span>вкладки</span>
       </p>
 
       <p class="on-bg-meta">
@@ -39,4 +48,17 @@ const { data: visitors } = await useFetch<VisitorsData>("/api/visitors", {
   transition: opacity 0.3s ease;
 }
 .footer-link:hover { opacity: 0.7; }
+.footer-kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-bottom-width: 2px;
+}
 </style>

@@ -59,7 +59,6 @@ onClickOutside(paletteRef, () => { showPalette.value = false })
             :key="tab.to"
             :to="tab.to"
             class="nav-link cursor-pointer flex-shrink-0 z-10"
-            :style="{ paddingRight: tab === navTabs[navTabs.length - 1] ? '0' : undefined }"
           >
             {{ tab.label }}
           </NuxtLink>

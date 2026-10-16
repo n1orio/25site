@@ -4,7 +4,7 @@ import type { LanyardData, SteamData } from "~/types/steam"
 
 const {
   primaryColor, secondaryColor, bgPrimary, bgSecondary,
-  accentSurface, accentContrast, accentOnBg, isDeadlock,
+  accentSurface, accentContrast, accentOnBg, isDeadlock, isDark,
 } = useSecretTheme()
 
 // шрифты темы «Дедлок» — только когда она включена
@@ -82,6 +82,17 @@ const applyThemeToDom = () => {
   style.setProperty("color", "var(--text-primary)")
   if (isDeadlock.value) el.setAttribute("data-deadlock", "")
   else el.removeAttribute("data-deadlock")
+
+  // Снимок для скрипта в <head> (nuxt.config): со следующего визита
+  // первая отрисовка сразу будет в нужных цветах, без мигания.
+  // У Дедлока свой слой оформления, его по переменным не воссоздать.
+  try {
+    const key = `nio-theme-vars-${isDark.value ? "dark" : "light"}`
+    if (isDeadlock.value) localStorage.removeItem(key)
+    else localStorage.setItem(key, vars.map(([n, v]) => `${n}:${v} !important;`).join(""))
+  } catch { /* хранилище недоступно — просто без снимка */ }
+  // инлайн уже стоит, временная подложка больше не нужна
+  document.getElementById("nio-theme-boot")?.remove()
 }
 
 onMounted(() => {
@@ -91,7 +102,7 @@ onMounted(() => {
 })
 
 watch(
-  [bgPrimary, bgSecondary, primaryColor, secondaryColor, accentSurface, accentContrast, accentOnBg, isDeadlock],
+  [bgPrimary, bgSecondary, primaryColor, secondaryColor, accentSurface, accentContrast, accentOnBg, isDeadlock, isDark],
   applyThemeToDom,
 )
 
@@ -121,7 +132,12 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
     <div class="max-w-[1300px] mx-auto px-4 sm:px-6 md:px-10 py-6 md:py-10 relative z-10 flex flex-col">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-14 items-start">
 
-        <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-8 w-full lg:sticky lg:top-10 z-20">
+        <!--
+          На телефоне сайдбар раскладывается в общую сетку (contents):
+          профиль сверху, затем вкладки, а статусы — под контентом.
+          Раньше до навигации приходилось листать через весь сайдбар.
+        -->
+        <aside class="contents lg:col-span-4 lg:flex flex-col gap-8 w-full lg:sticky lg:top-10 z-20">
           <ProfileCard
             :discord-avatar-url="discordAvatarUrl"
             :discord-status-color="discordStatusColor"
@@ -131,11 +147,11 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
             :bio-paragraph2="bioParagraph2"
           />
 
-          <LocalStatus />
+          <LocalStatus class="order-3 lg:order-none" />
 
-          <WaveDivider class="flex-1" />
+          <WaveDivider />
 
-          <section class="ds-section">
+          <section class="ds-section order-4 lg:order-none">
             <header class="flex items-center gap-3 mb-4">
               <h2 class="on-bg-meta">Сейчас</h2>
             </header>
@@ -164,7 +180,7 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
 
         </aside>
 
-        <main class="lg:col-span-8 xl:col-span-9 flex flex-col min-w-0 z-10 w-full">
+        <main class="order-2 lg:order-none lg:col-span-8 flex flex-col min-w-0 z-10 w-full">
           <AppNavigation />
 
           <div class="relative w-full" @touchstart="onTouchStart" @touchend="onTouchEnd">
@@ -357,6 +373,13 @@ ref="wrapperRef" class="theme-wrapper min-h-screen font-sans relative overflow-h
   letter-spacing: 0.05em;
   color: var(--accent-contrast);
   transition: all 0.3s ease;
+}
+/* плитка статистики: та же заливка, что у таблетки, но с углами карточки —
+   двухстрочные подписи в полностью скруглённой форме выглядели сплющенно */
+.ds-tile {
+  border-radius: calc(var(--radius-card) - 0.25rem);
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
 }
 .ds-pill-accent {
   background: var(--accent-contrast);

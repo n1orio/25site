@@ -12,7 +12,9 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
   const rankLabel = computed(() => {
     const r = info.value?.rank
     if (!r) return null
-    return r.division ? `${r.name} ${r.division}` : r.name
+    // rank_name уже содержит подранг («Sentinel V»), а division — это
+    // индекс самого ранга: дописывать его выходило «Sentinel V 4»
+    return r.name
   })
 
   const rankProgress = computed(() => {

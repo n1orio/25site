@@ -104,7 +104,13 @@ const onKey = (e: KeyboardEvent) => {
   }
 }
 
-onMounted(() => document.addEventListener("keydown", onKey))
+const scrollRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  document.addEventListener("keydown", onKey)
+  // на телефоне график шире экрана — показываем свежие недели, а не год назад
+  if (scrollRef.value) scrollRef.value.scrollLeft = scrollRef.value.scrollWidth
+})
 onUnmounted(() => document.removeEventListener("keydown", onKey))
 
 const formatRange = (from: string, to: string) => {
@@ -138,54 +144,52 @@ const formatRange = (from: string, to: string) => {
       </span>
     </div>
 
-    <div class="flex gap-1.5">
-      <!-- дни недели -->
-      <div class="flex flex-col gap-[3px] shrink-0">
-        <span
-          v-for="(d, i) in WEEKDAYS"
-          :key="d"
-          class="h-[10px] text-[0.5rem] leading-[10px] text-right pr-0.5"
-          style="color: var(--text-secondary)"
-        >{{ i % 2 === 1 ? d : '' }}</span>
-      </div>
-
-      <div class="overflow-x-auto hide-scrollbar min-w-0 flex-1">
+    <!--
+      Одна сетка на весь график: колонка подписей + по колонке на неделю.
+      Клетки тянутся на всю ширину карточки (раньше были фиксированные
+      10px и справа оставалась пустота), а на узком экране упираются в
+      минимум и график прокручивается — сразу к свежим неделям.
+    -->
+    <div ref="scrollRef" class="overflow-x-auto hide-scrollbar">
+      <div
+        class="contrib-grid"
+        :style="{ gridTemplateColumns: `auto repeat(${weeks.length}, minmax(10px, 1fr))` }"
+      >
         <!-- месяцы -->
-        <div class="flex gap-[3px] mb-1 h-3">
-          <span
-            v-for="(label, i) in monthLabels"
-            :key="i"
-            class="text-[0.5rem] leading-3 whitespace-nowrap shrink-0 w-[10px]"
-            style="color: var(--text-secondary)"
-          >{{ label }}</span>
-        </div>
+        <span class="contrib-dow" />
+        <span
+          v-for="(label, i) in monthLabels"
+          :key="`m-${i}`"
+          class="text-[0.5rem] leading-3 whitespace-nowrap overflow-visible"
+          style="color: var(--text-secondary)"
+        >{{ label }}</span>
 
-        <!-- дни -->
-        <div class="flex gap-[3px]">
-          <div v-for="(col, ci) in weeks" :key="ci" class="flex flex-col gap-[3px] shrink-0">
+        <!-- дни недели: подпись + клетки ряда -->
+        <template v-for="(d, row) in WEEKDAYS" :key="d">
+          <span
+            class="contrib-dow text-[0.5rem] leading-none pr-1"
+            style="color: var(--text-secondary)"
+          >{{ row % 2 === 1 ? d : '' }}</span>
+          <template v-for="(col, ci) in weeks" :key="`${ci}-${row}`">
             <button
-              v-for="(day, di) in col"
-              :key="day?.date ?? `empty-${ci}-${di}`"
+              v-if="col[row]"
               type="button"
-              class="w-[10px] h-[10px] rounded-[2px] p-0 border-0"
-              :class="day ? 'cursor-pointer' : 'pointer-events-none'"
-              :style="day
-                ? {
-                    background: tile(day.level),
-                    outline: active?.date === day.date ? '1px solid var(--accent-contrast)' : 'none',
-                    outlineOffset: '1px',
-                  }
-                : { background: 'transparent' }"
-              :disabled="!day"
-              :aria-label="day ? `${formatDate(day.date)}: ${LEVEL_TEXT[day.level]}` : undefined"
-              @mouseenter="showPop(day, $event.currentTarget as HTMLElement)"
-              @focus="showPop(day, $event.currentTarget as HTMLElement)"
+              class="contrib-cell cursor-pointer"
+              :style="{
+                background: tile(col[row]!.level),
+                outline: active?.date === col[row]!.date ? '1px solid var(--accent-contrast)' : 'none',
+                outlineOffset: '1px',
+              }"
+              :aria-label="`${formatDate(col[row]!.date)}: ${LEVEL_TEXT[col[row]!.level]}`"
+              @mouseenter="showPop(col[row]!, $event.currentTarget as HTMLElement)"
+              @focus="showPop(col[row]!, $event.currentTarget as HTMLElement)"
               @mouseleave="hidePop"
               @blur="hidePop"
-              @click="day && (showPop(day, $event.currentTarget as HTMLElement), togglePin(day))"
+              @click="showPop(col[row]!, $event.currentTarget as HTMLElement), togglePin(col[row]!)"
             />
-          </div>
-        </div>
+            <span v-else class="contrib-cell" aria-hidden="true" />
+          </template>
+        </template>
       </div>
     </div>
 
@@ -217,3 +221,33 @@ const formatRange = (from: string, to: string) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.contrib-grid {
+  display: grid;
+  gap: 3px;
+  min-width: min-content;
+}
+/* подписи дней недели не уезжают при прокрутке графика на телефоне */
+.contrib-dow {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--accent-surface);
+}
+.contrib-cell {
+  display: block;
+  aspect-ratio: 1;
+  min-width: 10px;
+  max-height: 16px;
+  max-width: 16px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+}
+</style>

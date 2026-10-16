@@ -31,7 +31,7 @@ onUnmounted(() => {
         <div
           v-for="item in workstationItems"
           :key="item.name"
-          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b border-white/20"
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b border-white/20 last:border-0"
         >
           <span class="ds-meta w-28 sm:w-32 flex-shrink-0">{{ item.name }}</span>
 

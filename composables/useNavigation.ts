@@ -140,6 +140,28 @@ export const useNavigation = () => {
     }
   }
 
+  /**
+   * Клавиатура — то же, что свайп на телефоне: ← → листают вкладки,
+   * цифры 1…N открывают вкладку по номеру. Не мешаем вводу текста
+   * и браузерным сочетаниям с модификаторами.
+   */
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
+    const t = e.target as HTMLElement | null
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+
+    const currentIdx = routesList.indexOf(cleanPath(route.path))
+    let target: string | undefined
+    if (e.key === "ArrowRight" && currentIdx !== -1) target = routesList[currentIdx + 1]
+    else if (e.key === "ArrowLeft" && currentIdx > 0) target = routesList[currentIdx - 1]
+    else if (/^[1-9]$/.test(e.key)) target = routesList[Number(e.key) - 1]
+
+    if (target && target !== cleanPath(route.path)) {
+      e.preventDefault()
+      router.push(target)
+    }
+  }
+
   let resizeObserver: ResizeObserver | undefined
 
   /**
@@ -165,6 +187,7 @@ export const useNavigation = () => {
       updateNavIndicator()
     }, 350)
     window.addEventListener("resize", onWindowResize)
+    window.addEventListener("keydown", onKeyDown)
     // Ширина вкладок меняется после загрузки шрифтов и смены темы —
     // без этого подсказки о прокрутке оставались бы неверными.
     // ResizeObserver тут не годится: у прокручиваемого трека его
@@ -188,6 +211,7 @@ export const useNavigation = () => {
 
   const destroyNav = () => {
     window.removeEventListener("resize", onWindowResize)
+    window.removeEventListener("keydown", onKeyDown)
     resizeObserver?.disconnect()
     resizeObserver = undefined
     initialized = false
