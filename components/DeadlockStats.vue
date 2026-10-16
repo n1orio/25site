@@ -9,23 +9,8 @@ const data = toRef(props, "data")
 const {
   rankLabel, rankProgress, winrateLabel, recordLabel,
   heroIconUrl, itemImageUrl, matchDuration, netWorth, deltaLabel, daysAgo,
-  hoursLabel, hoursWindowLabel, activityWeeks, activityLevel, itemTypeLabel, placeLabel,
+  hoursLabel, hoursWindowLabel, activityWeeks, itemTypeLabel, placeLabel,
 } = useDeadlock(data)
-
-/** активность одним окном: сколько недель покрыто */
-const activitySpan = computed(() => {
-  const a = data.value?.activity
-  if (!a) return null
-  return { from: a.windowStart.slice(5), to: a.windowEnd.slice(5) }
-})
-
-const WEEKDAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
-
-/** «44 дня»/«44 дня» — сколько дней реально в окне активности */
-const activityDaysLabel = computed(() => {
-  const n = data.value?.activity?.days.length ?? 0
-  return `${n} ${n === 1 ? "день" : n < 5 ? "дня" : "дней"}`
-})
 
 const confidenceLabel = computed(() => {
   const c = data.value?.stats?.confidence
@@ -75,65 +60,12 @@ v-if="data.rank?.emblem" :src="data.rank.emblem" :alt="`${data.rank.name} ${data
     </section>
 
     <!-- активность: только окно ddlk.bio, не всё время в игре -->
-    <section v-if="data.activity" class="ds-card p-5 sm:p-6">
-      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-1">
-        <p class="ds-meta">Активность</p>
-        <span class="ds-meta tabular-nums">{{ activitySpan?.from }} → {{ activitySpan?.to }}</span>
-      </div>
-      <p class="ds-meta mb-4 opacity-70">
-        хитмап только за {{ activityDaysLabel }} — всё время в игре выше, в «Ключевых показателях»
-      </p>
-
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        <div
-v-for="s in [
-          { label: 'Часов за окно', value: hoursWindowLabel },
-          { label: 'Матчей за окно', value: String(data.activity.totalMatches) },
-          { label: 'Матчей в день', value: (data.activity.totalMatches / Math.max(1, data.activity.days.length)).toFixed(1) },
-          { label: 'Максимум в день', value: String(data.activity.busiest?.matches ?? 0) },
-        ]" :key="s.label" class="ds-pill ds-tile flex-col items-start gap-1 !items-start py-3">
-          <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
-          <span class="ds-stat">{{ s.value }}</span>
-        </div>
-      </div>
-
-      <!-- сетка как у контрибуций: столбцы — недели, ряды — дни недели -->
-      <div class="flex gap-[3px] overflow-hidden">
-        <div class="flex flex-col gap-[3px] flex-shrink-0 mr-1">
-          <span
-v-for="(d, i) in WEEKDAYS" :key="i" class="flex items-center"
-            style="height: 11px; font-size: 8px; line-height: 1; opacity: .55;">{{ d }}</span>
-        </div>
-        <div v-for="(week, wi) in activityWeeks" :key="wi" class="flex flex-col gap-[3px]">
-          <div
-v-for="(day, di) in week" :key="di" class="w-[11px] h-[11px] flex-shrink-0"
-            :style="{
-              borderRadius: 'var(--radius-pill)',
-              background: day === null
-                ? 'transparent'
-                : activityLevel(day.matches) === 0
-                  ? 'color-mix(in srgb, var(--accent-contrast) 10%, transparent)'
-                  : `color-mix(in srgb, var(--accent-contrast) ${25 + activityLevel(day.matches) * 18}%, transparent)`,
-            }"
-            :title="day ? `${day.date} · ${day.matches} м · ${day.wins}W` : ''" />
-        </div>
-      </div>
-      <div class="flex items-center justify-between gap-3 mt-2.5 flex-wrap">
-        <p class="ds-meta">максимум в дне: {{ data.activity.busiest?.matches ?? 0 }} ({{ data.activity.busiest?.date ?? "—" }})</p>
-        <div class="flex items-center gap-1.5">
-          <span class="ds-meta opacity-70">меньше</span>
-          <span
-v-for="l in [0, 1, 2, 3, 4]" :key="l" class="w-[10px] h-[10px]"
-            :style="{
-              borderRadius: 'var(--radius-pill)',
-              background: l === 0
-                ? 'color-mix(in srgb, var(--accent-contrast) 10%, transparent)'
-                : `color-mix(in srgb, var(--accent-contrast) ${25 + l * 18}%, transparent)`,
-            }" />
-          <span class="ds-meta opacity-70">больше</span>
-        </div>
-      </div>
-    </section>
+    <DeadlockActivity
+      v-if="data.activity"
+      :activity="data.activity"
+      :weeks="activityWeeks"
+      :hours-label="hoursWindowLabel"
+    />
 
     <!-- ключевые цифры -->
     <section class="ds-card p-5 sm:p-6">
@@ -166,7 +98,7 @@ v-for="s in [
       </p>
     </section>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
     <!-- ранкед vs анранкед -->
     <section v-if="data.ranked || data.unranked" class="ds-card p-5 sm:p-6 flex flex-col">
       <p class="ds-meta mb-4">Ранкед против анранкеда</p>
@@ -210,19 +142,19 @@ v-for="row in [
     <!-- экономика и серии -->
     <section class="ds-card p-5 sm:p-6 flex flex-col">
       <p class="ds-meta mb-3">Экономика и серии</p>
-      <div class="grid grid-cols-2 gap-2.5">
+      <div class="grid grid-cols-2 gap-2.5 flex-1 content-center">
         <div
 v-for="s in [
           { label: 'Ср. нетворс', value: netWorth(data.economy.avgNetWorth) },
           { label: 'Макс. нетворс', value: netWorth(data.economy.bestNetWorth) },
           { label: 'Ср. матч', value: matchDuration(data.economy.avgDuration) },
           { label: 'Серия', value: data.streak.current + ' / ' + data.streak.best },
-        ]" :key="s.label" class="ds-pill ds-tile flex-col items-start justify-center gap-0.5 py-2.5 h-full">
+        ]" :key="s.label" class="ds-pill ds-tile flex-col !items-start justify-center gap-0.5 py-2.5 h-full">
           <span class="ds-meta whitespace-nowrap">{{ s.label }}</span>
           <span class="ds-stat text-base">{{ s.value }}</span>
         </div>
       </div>
-      <p class="ds-meta mt-3">текущая / рекордная серия побед подряд</p>
+      <p class="ds-meta mt-auto pt-3">текущая / рекордная серия побед подряд</p>
     </section>
 
     </div>
@@ -231,7 +163,10 @@ v-for="s in [
     <section v-if="data.heroes.length" class="ds-card p-5 sm:p-6">
       <p class="ds-meta mb-3">Герои за {{ data.sample }} последних матчей</p>
 
-      <div v-for="hero in data.heroes" :key="hero.name" class="py-3 border-b last:border-0 border-white/20">
+      <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
+      <div
+v-for="hero in data.heroes" :key="hero.name"
+        class="py-3 border-b border-white/20 last:border-0 md:[&:nth-last-child(2):nth-child(odd)]:border-0">
         <div class="flex items-center gap-3">
           <img
 v-if="hero.icon" :src="heroIconUrl(hero.icon)" :alt="hero.name" width="26" height="26"
@@ -247,6 +182,7 @@ v-if="hero.icon" :src="heroIconUrl(hero.icon)" :alt="hero.name" width="26" heigh
             KDA {{ hero.avgKda }} · {{ hero.avgKills }} уб.
           </span>
         </div>
+      </div>
       </div>
     </section>
 

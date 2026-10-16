@@ -1,4 +1,7 @@
-import type { DeadlockData, Mode } from "~/types/deadlock"
+import type { DeadlockActivityDay, DeadlockData, Mode } from "~/types/deadlock"
+
+/** клетка хитмапа активности: день окна, в том числе без матчей */
+export type ActivityCell = DeadlockActivityDay
 
 export const MODE_LABEL: Record<Mode, string> = {
   ranked: "Ранкед",
@@ -79,28 +82,39 @@ export const useDeadlock = (data: Ref<DeadlockData | null | undefined>) => {
   })
 
   /**
-   * Календарь активности: тот же вид, что у контрибуций —
-   * столбцы по неделям, ряды по дням недели. Пустые дни окна
-   * заполняем нулями, чтобы сетка не съезжала.
+   * Календарь активности как на ddlk.bio: столбцы — недели с понедельника,
+   * ряды — дни недели, на всё окно (обычно 13 недель). Раньше окно
+   * обрезалось до 12 недель и первая неделя пропадала. Дни без матчей
+   * заполняем нулями, будущие дни недели — null, чтобы сетка не съезжала.
    */
-  const activityWeeks = computed(() => {
-    const days = info.value?.activity?.days
-    if (!days?.length) return []
-    const byDate = new Map(days.map((d) => [d.date, d]))
-    const last = new Date(`${days[days.length - 1]!.date}T00:00:00Z`)
-    // недели считаем с понедельника, как в календаре
-    const start = new Date(last)
-    start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7) - 7 * 11)
-    const weeks: ({ date: string; matches: number; wins: number } | null)[][] = []
-    for (let w = 0; w < 12; w++) {
-      const week: ({ date: string; matches: number; wins: number } | null)[] = []
+  const activityWeeks = computed<(ActivityCell | null)[][]>(() => {
+    const a = info.value?.activity
+    if (!a?.days.length) return []
+    const byDate = new Map(a.days.map((d) => [d.date, d]))
+    const first = new Date(`${a.windowStart || a.days[0]!.date}T00:00:00Z`)
+    const windowEnd = new Date(`${a.windowEnd || a.days[a.days.length - 1]!.date}T00:00:00Z`)
+    const today = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`)
+    const last = windowEnd < today ? windowEnd : today
+    const start = new Date(first)
+    start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7))
+
+    const weeks: (ActivityCell | null)[][] = []
+    for (const cursor = new Date(start); cursor <= last; ) {
+      const week: (ActivityCell | null)[] = []
       for (let d = 0; d < 7; d++) {
-        const day = new Date(start)
-        day.setUTCDate(start.getUTCDate() + w * 7 + d)
-        const iso = day.toISOString().slice(0, 10)
-        if (day > last) { week.push(null); continue }
-        const found = byDate.get(iso)
-        week.push(found ? { date: iso, matches: found.matches, wins: found.wins } : { date: iso, matches: 0, wins: 0 })
+        const iso = cursor.toISOString().slice(0, 10)
+        if (cursor < first || cursor > last) week.push(null)
+        else {
+          const found = byDate.get(iso)
+          week.push({
+            date: iso,
+            matches: found?.matches ?? 0,
+            wins: found?.wins ?? 0,
+            losses: found?.losses ?? 0,
+            duration_s: found?.duration_s ?? 0,
+          })
+        }
+        cursor.setUTCDate(cursor.getUTCDate() + 1)
       }
       weeks.push(week)
     }

@@ -36,8 +36,28 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
   let lastMoveAt = 0
   /** окно, в котором mouseover считается «настоящим» наведением */
   const MOVE_WINDOW = 120
-  /** цикл rAF остановлен, пока курсор доехал до цели */
+  /** цикл rAF остановлен, пока вкладка скрыта */
   let paused = false
+  /** время прошлого кадра — вращение считается по времени, а не по кадрам */
+  let lastFrameAt = 0
+  /** скорость вращения свободного курсора, градусов в секунду */
+  const SPIN_SPEED = 90
+
+  /**
+   * Рамка, которую обнимает курсор. У элементов с display: contents
+   * (так сделаны иконки-ссылки в карточках соцсетей) своей рамки нет:
+   * прямоугольник нулевой и лежит в (0,0) — курсор улетал в угол экрана.
+   * В таком случае берём рамку первого видимого потомка.
+   */
+  const hoverRect = (el: HTMLElement): DOMRect | null => {
+    const rect = el.getBoundingClientRect()
+    if (rect.width > 0 && rect.height > 0) return rect
+    for (const child of Array.from(el.children)) {
+      const r = child.getBoundingClientRect()
+      if (r.width > 0 && r.height > 0) return r
+    }
+    return null
+  }
 
   // --- цвет курсора: плавно интерполируем между акцентом и контрастом ---
   const color = { r: 255, g: 255, b: 255 }
@@ -66,24 +86,19 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
       return
     }
 
+    const now = performance.now()
+    // после паузы (скрытая вкладка, мышь вне окна) не прыгаем на большой угол
+    const dt = lastFrameAt ? Math.min(now - lastFrameAt, 50) / 1000 : 0
+    lastFrameAt = now
+
     updateColor()
-    moveStep(el)
+    moveStep(el, dt)
     writeStyles(el)
 
-    // доехали до цели — останавливаем цикл, разбудим на движении мыши
-    const settled =
-      !hoverTarget &&
-      Math.abs(mouseX - cursorX) < 0.2 &&
-      Math.abs(mouseY - cursorY) < 0.2 &&
-      Math.abs(14 - cursorWidth) < 0.2 &&
-      Math.abs(14 - cursorHeight) < 0.2 &&
-      cachedBorderRadius === applied.radius &&
-      applied.r === Math.round(color.r) &&
-      applied.g === Math.round(color.g) &&
-      applied.b === Math.round(color.b)
-
-    if (settled) {
+    // курсор вертится всегда, поэтому цикл спит только когда его не видно
+    if (!isCursorVisible.value) {
       animationFrameId = null
+      lastFrameAt = 0
       return
     }
     animationFrameId = requestAnimationFrame(tick)
@@ -97,7 +112,7 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
   }
 
   /** один шаг интерполяции позиции, размера и поворота */
-  const moveStep = (el: HTMLElement) => {
+  const moveStep = (el: HTMLElement, dt: number) => {
     if (cachedBorderRadius !== applied.radius) {
       applied.radius = cachedBorderRadius
       el.style.setProperty("--cursor-radius", cachedBorderRadius)
@@ -111,8 +126,8 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
       cachedBorderRadius = "4px"
     }
 
-    if (hoverTarget) {
-      const rect = hoverTarget.getBoundingClientRect()
+    const rect = hoverTarget ? hoverRect(hoverTarget) : null
+    if (hoverTarget && rect) {
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
 
@@ -126,17 +141,12 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
       cursorWidth += ((isVertical ? rect.height : rect.width) + 16 - cursorWidth) * 0.3
       cursorHeight += ((isVertical ? rect.width : rect.height) + 16 - cursorHeight) * 0.3
     } else {
-      const goneX = cursorX
-      const goneY = cursorY
       cursorX += (mouseX - cursorX) * 0.35
       cursorY += (mouseY - cursorY) * 0.35
       cursorWidth += (14 - cursorWidth) * 0.35
       cursorHeight += (14 - cursorHeight) * 0.35
-      // поворот начисляем за пройденный путь: на ровном месте курсор
-      // останавливается, поэтому цикл rAF может засыпать
-      if (Math.hypot(cursorX - goneX, cursorY - goneY) > 0.4) {
-        cursorRotation = (cursorRotation + 1.2) % 360
-      }
+      // свободный курсор вертится постоянно, даже когда мышь стоит
+      cursorRotation = (cursorRotation + SPIN_SPEED * dt) % 360
     }
   }
 
@@ -207,7 +217,8 @@ export const useCursor = (primaryColor: Ref<string>, contrastColor: Ref<string>)
     }
 
     const target = el.closest(INTERACTIVE) as HTMLElement | null
-    if (target) {
+    // без видимой рамки обнимать нечего — остаёмся обычным курсором
+    if (target && hoverRect(target)) {
       hoverTarget = target
       isHovering.value = true
       const radius = window.getComputedStyle(target).borderRadius
