@@ -149,6 +149,15 @@ export const socials: Social[] = [
 // === Проекты ===
 export const projects: Project[] = [
   {
+    icon: "lucide:mountain",
+    title: "Uno",
+    desc: "Distant terrain (LOD) рендерер для Minecraft NeoForge 26.3 — независимая реализация в духе Distant Horizons. Работает через Blaze3D (OpenGL и Vulkan), совместим с Sodium и шейдерами через Vitrail.",
+    tags: ["Java", "NeoForge", "OpenGL", "Vulkan"],
+    links: [
+      { label: "GitHub", icon: "mdi:github", url: "https://github.com/n1orio/uno" },
+    ],
+  },
+  {
     icon: "lucide:bot",
     title: "25bot",
     desc: "Открытый Discord бот — бесплатная альтернатива MEE6. Тикеты, экономика, временные голосовые каналы, модерация, игры, TikTok постинг.",
